@@ -117,3 +117,29 @@ Sized in agent time. Waits are named separately.
 - The demo setting reads private strings from a file on one laptop; the product needs a demo that works for anyone.
 - `hq` on npm is taken; `homequarters` is free. The command stays `hq`.
 - 3.7 GB of QuestKeep history must stay readable after the move; the manifest pointing at the old folder is the plan.
+
+## Reviewed, 14 October
+
+Nell and a fresh schema reviewer read the brief; their reports are in `docs/reviews/`. What they found changed the plan below. The eight decisions stand.
+
+Changes to the manifest, built the same day:
+
+- `schemaVersion` is the defaults epoch. A key's shape never changes inside an epoch; a new shape is a new key. A bump happens only when a default changes, and HQ applies the defaults of the manifest's own epoch.
+- Every list element is a string or an object, and a string is shorthand (`stores`, `backlog.stages`, `tests.headers`, `plugins`). `info` is `true` or an object. A second attribute never changes a shape.
+- Deploy entries are `{ env, provider, url, with }`, keyed by `env` the way project-info keys its deploys. HQ never reads inside `with`.
+- Plugins are `{ path, with }` and a module exports `hqApi`, the ui API version it was written for. A newer one is refused with the reason; an older one loads with a warning.
+- `name` matches `^[a-z0-9][a-z0-9-]*$`. The default cache is `$XDG_CACHE_HOME/hq/<name>`, else `~/.cache/hq/<name>`, and setup always writes `cache` explicitly. `$schema` is allowed for editors.
+- Paths: repo-relative unless they start with `/` or `~/`; `/` on every platform; no environment interpolation.
+
+Changes to the plan, not yet built:
+
+- **The slot is a guard, not a record** (Nell). `hq slot take` must stop the run when `hq` is missing, since two gates at once is what it prevents. The proposed make lines now have `hq-record` (quiet) and `hq-guard` (loud) and QuestKeep keeps `scripts/lock.mjs` until the guard line is proven.
+- **Stages are the pipeline's steps plus a fixed set HQ ships** (both reviewers): self, reviewer, you, you-after, users. 84 of 106 trailers on QuestKeep's main name one of those five. The pipeline file gains `schema: 1`, a `stages` list and a `stage` per step. Every convention file gets `schema: 1`.
+- **Every appended line gets a `v` field** (both): the slot log, the problem events, the run line, CI's run.json. Readers treat a missing one as version 0. Four of the seven stores carry no version today.
+- **A `tests.sets` key** (Nell) names a file of set name to test list, so Testing and the live-run page stop parsing `GATE :=` out of a Makefile. QuestKeep writes it from the Makefile with a target and a test keeps them equal.
+- **A `delivery` key with the deploy workflow, the test workflow, the user-facing paths and the time zone** (Nell); the `questkeep` block in dora.json becomes `project`. Step 5 is a day, not half.
+- **The plugin seam is larger than one `ui` module for the hunter** (Nell): it needs the conversations index and follow, open-in-claude and the JSON guard for POSTs. Write the API list before step 6, or defer the hunter plugin to a step of its own after step 9.
+- **Step 8 is two or three days and three pull requests** (Nell): writers behind `hq` with the slot kept, then pages and tests out, then the hunter. Pre-push's FAST and SLOW lists lose 71 files, the tree hash bumps and stales every recorded laptop gate, `after.yml` runs `hq/dora.mjs` nightly so `hq` must be on the runner's PATH, and six agent files and CLAUDE.md name `hq/` paths.
+- **Writers take `HQ_` names with `QK_` read for one release** (Nell); `hq run-info --extra '<json>'` for project fields such as the Firebase SDK state.
+- **Backlog items that move with the split** (Nell): container-runs-record-their-commit changes the runs standard and lands first; hq-log-per-checkout is shipped by decision 2; hq-audit-leftovers, nightly-line-on-delivery and hq-gate-memory-page move with Delivery; delete-signups-when-early-access-ends moves with the Launch plugin.
+- **Two claims corrected**: "a quarter of QuestKeep's code" holds only against the app and tooling code (30 percent of 51k lines; 12 percent of everything tracked), and the theme copy needs a screenshot diff with the app's stylesheet linked and unlinked, not a class count.

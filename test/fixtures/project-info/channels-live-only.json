@@ -1,0 +1,12 @@
+{
+  "status": "success",
+  "result": {
+    "channels": [
+      {
+        "name": "projects/questkeep/sites/questkeep/channels/live",
+        "url": "https://questkeep.web.app",
+        "expireTime": null
+      }
+    ]
+  }
+}

@@ -1,0 +1,77 @@
+review (Noor)
+Noor (review of fm/card)
+Noor (review of fm/quests)
+review (Mara)
+Noor (review)
+Nell, review of the combined branch, 10 Oct 2026
+smoke-link
+Noor, review of fm/info, 10 Oct 2026
+Noor (review of fm/moss)
+review (Juno)
+Noor (review of Rough day)
+Noor (review of fm/dream)
+Juno, review 10 Oct 2026
+Juno (review of Rough day)
+Theo, review 10 Oct 2026
+Theo (review)
+the person you work with (review of the local build)
+Noor (review of fm/r2-moss)
+Noor (review of fm/r2-card)
+Mara (review)
+fm-players, self-review 10 Oct 2026
+Theo (first-minute research, 10 Oct 2026)
+Theo
+review (Theo)
+review (Theo, Mara)
+Noor (review of #278)
+Nell (review)
+Mara, Nell and Theo, reading the code
+Mara and Theo, reviewing fix/consent-per-account
+Mags (log diagnosis)
+Juno (review of fm/moss)
+Juno (review of fm/card)
+Juno (built-branch review)
+Drew, review of 10 Oct 2026
+Drew (review)
+consent-fixer, reading sync.js for consent-per-account
+Theo, reviewing fix/consent-per-account
+Theo, review of PR 1, 10 Oct 2026
+Theo, review of fm/postcard, 10 Oct 2026
+Theo, Nell and Mara (reset list review)
+Theo and Mara (review of a617c5d)
+Theo (review of seams-1)
+the lead (A1 shots)
+smoke-link-conflict
+smoke-link (trace)
+smoke-firstcard-layout (green run of the card-mouse fix)
+Jane
+review (testing team), 6 Oct
+review (sdk-local, retrying #253's smoke-boot)
+review (Nell)
+review (Mags, via sdk-local)
+review (Juno), 9 Oct 2026
+review (Juno), 10 Oct 2026
+review (Hollis)
+review
+PR #276 laptop gate (EROFS after the read-only mount)
+PR #276 laptop gate
+Mara, Nell and Theo (review)
+Mara and Nell (review)
+Mara (review of fm/card)
+Mara (review of #278)
+Mags (review of ci/tooling-skips-gate)
+Mags (log diagnosis of PR #276's gate)
+lead's test-unit run on the integration branch, 10 Oct 2026
+lead's smoke-postcard run, 10 Oct 2026
+Juno, review of fm/players, 10 Oct 2026
+Juno, Noor, Mags, Nell, Mara, cold review, Jane
+Juno (review of fm/dream)
+Juno (review of #278)
+fm-guest (self-review)
+fm-door (review film)
+fm-door (re-shoot)
+fm-door (A1 screenshots)
+fm-card, through the second-device check added for Noor's review
+fm-card (probe from Mags' reading)
+Drew (review of #266)
+Claude Code, while checking the phone fix

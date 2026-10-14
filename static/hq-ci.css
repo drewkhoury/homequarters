@@ -1,0 +1,35 @@
+/* CI runs in progress, step by step (hq/pages/ci.mjs): a card per run, each job's steps with a dot for how they
+   stand, and the estimate of which test the test step is on. */
+.ci-now { display: grid; gap: 12px; }
+.ci-run { background: var(--color-surface); border: 1px solid var(--color-divider); border-radius: var(--radius-md); padding: 12px 14px; display: grid; gap: 6px; }
+.ci-run[data-status="in_progress"] { border-color: color-mix(in srgb, var(--color-accent) 45%, var(--color-divider)); }
+.ci-head { display: flex; gap: 10px; align-items: baseline; justify-content: space-between; }
+.ci-title { font-weight: 600; text-decoration: none; color: var(--color-text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
+.ci-title:hover { text-decoration: underline; }
+.ci-meta { margin: 0; font-size: 12px; }
+.ci-res { flex: none; font-size: 11px; font-weight: 600; padding: 1px 8px; border-radius: 99px; background: color-mix(in srgb, var(--color-text) 8%, transparent); color: var(--color-neutral-300); }
+.ci-res[data-result="success"] { color: var(--color-success); background: color-mix(in srgb, var(--color-success) 12%, transparent); }
+.ci-res[data-result="failure"], .ci-res[data-result="timed_out"] { color: #f0a6a6; background: color-mix(in srgb, #f0a6a6 14%, transparent); }
+.ci-res[data-result="in_progress"] { color: var(--color-accent-300); background: color-mix(in srgb, var(--color-accent) 16%, transparent); }
+.ci-res[data-result="queued"], .ci-res[data-result="waiting"], .ci-res[data-result="pending"] { color: #f0c38a; background: color-mix(in srgb, #f0c38a 12%, transparent); }
+.ci-job h4 { margin: 6px 0 4px; font-size: 13px; display: flex; gap: 8px; align-items: baseline; }
+.ci-steps { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; font-size: 12.5px; }
+.ci-steps li { display: grid; grid-template-columns: 14px minmax(0, 1fr) auto; gap: 8px; align-items: center; padding: 2px 0; }
+.ci-step { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ci-time { color: var(--color-neutral-400); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.ci-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--color-success); justify-self: center; }
+.ci-steps li[data-state="queued"] { color: var(--color-neutral-500); } .ci-steps li[data-state="queued"] .ci-dot { background: none; border: 1px solid var(--color-neutral-600); }
+.ci-steps li[data-state="skipped"] { color: var(--color-neutral-500); } .ci-steps li[data-state="skipped"] .ci-dot { background: var(--color-neutral-600); }
+.ci-steps li[data-result="failure"] .ci-dot { background: #f0a6a6; } .ci-steps li[data-result="failure"] .ci-time { color: #f0a6a6; }
+.ci-steps li[data-state="running"] { color: var(--color-text); font-weight: 600; }
+.ci-steps li[data-state="running"] .ci-dot { background: var(--color-accent-400); animation: ci-pulse 1.4s ease-in-out infinite; }
+@keyframes ci-pulse { 50% { opacity: .35; } }
+@media (prefers-reduced-motion: reduce) { .ci-steps li[data-state="running"] .ci-dot { animation: none; } }
+.ci-est { margin: 2px 0 6px; font-size: 12.5px; display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+.ci-sub { margin: 4px 0 0; font-size: 12px; letter-spacing: .06em; text-transform: uppercase; color: var(--color-neutral-500); }
+.ci-recent { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; font-size: 13px; }
+.ci-recent li { display: flex; gap: 8px; align-items: baseline; flex-wrap: wrap; }
+.ci-limit { margin: 0; font-size: 12px; }
+.ci-done { margin: 0 0 10px; }
+.ci-mini { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; font-size: 13px; }
+.ci-mini li { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }

@@ -1,0 +1,26 @@
+{
+  "state": "MERGED",
+  "url": "https://github.com/example-org/questkeep/pull/89",
+  "statusCheckRollup": [
+    {
+      "name": "test (a)",
+      "status": "COMPLETED",
+      "conclusion": "SUCCESS"
+    },
+    {
+      "name": "unit",
+      "status": "COMPLETED",
+      "conclusion": "SUCCESS"
+    },
+    {
+      "name": "test (b)",
+      "status": "COMPLETED",
+      "conclusion": "SUCCESS"
+    },
+    {
+      "name": "filed",
+      "status": "COMPLETED",
+      "conclusion": "SUCCESS"
+    }
+  ]
+}

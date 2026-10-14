@@ -1,0 +1,559 @@
+{
+ "runs": [
+  {
+   "id": 37239479411,
+   "path": ".github/workflows/test.yml",
+   "event": "pull_request",
+   "head_branch": "feat/theme-accent",
+   "head_sha": "0a7a7f57184d8dd6ef8b9f495548dc5c6c4ea079",
+   "created_at": "2026-10-04T22:17:55Z",
+   "status": "completed",
+   "conclusion": "failure",
+   "run_attempt": 1,
+   "html_url": "https://github.com/example-org/questkeep/actions/runs/37239479411"
+  },
+  {
+   "id": 37255436574,
+   "path": ".github/workflows/test.yml",
+   "event": "pull_request",
+   "head_branch": "feat/theme-accent",
+   "head_sha": "ae05e84f6797b06f4065194f7ef223115c13a627",
+   "created_at": "2026-10-05T02:26:51Z",
+   "status": "completed",
+   "conclusion": "success",
+   "run_attempt": 1,
+   "html_url": "https://github.com/example-org/questkeep/actions/runs/37255436574"
+  },
+  {
+   "id": 37434109311,
+   "path": ".github/workflows/test.yml",
+   "event": "pull_request",
+   "head_branch": "feat/lock-run-id",
+   "head_sha": "9c7f7d8ff1cf3a570db309673d2d15da92c2dfc9",
+   "created_at": "2026-10-06T08:08:15Z",
+   "status": "completed",
+   "conclusion": "success",
+   "run_attempt": 1,
+   "html_url": "https://github.com/example-org/questkeep/actions/runs/37434109311"
+  }
+ ],
+ "jobs": {
+  "37239479411-1": [
+   {
+    "name": "laptop",
+    "conclusion": "failure",
+    "created_at": "2026-10-04T22:17:55Z",
+    "started_at": "2026-10-04T22:19:48Z",
+    "completed_at": "2026-10-04T22:41:07Z",
+    "labels": [
+     "self-hosted",
+     "laptop"
+    ],
+    "steps": [
+     {
+      "name": "Set up job",
+      "conclusion": "success",
+      "started_at": "2026-10-04T22:19:49Z",
+      "completed_at": "2026-10-04T22:19:51Z"
+     },
+     {
+      "name": "Set up runner",
+      "conclusion": "success",
+      "started_at": "2026-10-04T22:19:51Z",
+      "completed_at": "2026-10-04T22:19:51Z"
+     },
+     {
+      "name": "Run actions/checkout@v5",
+      "conclusion": "success",
+      "started_at": "2026-10-04T22:19:51Z",
+      "completed_at": "2026-10-04T22:19:53Z"
+     },
+     {
+      "name": "Check Docker is running on the laptop",
+      "conclusion": "success",
+      "started_at": "2026-10-04T22:19:53Z",
+      "completed_at": "2026-10-04T22:19:54Z"
+     },
+     {
+      "name": "Reuse a gate that passed on the laptop on this tree",
+      "conclusion": "success",
+      "started_at": "2026-10-04T22:19:54Z",
+      "completed_at": "2026-10-04T22:19:55Z"
+     },
+     {
+      "name": "Run the tests",
+      "conclusion": "failure",
+      "started_at": "2026-10-04T22:19:55Z",
+      "completed_at": "2026-10-04T22:40:58Z"
+     },
+     {
+      "name": "Stop this run's test containers",
+      "conclusion": "success",
+      "started_at": "2026-10-04T22:40:58Z",
+      "completed_at": "2026-10-04T22:40:58Z"
+     },
+     {
+      "name": "Keep the results",
+      "conclusion": "success",
+      "started_at": "2026-10-04T22:40:58Z",
+      "completed_at": "2026-10-04T22:40:59Z"
+     },
+     {
+      "name": "Run actions/upload-artifact@v6",
+      "conclusion": "success",
+      "started_at": "2026-10-04T22:40:59Z",
+      "completed_at": "2026-10-04T22:41:00Z"
+     },
+     {
+      "name": "Post Run actions/checkout@v5",
+      "conclusion": "success",
+      "started_at": "2026-10-04T22:41:00Z",
+      "completed_at": "2026-10-04T22:41:01Z"
+     },
+     {
+      "name": "Complete job",
+      "conclusion": "success",
+      "started_at": "2026-10-04T22:41:01Z",
+      "completed_at": "2026-10-04T22:41:05Z"
+     }
+    ]
+   },
+   {
+    "name": "test",
+    "conclusion": "skipped",
+    "created_at": "2026-10-04T22:17:56Z",
+    "started_at": "2026-10-04T22:17:56Z",
+    "completed_at": "2026-10-04T22:17:55Z",
+    "labels": [
+     "ubuntu-latest"
+    ],
+    "steps": []
+   },
+   {
+    "name": "filed",
+    "conclusion": "skipped",
+    "created_at": "2026-10-04T22:41:08Z",
+    "started_at": "2026-10-04T22:41:08Z",
+    "completed_at": "2026-10-04T22:41:07Z",
+    "labels": [
+     "self-hosted",
+     "laptop"
+    ],
+    "steps": []
+   }
+  ],
+  "37255436574-1": [
+   {
+    "name": "laptop",
+    "conclusion": "success",
+    "created_at": "2026-10-05T02:26:51Z",
+    "started_at": "2026-10-05T02:26:53Z",
+    "completed_at": "2026-10-05T02:32:30Z",
+    "labels": [
+     "self-hosted",
+     "laptop"
+    ],
+    "steps": [
+     {
+      "name": "Set up job",
+      "conclusion": "success",
+      "started_at": "2026-10-05T02:26:54Z",
+      "completed_at": "2026-10-05T02:26:56Z"
+     },
+     {
+      "name": "Set up runner",
+      "conclusion": "success",
+      "started_at": "2026-10-05T02:26:56Z",
+      "completed_at": "2026-10-05T02:26:56Z"
+     },
+     {
+      "name": "Run actions/checkout@v5",
+      "conclusion": "success",
+      "started_at": "2026-10-05T02:26:56Z",
+      "completed_at": "2026-10-05T02:26:57Z"
+     },
+     {
+      "name": "Check Docker is running on the laptop",
+      "conclusion": "success",
+      "started_at": "2026-10-05T02:26:57Z",
+      "completed_at": "2026-10-05T02:26:58Z"
+     },
+     {
+      "name": "Reuse a gate that passed on the laptop on this tree",
+      "conclusion": "success",
+      "started_at": "2026-10-05T02:26:58Z",
+      "completed_at": "2026-10-05T02:26:59Z"
+     },
+     {
+      "name": "Run the tests",
+      "conclusion": "success",
+      "started_at": "2026-10-05T02:26:59Z",
+      "completed_at": "2026-10-05T02:32:22Z"
+     },
+     {
+      "name": "Stop this run's test containers",
+      "conclusion": "success",
+      "started_at": "2026-10-05T02:32:22Z",
+      "completed_at": "2026-10-05T02:32:23Z"
+     },
+     {
+      "name": "Keep the results",
+      "conclusion": "success",
+      "started_at": "2026-10-05T02:32:23Z",
+      "completed_at": "2026-10-05T02:32:23Z"
+     },
+     {
+      "name": "Run actions/upload-artifact@v6",
+      "conclusion": "success",
+      "started_at": "2026-10-05T02:32:23Z",
+      "completed_at": "2026-10-05T02:32:25Z"
+     },
+     {
+      "name": "Post Run actions/checkout@v5",
+      "conclusion": "success",
+      "started_at": "2026-10-05T02:32:25Z",
+      "completed_at": "2026-10-05T02:32:25Z"
+     },
+     {
+      "name": "Complete job",
+      "conclusion": "success",
+      "started_at": "2026-10-05T02:32:25Z",
+      "completed_at": "2026-10-05T02:32:26Z"
+     }
+    ]
+   },
+   {
+    "name": "test",
+    "conclusion": "skipped",
+    "created_at": "2026-10-05T02:26:52Z",
+    "started_at": "2026-10-05T02:26:52Z",
+    "completed_at": "2026-10-05T02:26:51Z",
+    "labels": [
+     "ubuntu-latest"
+    ],
+    "steps": []
+   },
+   {
+    "name": "filed",
+    "conclusion": "success",
+    "created_at": "2026-10-05T02:32:30Z",
+    "started_at": "2026-10-05T02:32:41Z",
+    "completed_at": "2026-10-05T02:32:52Z",
+    "labels": [
+     "self-hosted",
+     "laptop"
+    ],
+    "steps": [
+     {
+      "name": "Set up job",
+      "conclusion": "success",
+      "started_at": "2026-10-05T02:32:42Z",
+      "completed_at": "2026-10-05T02:32:46Z"
+     },
+     {
+      "name": "Set up runner",
+      "conclusion": "success",
+      "started_at": "2026-10-05T02:32:46Z",
+      "completed_at": "2026-10-05T02:32:46Z"
+     },
+     {
+      "name": "Run actions/checkout@v5",
+      "conclusion": "success",
+      "started_at": "2026-10-05T02:32:46Z",
+      "completed_at": "2026-10-05T02:32:48Z"
+     },
+     {
+      "name": "Run actions/download-artifact@v6",
+      "conclusion": "skipped",
+      "started_at": "2026-10-05T02:32:48Z",
+      "completed_at": "2026-10-05T02:32:48Z"
+     },
+     {
+      "name": "Run actions/download-artifact@v6",
+      "conclusion": "success",
+      "started_at": "2026-10-05T02:32:48Z",
+      "completed_at": "2026-10-05T02:32:48Z"
+     },
+     {
+      "name": "Check the gate ran whole",
+      "conclusion": "success",
+      "started_at": "2026-10-05T02:32:48Z",
+      "completed_at": "2026-10-05T02:32:48Z"
+     },
+     {
+      "name": "File the passed gate under the tree's hash",
+      "conclusion": "success",
+      "started_at": "2026-10-05T02:32:48Z",
+      "completed_at": "2026-10-05T02:32:49Z"
+     },
+     {
+      "name": "Run actions/upload-artifact@v6",
+      "conclusion": "success",
+      "started_at": "2026-10-05T02:32:49Z",
+      "completed_at": "2026-10-05T02:32:50Z"
+     },
+     {
+      "name": "Post Run actions/checkout@v5",
+      "conclusion": "success",
+      "started_at": "2026-10-05T02:32:50Z",
+      "completed_at": "2026-10-05T02:32:50Z"
+     },
+     {
+      "name": "Complete job",
+      "conclusion": "success",
+      "started_at": "2026-10-05T02:32:50Z",
+      "completed_at": "2026-10-05T02:32:50Z"
+     }
+    ]
+   }
+  ],
+  "37434109311-1": [
+   {
+    "name": "laptop",
+    "conclusion": "success",
+    "created_at": "2026-10-06T08:08:16Z",
+    "started_at": "2026-10-06T08:09:23Z",
+    "completed_at": "2026-10-06T08:18:01Z",
+    "labels": [
+     "self-hosted",
+     "laptop"
+    ],
+    "steps": [
+     {
+      "name": "Set up job",
+      "conclusion": "success",
+      "started_at": "2026-10-06T08:09:24Z",
+      "completed_at": "2026-10-06T08:09:26Z"
+     },
+     {
+      "name": "Set up runner",
+      "conclusion": "success",
+      "started_at": "2026-10-06T08:09:26Z",
+      "completed_at": "2026-10-06T08:09:26Z"
+     },
+     {
+      "name": "Run actions/checkout@v5",
+      "conclusion": "success",
+      "started_at": "2026-10-06T08:09:26Z",
+      "completed_at": "2026-10-06T08:09:28Z"
+     },
+     {
+      "name": "Check Docker is running on the laptop",
+      "conclusion": "success",
+      "started_at": "2026-10-06T08:09:28Z",
+      "completed_at": "2026-10-06T08:09:28Z"
+     },
+     {
+      "name": "Reuse a gate that passed on the laptop on this tree",
+      "conclusion": "success",
+      "started_at": "2026-10-06T08:09:28Z",
+      "completed_at": "2026-10-06T08:09:29Z"
+     },
+     {
+      "name": "Run the tests",
+      "conclusion": "success",
+      "started_at": "2026-10-06T08:09:29Z",
+      "completed_at": "2026-10-06T08:17:50Z"
+     },
+     {
+      "name": "Stop this run's test containers",
+      "conclusion": "success",
+      "started_at": "2026-10-06T08:17:50Z",
+      "completed_at": "2026-10-06T08:17:50Z"
+     },
+     {
+      "name": "Keep the results",
+      "conclusion": "success",
+      "started_at": "2026-10-06T08:17:50Z",
+      "completed_at": "2026-10-06T08:17:50Z"
+     },
+     {
+      "name": "Run actions/upload-artifact@v6",
+      "conclusion": "success",
+      "started_at": "2026-10-06T08:17:50Z",
+      "completed_at": "2026-10-06T08:17:54Z"
+     },
+     {
+      "name": "Check the gate ran whole",
+      "conclusion": "success",
+      "started_at": "2026-10-06T08:17:54Z",
+      "completed_at": "2026-10-06T08:17:54Z"
+     },
+     {
+      "name": "File the passed gate under the tree's hash",
+      "conclusion": "success",
+      "started_at": "2026-10-06T08:17:54Z",
+      "completed_at": "2026-10-06T08:17:54Z"
+     },
+     {
+      "name": "Run actions/upload-artifact@v6",
+      "conclusion": "success",
+      "started_at": "2026-10-06T08:17:54Z",
+      "completed_at": "2026-10-06T08:17:57Z"
+     },
+     {
+      "name": "Post Run actions/checkout@v5",
+      "conclusion": "success",
+      "started_at": "2026-10-06T08:17:57Z",
+      "completed_at": "2026-10-06T08:17:57Z"
+     },
+     {
+      "name": "Complete job",
+      "conclusion": "success",
+      "started_at": "2026-10-06T08:17:57Z",
+      "completed_at": "2026-10-06T08:17:57Z"
+     }
+    ]
+   },
+   {
+    "name": "test",
+    "conclusion": "skipped",
+    "created_at": "2026-10-06T08:08:16Z",
+    "started_at": "2026-10-06T08:08:16Z",
+    "completed_at": "2026-10-06T08:08:16Z",
+    "labels": [
+     "ubuntu-latest"
+    ],
+    "steps": []
+   },
+   {
+    "name": "filed",
+    "conclusion": "skipped",
+    "created_at": "2026-10-06T08:08:16Z",
+    "started_at": "2026-10-06T08:08:16Z",
+    "completed_at": "2026-10-06T08:08:16Z",
+    "labels": [
+     "self-hosted",
+     "laptop"
+    ],
+    "steps": []
+   }
+  ]
+ },
+ "lock": [
+  {
+   "at": "2026-10-02T18:13:52.642Z",
+   "event": "take",
+   "pid": 65453,
+   "person": null,
+   "target": "docker-smoke-smoke-queued"
+  },
+  {
+   "at": "2026-10-02T18:14:50.981Z",
+   "event": "release",
+   "pid": 65453,
+   "person": null,
+   "target": "docker-smoke-smoke-queued"
+  },
+  {
+   "at": "2026-10-04T22:19:57.159Z",
+   "event": "wait",
+   "pid": 65453,
+   "person": "the laptop runner (test.yml)",
+   "target": "docker-test",
+   "for": "questkeep-soak-a's test container busy_cerf is still running (5 minutes ago). If it is stuck: docker stop busy_cerf"
+  },
+  {
+   "at": "2026-10-04T22:33:10.581Z",
+   "event": "take",
+   "pid": 65453,
+   "person": "the laptop runner (test.yml)",
+   "target": "docker-test",
+   "machine": {
+    "load1": 9.87
+   }
+  },
+  {
+   "at": "2026-10-04T22:40:58.367Z",
+   "event": "release",
+   "pid": 65453,
+   "person": "the laptop runner (test.yml)",
+   "target": "docker-test",
+   "machine": {
+    "load1": 11.91
+   }
+  },
+  {
+   "at": "2026-10-05T02:26:59.761Z",
+   "event": "take",
+   "pid": 43287,
+   "person": "the laptop runner (test.yml)",
+   "target": "docker-test",
+   "machine": {
+    "load1": 6.65
+   }
+  },
+  {
+   "at": "2026-10-05T02:32:22.912Z",
+   "event": "release",
+   "pid": 43287,
+   "person": "the laptop runner (test.yml)",
+   "target": "docker-test",
+   "machine": {
+    "load1": 18.05
+   }
+  },
+  {
+   "at": "2026-10-06T08:09:29.996Z",
+   "event": "wait",
+   "pid": 38917,
+   "person": "the laptop runner (test.yml)",
+   "ciRun": 37434109311,
+   "ciAttempt": 1,
+   "target": "docker-test",
+   "for": "questkeep-synced-parent (test/offline-says-why-reload-stalled) is running docker-smoke-smoke-queued (since 04:08, 1 min)."
+  },
+  {
+   "at": "2026-10-06T08:14:58.906Z",
+   "event": "release",
+   "pid": 37936,
+   "person": null,
+   "target": "docker-smoke-smoke-queued",
+   "machine": {
+    "load1": 2.07
+   }
+  },
+  {
+   "at": "2026-10-06T08:15:00.202Z",
+   "event": "take",
+   "pid": 38917,
+   "person": "the laptop runner (test.yml)",
+   "ciRun": 37434109311,
+   "ciAttempt": 1,
+   "target": "docker-test",
+   "machine": {
+    "load1": 2.07
+   }
+  },
+  {
+   "at": "2026-10-06T08:15:20.180Z",
+   "event": "wait",
+   "pid": 48063,
+   "person": null,
+   "target": "docker-smoke-smoke-queued",
+   "for": "the laptop runner (test.yml), in questkeep (HEAD) is running docker-test (since 04:15, 0 min)."
+  },
+  {
+   "at": "2026-10-06T08:17:50.067Z",
+   "event": "release",
+   "pid": 38917,
+   "person": "the laptop runner (test.yml)",
+   "ciRun": 37434109311,
+   "ciAttempt": 1,
+   "target": "docker-test",
+   "machine": {
+    "load1": 5.2
+   }
+  },
+  {
+   "at": "2026-10-06T08:17:50.761Z",
+   "event": "take",
+   "pid": 48063,
+   "person": null,
+   "target": "docker-smoke-smoke-queued",
+   "machine": {
+    "load1": 5.2
+   }
+  }
+ ]
+}

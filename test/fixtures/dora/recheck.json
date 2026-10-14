@@ -1,0 +1,647 @@
+{
+ "runs": [
+  {
+   "id": 37887271953,
+   "path": ".github/workflows/deploy.yml",
+   "event": "push",
+   "head_branch": "main",
+   "head_sha": "0ec9675656892a933436f77223b38d4c84cadf16",
+   "created_at": "2026-10-09T05:10:06Z",
+   "status": "completed",
+   "conclusion": "success",
+   "run_attempt": 2,
+   "html_url": "https://github.com/example-org/questkeep/actions/runs/37887271953"
+  }
+ ],
+ "jobs": {
+  "37887271953-1": [
+   {
+    "name": "decide",
+    "conclusion": "success",
+    "created_at": "2026-10-09T05:10:07Z",
+    "started_at": "2026-10-09T05:10:20Z",
+    "completed_at": "2026-10-09T05:10:34Z",
+    "labels": [
+     "self-hosted",
+     "laptop"
+    ],
+    "steps": [
+     {
+      "name": "Set up job",
+      "conclusion": "success",
+      "started_at": "2026-10-09T05:10:21Z",
+      "completed_at": "2026-10-09T05:10:26Z"
+     },
+     {
+      "name": "Set up runner",
+      "conclusion": "success",
+      "started_at": "2026-10-09T05:10:26Z",
+      "completed_at": "2026-10-09T05:10:26Z"
+     },
+     {
+      "name": "Run echo \"at=$(date +%s)\" >> \"$GITHUB_OUTPUT\"",
+      "conclusion": "success",
+      "started_at": "2026-10-09T05:10:26Z",
+      "completed_at": "2026-10-09T05:10:26Z"
+     },
+     {
+      "name": "Run actions/checkout@v5",
+      "conclusion": "success",
+      "started_at": "2026-10-09T05:10:26Z",
+      "completed_at": "2026-10-09T05:10:28Z"
+     },
+     {
+      "name": "Run actions/setup-node@v5",
+      "conclusion": "success",
+      "started_at": "2026-10-09T05:10:28Z",
+      "completed_at": "2026-10-09T05:10:28Z"
+     },
+     {
+      "name": "Find a gate that passed on the laptop on this tree",
+      "conclusion": "success",
+      "started_at": "2026-10-09T05:10:28Z",
+      "completed_at": "2026-10-09T05:10:29Z"
+     },
+     {
+      "name": "Run if [ \"$QK_DECIDE\" = off ] || [ -n \"$QK_FORCE\" ]; then",
+      "conclusion": "success",
+      "started_at": "2026-10-09T05:10:29Z",
+      "completed_at": "2026-10-09T05:10:31Z"
+     },
+     {
+      "name": "Tell Discord it was already live",
+      "conclusion": "skipped",
+      "started_at": "2026-10-09T05:10:31Z",
+      "completed_at": "2026-10-09T05:10:31Z"
+     },
+     {
+      "name": "Post Run actions/setup-node@v5",
+      "conclusion": "success",
+      "started_at": "2026-10-09T05:10:31Z",
+      "completed_at": "2026-10-09T05:10:31Z"
+     },
+     {
+      "name": "Post Run actions/checkout@v5",
+      "conclusion": "success",
+      "started_at": "2026-10-09T05:10:31Z",
+      "completed_at": "2026-10-09T05:10:31Z"
+     },
+     {
+      "name": "Complete job",
+      "conclusion": "success",
+      "started_at": "2026-10-09T05:10:31Z",
+      "completed_at": "2026-10-09T05:10:31Z"
+     }
+    ]
+   },
+   {
+    "name": "deploy",
+    "conclusion": "success",
+    "created_at": "2026-10-09T05:10:34Z",
+    "started_at": "2026-10-09T05:10:37Z",
+    "completed_at": "2026-10-09T05:11:10Z",
+    "labels": [
+     "self-hosted",
+     "laptop"
+    ],
+    "steps": [
+     {
+      "name": "Set up job",
+      "conclusion": "success",
+      "started_at": "2026-10-09T05:10:38Z",
+      "completed_at": "2026-10-09T05:10:43Z"
+     },
+     {
+      "name": "Set up runner",
+      "conclusion": "success",
+      "started_at": "2026-10-09T05:10:43Z",
+      "completed_at": "2026-10-09T05:10:43Z"
+     },
+     {
+      "name": "Run actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09",
+      "conclusion": "success",
+      "started_at": "2026-10-09T05:10:43Z",
+      "completed_at": "2026-10-09T05:10:46Z"
+     },
+     {
+      "name": "Hide any personal sign-in from this job",
+      "conclusion": "success",
+      "started_at": "2026-10-09T05:10:46Z",
+      "completed_at": "2026-10-09T05:10:46Z"
+     },
+     {
+      "name": "Run actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444",
+      "conclusion": "success",
+      "started_at": "2026-10-09T05:10:46Z",
+      "completed_at": "2026-10-09T05:10:46Z"
+     },
+     {
+      "name": "Run npm ci --no-audit --no-fund",
+      "conclusion": "success",
+      "started_at": "2026-10-09T05:10:46Z",
+      "completed_at": "2026-10-09T05:10:50Z"
+     },
+     {
+      "name": "Check no person is signed in to the Firebase CLI",
+      "conclusion": "success",
+      "started_at": "2026-10-09T05:10:50Z",
+      "completed_at": "2026-10-09T05:10:53Z"
+     },
+     {
+      "name": "Sign in to Google Cloud as the deploy account",
+      "conclusion": "success",
+      "started_at": "2026-10-09T05:10:53Z",
+      "completed_at": "2026-10-09T05:10:53Z"
+     },
+     {
+      "name": "Deploy to production",
+      "conclusion": "success",
+      "started_at": "2026-10-09T05:10:53Z",
+      "completed_at": "2026-10-09T05:11:06Z"
+     },
+     {
+      "name": "Tell Discord it is live",
+      "conclusion": "success",
+      "started_at": "2026-10-09T05:11:06Z",
+      "completed_at": "2026-10-09T05:11:07Z"
+     },
+     {
+      "name": "Post Sign in to Google Cloud as the deploy account",
+      "conclusion": "success",
+      "started_at": "2026-10-09T05:11:07Z",
+      "completed_at": "2026-10-09T05:11:07Z"
+     },
+     {
+      "name": "Post Run actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444",
+      "conclusion": "success",
+      "started_at": "2026-10-09T05:11:07Z",
+      "completed_at": "2026-10-09T05:11:07Z"
+     },
+     {
+      "name": "Post Run actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09",
+      "conclusion": "success",
+      "started_at": "2026-10-09T05:11:07Z",
+      "completed_at": "2026-10-09T05:11:07Z"
+     },
+     {
+      "name": "Complete job",
+      "conclusion": "success",
+      "started_at": "2026-10-09T05:11:07Z",
+      "completed_at": "2026-10-09T05:11:07Z"
+     }
+    ]
+   },
+   {
+    "name": "test",
+    "conclusion": "skipped",
+    "created_at": "2026-10-09T05:10:35Z",
+    "started_at": "2026-10-09T05:10:35Z",
+    "completed_at": "2026-10-09T05:10:34Z",
+    "labels": [],
+    "steps": []
+   },
+   {
+    "name": "smoke",
+    "conclusion": "failure",
+    "created_at": "2026-10-09T05:11:10Z",
+    "started_at": "2026-10-09T05:11:11Z",
+    "completed_at": "2026-10-09T05:11:31Z",
+    "labels": [
+     "self-hosted",
+     "laptop"
+    ],
+    "steps": [
+     {
+      "name": "Set up job",
+      "conclusion": "success",
+      "started_at": "2026-10-09T05:11:12Z",
+      "completed_at": "2026-10-09T05:11:17Z"
+     },
+     {
+      "name": "Set up runner",
+      "conclusion": "success",
+      "started_at": "2026-10-09T05:11:17Z",
+      "completed_at": "2026-10-09T05:11:17Z"
+     },
+     {
+      "name": "Run actions/checkout@v5",
+      "conclusion": "success",
+      "started_at": "2026-10-09T05:11:17Z",
+      "completed_at": "2026-10-09T05:11:21Z"
+     },
+     {
+      "name": "The production smoke test in the test image",
+      "conclusion": "failure",
+      "started_at": "2026-10-09T05:11:21Z",
+      "completed_at": "2026-10-09T05:11:29Z"
+     },
+     {
+      "name": "Run actions/setup-node@v5",
+      "conclusion": "skipped",
+      "started_at": "2026-10-09T05:11:29Z",
+      "completed_at": "2026-10-09T05:11:29Z"
+     },
+     {
+      "name": "Name the node_modules cache",
+      "conclusion": "skipped",
+      "started_at": "2026-10-09T05:11:29Z",
+      "completed_at": "2026-10-09T05:11:29Z"
+     },
+     {
+      "name": "Restore node_modules",
+      "conclusion": "skipped",
+      "started_at": "2026-10-09T05:11:29Z",
+      "completed_at": "2026-10-09T05:11:29Z"
+     },
+     {
+      "name": "Install packages",
+      "conclusion": "skipped",
+      "started_at": "2026-10-09T05:11:29Z",
+      "completed_at": "2026-10-09T05:11:29Z"
+     },
+     {
+      "name": "Save node_modules",
+      "conclusion": "skipped",
+      "started_at": "2026-10-09T05:11:29Z",
+      "completed_at": "2026-10-09T05:11:29Z"
+     },
+     {
+      "name": "Run touch -c node_modules/.package-lock.json",
+      "conclusion": "skipped",
+      "started_at": "2026-10-09T05:11:29Z",
+      "completed_at": "2026-10-09T05:11:29Z"
+     },
+     {
+      "name": "Run actions/cache/restore@v5",
+      "conclusion": "skipped",
+      "started_at": "2026-10-09T05:11:29Z",
+      "completed_at": "2026-10-09T05:11:29Z"
+     },
+     {
+      "name": "Run make prod-smoke",
+      "conclusion": "skipped",
+      "started_at": "2026-10-09T05:11:29Z",
+      "completed_at": "2026-10-09T05:11:29Z"
+     },
+     {
+      "name": "Post Run actions/checkout@v5",
+      "conclusion": "success",
+      "started_at": "2026-10-09T05:11:29Z",
+      "completed_at": "2026-10-09T05:11:29Z"
+     },
+     {
+      "name": "Complete job",
+      "conclusion": "success",
+      "started_at": "2026-10-09T05:11:29Z",
+      "completed_at": "2026-10-09T05:11:29Z"
+     }
+    ]
+   },
+   {
+    "name": "report",
+    "conclusion": "success",
+    "created_at": "2026-10-09T05:11:31Z",
+    "started_at": "2026-10-09T05:11:33Z",
+    "completed_at": "2026-10-09T05:11:39Z",
+    "labels": [
+     "self-hosted",
+     "laptop"
+    ],
+    "steps": [
+     {
+      "name": "Set up job",
+      "conclusion": "success",
+      "started_at": "2026-10-09T05:11:34Z",
+      "completed_at": "2026-10-09T05:11:35Z"
+     },
+     {
+      "name": "Set up runner",
+      "conclusion": "success",
+      "started_at": "2026-10-09T05:11:35Z",
+      "completed_at": "2026-10-09T05:11:35Z"
+     },
+     {
+      "name": "Run actions/checkout@v5",
+      "conclusion": "success",
+      "started_at": "2026-10-09T05:11:35Z",
+      "completed_at": "2026-10-09T05:11:36Z"
+     },
+     {
+      "name": "Tell Discord where the run stopped",
+      "conclusion": "success",
+      "started_at": "2026-10-09T05:11:36Z",
+      "completed_at": "2026-10-09T05:11:37Z"
+     },
+     {
+      "name": "Post Run actions/checkout@v5",
+      "conclusion": "success",
+      "started_at": "2026-10-09T05:11:37Z",
+      "completed_at": "2026-10-09T05:11:37Z"
+     },
+     {
+      "name": "Complete job",
+      "conclusion": "success",
+      "started_at": "2026-10-09T05:11:37Z",
+      "completed_at": "2026-10-09T05:11:37Z"
+     }
+    ]
+   }
+  ],
+  "37887271953-2": [
+   {
+    "name": "decide",
+    "conclusion": "success",
+    "created_at": "2026-10-09T05:12:37Z",
+    "started_at": "2026-10-09T05:10:20Z",
+    "completed_at": "2026-10-09T05:10:34Z",
+    "labels": [
+     "self-hosted",
+     "laptop"
+    ],
+    "steps": [
+     {
+      "name": "Set up job",
+      "conclusion": "success",
+      "started_at": "2026-10-09T05:10:21Z",
+      "completed_at": "2026-10-09T05:10:26Z"
+     },
+     {
+      "name": "Set up runner",
+      "conclusion": "success",
+      "started_at": "2026-10-09T05:10:26Z",
+      "completed_at": "2026-10-09T05:10:26Z"
+     },
+     {
+      "name": "Run echo \"at=$(date +%s)\" >> \"$GITHUB_OUTPUT\"",
+      "conclusion": "success",
+      "started_at": "2026-10-09T05:10:26Z",
+      "completed_at": "2026-10-09T05:10:26Z"
+     },
+     {
+      "name": "Run actions/checkout@v5",
+      "conclusion": "success",
+      "started_at": "2026-10-09T05:10:26Z",
+      "completed_at": "2026-10-09T05:10:28Z"
+     },
+     {
+      "name": "Run actions/setup-node@v5",
+      "conclusion": "success",
+      "started_at": "2026-10-09T05:10:28Z",
+      "completed_at": "2026-10-09T05:10:28Z"
+     },
+     {
+      "name": "Find a gate that passed on the laptop on this tree",
+      "conclusion": "success",
+      "started_at": "2026-10-09T05:10:28Z",
+      "completed_at": "2026-10-09T05:10:29Z"
+     },
+     {
+      "name": "Run if [ \"$QK_DECIDE\" = off ] || [ -n \"$QK_FORCE\" ]; then",
+      "conclusion": "success",
+      "started_at": "2026-10-09T05:10:29Z",
+      "completed_at": "2026-10-09T05:10:31Z"
+     },
+     {
+      "name": "Tell Discord it was already live",
+      "conclusion": "skipped",
+      "started_at": "2026-10-09T05:10:31Z",
+      "completed_at": "2026-10-09T05:10:31Z"
+     },
+     {
+      "name": "Post Run actions/setup-node@v5",
+      "conclusion": "success",
+      "started_at": "2026-10-09T05:10:31Z",
+      "completed_at": "2026-10-09T05:10:31Z"
+     },
+     {
+      "name": "Post Run actions/checkout@v5",
+      "conclusion": "success",
+      "started_at": "2026-10-09T05:10:31Z",
+      "completed_at": "2026-10-09T05:10:31Z"
+     },
+     {
+      "name": "Complete job",
+      "conclusion": "success",
+      "started_at": "2026-10-09T05:10:31Z",
+      "completed_at": "2026-10-09T05:10:31Z"
+     }
+    ]
+   },
+   {
+    "name": "smoke",
+    "conclusion": "success",
+    "created_at": "2026-10-09T05:12:37Z",
+    "started_at": "2026-10-09T05:12:39Z",
+    "completed_at": "2026-10-09T05:12:56Z",
+    "labels": [
+     "self-hosted",
+     "laptop"
+    ],
+    "steps": [
+     {
+      "name": "Set up job",
+      "conclusion": "success",
+      "started_at": "2026-10-09T05:12:39Z",
+      "completed_at": "2026-10-09T05:12:45Z"
+     },
+     {
+      "name": "Set up runner",
+      "conclusion": "success",
+      "started_at": "2026-10-09T05:12:45Z",
+      "completed_at": "2026-10-09T05:12:45Z"
+     },
+     {
+      "name": "Run actions/checkout@v5",
+      "conclusion": "success",
+      "started_at": "2026-10-09T05:12:45Z",
+      "completed_at": "2026-10-09T05:12:46Z"
+     },
+     {
+      "name": "The production smoke test in the test image",
+      "conclusion": "success",
+      "started_at": "2026-10-09T05:12:46Z",
+      "completed_at": "2026-10-09T05:12:53Z"
+     },
+     {
+      "name": "Run actions/setup-node@v5",
+      "conclusion": "skipped",
+      "started_at": "2026-10-09T05:12:53Z",
+      "completed_at": "2026-10-09T05:12:53Z"
+     },
+     {
+      "name": "Name the node_modules cache",
+      "conclusion": "skipped",
+      "started_at": "2026-10-09T05:12:53Z",
+      "completed_at": "2026-10-09T05:12:53Z"
+     },
+     {
+      "name": "Restore node_modules",
+      "conclusion": "skipped",
+      "started_at": "2026-10-09T05:12:53Z",
+      "completed_at": "2026-10-09T05:12:53Z"
+     },
+     {
+      "name": "Install packages",
+      "conclusion": "skipped",
+      "started_at": "2026-10-09T05:12:53Z",
+      "completed_at": "2026-10-09T05:12:53Z"
+     },
+     {
+      "name": "Save node_modules",
+      "conclusion": "skipped",
+      "started_at": "2026-10-09T05:12:53Z",
+      "completed_at": "2026-10-09T05:12:53Z"
+     },
+     {
+      "name": "Run touch -c node_modules/.package-lock.json",
+      "conclusion": "skipped",
+      "started_at": "2026-10-09T05:12:53Z",
+      "completed_at": "2026-10-09T05:12:53Z"
+     },
+     {
+      "name": "Run actions/cache/restore@v5",
+      "conclusion": "skipped",
+      "started_at": "2026-10-09T05:12:53Z",
+      "completed_at": "2026-10-09T05:12:53Z"
+     },
+     {
+      "name": "Run make prod-smoke",
+      "conclusion": "skipped",
+      "started_at": "2026-10-09T05:12:53Z",
+      "completed_at": "2026-10-09T05:12:53Z"
+     },
+     {
+      "name": "Post Run actions/checkout@v5",
+      "conclusion": "success",
+      "started_at": "2026-10-09T05:12:53Z",
+      "completed_at": "2026-10-09T05:12:54Z"
+     },
+     {
+      "name": "Complete job",
+      "conclusion": "success",
+      "started_at": "2026-10-09T05:12:54Z",
+      "completed_at": "2026-10-09T05:12:54Z"
+     }
+    ]
+   },
+   {
+    "name": "test",
+    "conclusion": "skipped",
+    "created_at": "2026-10-09T05:12:37Z",
+    "started_at": "2026-10-09T05:12:37Z",
+    "completed_at": "2026-10-09T05:12:37Z",
+    "labels": [],
+    "steps": []
+   },
+   {
+    "name": "deploy",
+    "conclusion": "success",
+    "created_at": "2026-10-09T05:12:37Z",
+    "started_at": "2026-10-09T05:10:37Z",
+    "completed_at": "2026-10-09T05:11:10Z",
+    "labels": [
+     "self-hosted",
+     "laptop"
+    ],
+    "steps": [
+     {
+      "name": "Set up job",
+      "conclusion": "success",
+      "started_at": "2026-10-09T05:10:38Z",
+      "completed_at": "2026-10-09T05:10:43Z"
+     },
+     {
+      "name": "Set up runner",
+      "conclusion": "success",
+      "started_at": "2026-10-09T05:10:43Z",
+      "completed_at": "2026-10-09T05:10:43Z"
+     },
+     {
+      "name": "Run actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09",
+      "conclusion": "success",
+      "started_at": "2026-10-09T05:10:43Z",
+      "completed_at": "2026-10-09T05:10:46Z"
+     },
+     {
+      "name": "Hide any personal sign-in from this job",
+      "conclusion": "success",
+      "started_at": "2026-10-09T05:10:46Z",
+      "completed_at": "2026-10-09T05:10:46Z"
+     },
+     {
+      "name": "Run actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444",
+      "conclusion": "success",
+      "started_at": "2026-10-09T05:10:46Z",
+      "completed_at": "2026-10-09T05:10:46Z"
+     },
+     {
+      "name": "Run npm ci --no-audit --no-fund",
+      "conclusion": "success",
+      "started_at": "2026-10-09T05:10:46Z",
+      "completed_at": "2026-10-09T05:10:50Z"
+     },
+     {
+      "name": "Check no person is signed in to the Firebase CLI",
+      "conclusion": "success",
+      "started_at": "2026-10-09T05:10:50Z",
+      "completed_at": "2026-10-09T05:10:53Z"
+     },
+     {
+      "name": "Sign in to Google Cloud as the deploy account",
+      "conclusion": "success",
+      "started_at": "2026-10-09T05:10:53Z",
+      "completed_at": "2026-10-09T05:10:53Z"
+     },
+     {
+      "name": "Deploy to production",
+      "conclusion": "success",
+      "started_at": "2026-10-09T05:10:53Z",
+      "completed_at": "2026-10-09T05:11:06Z"
+     },
+     {
+      "name": "Tell Discord it is live",
+      "conclusion": "success",
+      "started_at": "2026-10-09T05:11:06Z",
+      "completed_at": "2026-10-09T05:11:07Z"
+     },
+     {
+      "name": "Post Sign in to Google Cloud as the deploy account",
+      "conclusion": "success",
+      "started_at": "2026-10-09T05:11:07Z",
+      "completed_at": "2026-10-09T05:11:07Z"
+     },
+     {
+      "name": "Post Run actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444",
+      "conclusion": "success",
+      "started_at": "2026-10-09T05:11:07Z",
+      "completed_at": "2026-10-09T05:11:07Z"
+     },
+     {
+      "name": "Post Run actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09",
+      "conclusion": "success",
+      "started_at": "2026-10-09T05:11:07Z",
+      "completed_at": "2026-10-09T05:11:07Z"
+     },
+     {
+      "name": "Complete job",
+      "conclusion": "success",
+      "started_at": "2026-10-09T05:11:07Z",
+      "completed_at": "2026-10-09T05:11:07Z"
+     }
+    ]
+   },
+   {
+    "name": "report",
+    "conclusion": "skipped",
+    "created_at": "2026-10-09T05:12:56Z",
+    "started_at": "2026-10-09T05:12:56Z",
+    "completed_at": "2026-10-09T05:12:56Z",
+    "labels": [
+     "self-hosted",
+     "laptop"
+    ],
+    "steps": []
+   }
+  ]
+ }
+}

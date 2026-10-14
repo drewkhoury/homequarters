@@ -1,0 +1,11 @@
+{
+  "commit": "74848df383169d058e5d3784e78998e569f08ff7",
+  "short": "74848df",
+  "dirty": false,
+  "deployedAt": "2026-10-02T05:05:08.298Z",
+  "from": "ci",
+  "hash": "v2:6f3ef78ac99368f464936699707e94627437822748ee26c2ebc96543f4084a06",
+  "gate": "reused",
+  "gateRun": "36966761885",
+  "scope": "all"
+}

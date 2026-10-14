@@ -1,0 +1,47 @@
+/* Runs happening now on this laptop or in its container (hq/pages/live.mjs, hq/static/hq-live.js). */
+
+.lv-head { margin: 0 0 10px; color: var(--color-neutral-300); font-size: 13.5px; }
+.lv-banner { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; padding: 9px 12px; margin-bottom: 14px; border-radius: var(--radius-md); font-size: 13.5px;
+  border: 1px solid var(--color-divider); background: var(--color-surface); }
+.lv-banner[data-state="live"] { border-color: color-mix(in srgb, var(--color-accent) 45%, transparent); }
+.lv-banner[data-state="passed"] { border-color: color-mix(in srgb, var(--color-success) 50%, transparent); color: var(--color-success); }
+.lv-banner[data-state="failed"] { border-color: color-mix(in srgb, #f0a6a6 55%, transparent); color: #f0a6a6; }
+.lv-phase { color: var(--color-neutral-400); }
+.lv-pulse { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--color-success); margin-right: 6px; vertical-align: 1px; animation: lv-pulse 1.6s ease-in-out infinite; }
+@keyframes lv-pulse { 50% { opacity: .3; } }
+.lv-tasks { margin-top: 0; }
+
+.lv-grid { display: grid; grid-template-columns: minmax(260px, 360px) minmax(0, 1fr); gap: 14px; align-items: start; }
+.lv-tests, .lv-log { padding: 12px 14px; min-width: 0; }
+.lv-tests h2, .lv-log h2 { font-size: 14px; margin: 0 0 8px; }
+.lv-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; max-height: calc(100vh - 260px); overflow: auto; }
+.lv-test { display: grid; grid-template-columns: 12px minmax(0, 1fr) auto auto; gap: 4px 8px; align-items: center; padding: 4px 6px; border-radius: var(--radius-sm); font-size: 13px; }
+.lv-test[data-line] { cursor: pointer; } .lv-test[data-line]:hover { background: color-mix(in srgb, var(--color-text) 6%, transparent); }
+.lv-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--color-neutral-600); }
+.lv-test[data-state="running"] .lv-dot { background: var(--color-accent-400); animation: lv-pulse 1.2s ease-in-out infinite; }
+.lv-test[data-state="passed"] .lv-dot { background: var(--color-success); }
+.lv-test[data-state="failed"] .lv-dot { background: #f0a6a6; }
+.lv-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.lv-state { font-size: 11.5px; color: var(--color-neutral-500); }
+.lv-test[data-state="failed"] .lv-state { color: #f0a6a6; } .lv-test[data-state="running"] .lv-state { color: var(--color-accent-300); }
+.lv-secs { font-size: 11.5px; color: var(--color-neutral-400); font-variant-numeric: tabular-nums; min-width: 3.5em; text-align: right; }
+.lv-excerpt { grid-column: 2 / -1; margin: 2px 0 6px; padding: 6px 8px; max-height: 12em; overflow: auto; font-size: 11.5px; white-space: pre-wrap; border-radius: var(--radius-sm);
+  background: color-mix(in srgb, #f0a6a6 8%, transparent); color: var(--color-neutral-200); }
+.lv-counts { margin: 0 0 8px; font-size: 13.5px; } .lv-counts .fail { color: #f0a6a6; }
+
+.lv-loghead { display: flex; align-items: baseline; gap: 10px; } .lv-loghead .lv-end { margin-left: auto; font-size: 12px; padding: 3px 9px; }
+.lv-pane { height: calc(100vh - 260px); min-height: 280px; overflow: auto; padding: 8px 10px; border-radius: var(--radius-sm); background: color-mix(in srgb, var(--color-surface) 70%, black 30%);
+  font: 12px/1.5 ui-monospace, Menlo, Consolas, monospace; overscroll-behavior: contain; }
+.lv-l { white-space: pre-wrap; overflow-wrap: anywhere; color: var(--color-neutral-200); }
+.lv-l.lv-flash { background: color-mix(in srgb, #f0c38a 22%, transparent); }
+/* terminal colours */
+.lv-c30, .lv-c90 { color: var(--color-neutral-500); } .lv-c31, .lv-c91 { color: #f0a6a6; } .lv-c32, .lv-c92 { color: var(--color-success); }
+.lv-c33, .lv-c93 { color: #f0c38a; } .lv-c34, .lv-c94 { color: #7cc4e8; } .lv-c35, .lv-c95 { color: #b5abfc; } .lv-c36, .lv-c96 { color: #7cc4e8; } .lv-c37, .lv-c97 { color: var(--color-text); }
+.lv-b { font-weight: 700; }
+
+/* Home's card */
+.lv-card .kicker { display: inline-flex; align-items: center; }
+.lv-cardline { margin: 4px 0 0; font-size: 13px; }
+
+@container page (max-width: 800px) { .lv-grid { grid-template-columns: minmax(0, 1fr); } .lv-list { max-height: none; } }
+@media (prefers-reduced-motion: reduce) { .lv-pulse, .lv-test[data-state="running"] .lv-dot { animation: none; } }

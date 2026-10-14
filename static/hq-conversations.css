@@ -1,0 +1,46 @@
+/* The Conversations page (hq/pages/conversations.mjs), and its line on the Code page. */
+.cv-search { display: flex; gap: 10px; align-items: center; margin: 8px 0 14px; }
+.cv-search input { flex: 0 1 420px; }
+.cv-snippet { font-size: 12px; color: var(--color-neutral-400); margin-top: 3px; }
+.cv-live { font-size: 11px; font-weight: 600; padding: 1px 7px; border-radius: 99px; color: var(--color-success); border: 1px solid color-mix(in srgb, var(--color-success) 45%, transparent); }
+.cv-gone { font-size: 11px; padding: 1px 7px; border-radius: 99px; color: var(--color-neutral-500); border: 1px dashed var(--color-divider); }
+.cv-title { overflow-wrap: anywhere; }
+.cv-facts { display: grid; grid-template-columns: max-content minmax(0, 1fr); gap: 6px 16px; font-size: 13.5px; margin: 8px 0 12px; }
+.cv-facts dt { color: var(--color-neutral-500); }
+.cv-facts dd { margin: 0; min-width: 0; overflow-wrap: anywhere; }
+/* the box is as wide as its text, so Copy sits right after it */
+.cv-facts .hq-command { display: inline-flex; max-width: 100%; gap: 8px; align-items: center; min-width: 0; }
+.cv-facts .hq-command code { flex: 0 1 auto; overflow-wrap: anywhere; }
+.cv-links { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 14px; margin: 8px 0 4px; }
+.cv-links h3 { font-size: 13px; letter-spacing: .06em; text-transform: uppercase; color: var(--color-neutral-400); margin: 0 0 6px; }
+.cv-links ul { margin: 0; padding-left: 18px; display: grid; gap: 3px; font-size: 13px; overflow-wrap: anywhere; }
+.cv-pager { display: flex; gap: 12px; align-items: center; margin: 10px 0; }
+.cv-transcript { display: grid; gap: 18px; }
+.cv-turn { display: grid; gap: 8px; padding-bottom: 14px; border-bottom: 1px solid var(--color-divider); min-width: 0; }
+.cv-you { white-space: pre-wrap; overflow-wrap: anywhere; background: color-mix(in srgb, var(--color-accent) 16%, transparent); padding: 10px 12px; border-radius: var(--radius-md); font-size: 14px; }
+.cv-when { display: block; font-size: 11px; color: var(--color-neutral-400); margin-bottom: 4px; }
+.cv-claude { padding: 0 2px; min-width: 0; overflow-wrap: anywhere; }
+.cv-claude > :first-child { margin-top: 0; } .cv-claude > :last-child { margin-bottom: 0; }
+.cv-tool { font-size: 12.5px; border: 1px solid var(--color-divider); border-radius: var(--radius-md); background: var(--color-surface); min-width: 0; }
+.cv-tool > summary { cursor: pointer; padding: 5px 10px; list-style: none; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.cv-tool > summary::-webkit-details-marker { display: none; }
+.cv-tool > summary code { color: var(--color-neutral-300); }
+.cv-tool.error > summary b { color: #f0a6a6; }
+.cv-tool pre { margin: 0; padding: 8px 10px; border-top: 1px solid var(--color-divider); white-space: pre-wrap; overflow-wrap: anywhere; max-height: 420px; overflow: auto; font-size: 12px; }
+.cv-result.error { color: #f0a6a6; }
+.cv-changed { margin: 4px 0 10px; font-size: 12.5px; }
+
+/* the title keeps a readable width when the page is narrow (the Chat panel pushing it over): the table scrolls
+   sideways instead of squeezing it */
+#conversations { min-width: 900px; }
+#conversations col:first-child { width: 300px; }
+
+/* the transcript and its minimap (hq/static/cv-minimap.js) */
+.cv-read { display: grid; grid-template-columns: minmax(0, 1fr) 96px; gap: 18px; align-items: start; }
+.cv-minimap { position: sticky; top: 76px; height: calc(100vh - 100px); cursor: pointer; user-select: none; touch-action: none; border-left: 1px solid var(--color-divider);
+  --mm-you: #b5abfc; --mm-text: color-mix(in srgb, var(--color-text) 38%, transparent); --mm-code: color-mix(in srgb, #7cc4e8 45%, transparent);
+  --mm-tool: #7cc4e8; --mm-edit: #f0c38a; --mm-error: #f0a6a6; }
+.cv-minimap canvas { display: block; width: 100%; }
+.cv-mm-view { position: absolute; left: 0; right: 0; top: 0; background: color-mix(in srgb, var(--color-text) 12%, transparent); border: 1px solid color-mix(in srgb, var(--color-text) 25%, transparent); border-radius: 3px; pointer-events: none; }
+.cv-mm-tip { position: absolute; right: calc(100% + 8px); width: 260px; padding: 6px 9px; font-size: 12px; line-height: 1.4; background: var(--color-surface); border: 1px solid var(--color-divider); border-radius: var(--radius-md); box-shadow: var(--shadow-md); pointer-events: none; }
+@container page (max-width: 700px) { .cv-read { grid-template-columns: minmax(0, 1fr); } .cv-minimap { display: none; } }

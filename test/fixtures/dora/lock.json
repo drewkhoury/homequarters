@@ -1,0 +1,134 @@
+[
+ {
+  "at": "2026-10-03T06:44:31.025Z",
+  "event": "take",
+  "pid": 78181,
+  "person": "the laptop runner (test.yml)"
+ },
+ {
+  "at": "2026-10-03T06:50:18.630Z",
+  "event": "release",
+  "pid": 78181,
+  "person": "the laptop runner (test.yml)"
+ },
+ {
+  "at": "2026-10-03T07:13:42.034Z",
+  "event": "take",
+  "pid": 27797,
+  "person": "the laptop runner (test.yml)"
+ },
+ {
+  "at": "2026-10-03T07:19:12.456Z",
+  "event": "release",
+  "pid": 27797,
+  "person": "the laptop runner (test.yml)"
+ },
+ {
+  "at": "2026-10-04T01:49:46.997Z",
+  "event": "take",
+  "pid": 25822,
+  "person": "the laptop runner (test.yml)",
+  "machine": {
+   "load1": 3.52
+  }
+ },
+ {
+  "at": "2026-10-04T01:54:40.166Z",
+  "event": "release",
+  "pid": 25822,
+  "person": "the laptop runner (test.yml)",
+  "machine": {
+   "load1": 5.34
+  }
+ },
+ {
+  "at": "2026-10-04T02:02:28.552Z",
+  "event": "take",
+  "pid": 42246,
+  "person": "the laptop runner (test.yml)",
+  "machine": {
+   "load1": 2.38
+  }
+ },
+ {
+  "at": "2026-10-04T02:07:16.052Z",
+  "event": "release",
+  "pid": 42246,
+  "person": "the laptop runner (test.yml)",
+  "machine": {
+   "load1": 4.88
+  }
+ },
+ {
+  "at": "2026-10-05T18:23:40.574Z",
+  "event": "take",
+  "pid": 21078,
+  "person": "the laptop runner (test.yml)",
+  "machine": {
+   "load1": 73.14
+  }
+ },
+ {
+  "at": "2026-10-05T18:24:56.292Z",
+  "event": "release",
+  "pid": 21078,
+  "person": "the laptop runner (test.yml)",
+  "machine": {
+   "load1": 26.3
+  }
+ },
+ {
+  "at": "2026-10-05T21:59:47.280Z",
+  "event": "take",
+  "pid": 51666,
+  "person": "the laptop runner (test.yml)",
+  "machine": {
+   "load1": 2.82
+  }
+ },
+ {
+  "at": "2026-10-05T22:03:46.213Z",
+  "event": "release",
+  "pid": 51666,
+  "person": "the laptop runner (test.yml)",
+  "machine": {
+   "load1": 6.11
+  }
+ },
+ {
+  "at": "2026-10-05T23:55:17.112Z",
+  "event": "take",
+  "pid": 81810,
+  "person": "the laptop runner (test.yml)",
+  "machine": {
+   "load1": 2.01
+  }
+ },
+ {
+  "at": "2026-10-05T23:59:13.607Z",
+  "event": "release",
+  "pid": 81810,
+  "person": "the laptop runner (test.yml)",
+  "machine": {
+   "load1": 8.25
+  }
+ },
+ {
+  "at": "2026-10-06T01:34:10.508Z",
+  "event": "take",
+  "pid": 89012,
+  "person": "the laptop runner (test.yml)",
+  "machine": {
+   "load1": 4.29
+  }
+ },
+ {
+  "at": "2026-10-06T01:38:31.695Z",
+  "event": "release",
+  "pid": 89012,
+  "person": "the laptop runner (test.yml)",
+  "machine": {
+   "load1": 6.44
+  }
+ }
+]

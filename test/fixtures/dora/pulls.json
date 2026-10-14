@@ -1,0 +1,134 @@
+[
+ {
+  "number": 189,
+  "title": "test: the offline check says why a device has not synced",
+  "merged_at": "2026-10-06T04:59:14Z",
+  "merge_commit_sha": "6a1e5bc43533e0a2112614db97115cae4c00b0bf",
+  "head": {
+   "sha": "f0f92425441bf284020db8ced5c54554a3092863",
+   "ref": "test/offline-says-why"
+  },
+  "html_url": "https://github.com/example-org/questkeep/pull/189"
+ },
+ {
+  "number": 175,
+  "title": "feat: lists can be pinned to the top",
+  "merged_at": "2026-10-06T01:40:34Z",
+  "merge_commit_sha": "e9d5b78b8e9c1f8f5681d48b24eb2670c292a565",
+  "head": {
+   "sha": "fe4ffa9334d13bf57d180783143347366a5f634e",
+   "ref": "feat/pinned-lists"
+  },
+  "html_url": "https://github.com/example-org/questkeep/pull/175"
+ },
+ {
+  "number": 172,
+  "title": "refactor: the save step moves to a tested module",
+  "merged_at": "2026-10-05T22:08:33Z",
+  "merge_commit_sha": "c5b78b046a0b867443cafe2f008915e7cea60c8b",
+  "head": {
+   "sha": "74ab1b134e520db35b3efd97ffe98324473dbcc7",
+   "ref": "refactor/save-module"
+  },
+  "html_url": "https://github.com/example-org/questkeep/pull/172"
+ },
+ {
+  "number": 161,
+  "title": "fix: an edit made while starting up keeps its base",
+  "merged_at": "2026-10-05T20:33:09Z",
+  "merge_commit_sha": "ec1370005dfbfc979389ac63f12b5df7934529fe",
+  "head": {
+   "sha": "ee9ead72317bf30fbf3ae5ea13fa7421e144c1e6",
+   "ref": "fix/startup-edit-base"
+  },
+  "html_url": "https://github.com/example-org/questkeep/pull/161"
+ },
+ {
+  "number": 136,
+  "title": "fix: laptop jobs don't save the npm cache",
+  "merged_at": "2026-10-03T07:52:25Z",
+  "merge_commit_sha": "ff3a047591dd91a50d21b66759f2fe4ac674cc29",
+  "head": {
+   "sha": "29685be4dd32e80b980851c1c46ebc11c4416181",
+   "ref": "fix/laptop-no-npm-cache"
+  },
+  "html_url": "https://github.com/example-org/questkeep/pull/136"
+ },
+ {
+  "number": 132,
+  "title": "CI runs on the laptop runner behind one switch",
+  "merged_at": "2026-10-03T07:23:45Z",
+  "merge_commit_sha": "8d237919b212afd1cea9adca36fe57e0910b0dba",
+  "head": {
+   "sha": "7ab97d350a5437aefa08a04e2fd5c9d074db5f60",
+   "ref": "ci/laptop-runner-switch"
+  },
+  "html_url": "https://github.com/example-org/questkeep/pull/132"
+ },
+ {
+  "number": 65,
+  "title": "fix: deploys go green and the backlog is tidied",
+  "merged_at": "2026-10-01T06:28:49Z",
+  "merge_commit_sha": "e6b4837829db97bbb97405f712dcf524224e93e6",
+  "head": {
+   "sha": "da581dcc83e390bfe27730e999502db51953838d",
+   "ref": "fix/deploys-green-and-cleanup"
+  },
+  "html_url": "https://github.com/example-org/questkeep/pull/65"
+ },
+ {
+  "number": 57,
+  "title": "fix(sync): a delete refused partway says what was removed",
+  "merged_at": "2026-09-30T09:07:36Z",
+  "merge_commit_sha": "2f8602ed2e07129bd17e5d30c5858bbec0ed0f92",
+  "head": {
+   "sha": "fd0074c73dfb169ddda4971ca3c672929e877c2d",
+   "ref": "fix/delete-message"
+  },
+  "html_url": "https://github.com/example-org/questkeep/pull/57"
+ },
+ {
+  "number": 55,
+  "title": "fix(app): a new account's start date no longer shows a time zone",
+  "merged_at": "2026-09-30T08:51:07Z",
+  "merge_commit_sha": "b61152e483c0ba41088b4f2c63af775166a5be6a",
+  "head": {
+   "sha": "6eb79128438e1db54f8669672decb33c0481001c",
+   "ref": "fix/start-date"
+  },
+  "html_url": "https://github.com/example-org/questkeep/pull/55"
+ },
+ {
+  "number": 54,
+  "title": "fix(sync): a setting changed just after a reload is kept",
+  "merged_at": "2026-09-30T08:38:58Z",
+  "merge_commit_sha": "7dfb9108ebe8f284a7752e5d01a0fd7b01ac5472",
+  "head": {
+   "sha": "b44713762658b07e1cf4b8bbd7f42e76df8ff682",
+   "ref": "fix/reload-merge"
+  },
+  "html_url": "https://github.com/example-org/questkeep/pull/54"
+ },
+ {
+  "number": 75,
+  "title": "test(reset): the stall report keeps its log lines whole",
+  "merged_at": "2026-10-01T21:40:17Z",
+  "merge_commit_sha": "5b09943a784c42bae2814c23f985b3ed1c59f334",
+  "head": {
+   "sha": "adf1c1a33910956cd33923107a404f0503271ef6",
+   "ref": "test/reset-log-whole"
+  },
+  "html_url": "https://github.com/example-org/questkeep/pull/75"
+ },
+ {
+  "number": 76,
+  "title": "fix(sync): a setting changed twice after a reload keeps the last value",
+  "merged_at": "2026-10-01T21:40:22Z",
+  "merge_commit_sha": "e5f2e2e9d221e6f434b80a39a0bf38dc29138df9",
+  "head": {
+   "sha": "617dd3fdb54de854306626aefc54cbcb5b0d1f20",
+   "ref": "fix/reload-base-after-own-save"
+  },
+  "html_url": "https://github.com/example-org/questkeep/pull/76"
+ }
+]

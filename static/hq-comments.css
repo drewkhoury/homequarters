@@ -1,0 +1,54 @@
+/* Comments on any page (hq/static/hq-comments.js). The Comment button, the write box, a comment's card and the
+   margin markers are placed in the page's own coordinates (or the popup's), so they scroll with the words. Their
+   display rules would otherwise beat the hidden attribute, so hidden is spelled out for each. */
+.hqc-pick, .hqc-box, .hqc-card, .hqc-margin { position: absolute; z-index: 30; }
+.hqc-pick[hidden], .hqc-box[hidden], .hqc-card[hidden], .hqc-panel [hidden] { display: none; }
+.hqc-pick { font: 600 12px var(--font-body); padding: 5px 10px; border-radius: 99px; border: 0; background: var(--color-accent-400); color: var(--color-bg); cursor: pointer; box-shadow: var(--shadow-md); }
+.hqc-box, .hqc-card { width: min(380px, calc(100vw - 16px)); display: grid; gap: 8px; padding: 12px; border-radius: var(--radius-md); background: var(--color-surface); border: 1px solid var(--color-divider); box-shadow: var(--shadow-lg); }
+.hqc-quote { margin: 0; font-size: 12.5px; color: var(--color-neutral-300); max-height: 5em; overflow: auto; }
+.hqc-row { display: flex; gap: 8px; align-items: center; } .hqc-row .hint { margin-right: auto; font-size: 11.5px; }
+.hqc-edit .hqc-row { justify-content: flex-end; }
+
+/* the words a comment is on, and the marker beside their line */
+mark.hqc-mark { background: color-mix(in srgb, #f0c38a 20%, transparent); color: inherit; border-bottom: 1px solid color-mix(in srgb, #f0c38a 65%, transparent); border-radius: 2px; cursor: pointer; padding: 0; }
+mark.hqc-mark:hover, mark.hqc-mark.open { background: color-mix(in srgb, #f0c38a 34%, transparent); }
+mark.hqc-mark.flash { animation: hqc-flash 1.4s ease-out; }
+@keyframes hqc-flash { 0%, 30% { background: color-mix(in srgb, #f0c38a 70%, transparent); } 100% { background: color-mix(in srgb, #f0c38a 20%, transparent); } }
+@media (prefers-reduced-motion: reduce) { mark.hqc-mark.flash { animation: none; background: color-mix(in srgb, #f0c38a 40%, transparent); } }
+.hqc-margin { min-width: 20px; height: 20px; padding: 0 5px; border-radius: 10px 10px 10px 3px; border: 1px solid color-mix(in srgb, #f0c38a 60%, transparent); background: color-mix(in srgb, #f0c38a 18%, var(--color-bg)); color: #f0c38a; font: 600 11px/18px var(--font-body); cursor: pointer; }
+.hqc-margin:hover, .hqc-margin:focus-visible { background: #f0c38a; color: var(--color-bg); outline: none; }
+
+/* a comment opened under its words */
+.hqc-card { gap: 10px; }
+.hqc-card-one + .hqc-card-one { border-top: 1px solid var(--color-divider); padding-top: 10px; }
+.hqc-card-text { margin: 0; font-size: 13.5px; white-space: pre-wrap; overflow-wrap: anywhere; }
+.hqc-card-foot { display: flex; align-items: center; gap: 4px; margin-top: 4px; } .hqc-card-foot .hint { margin-right: auto; font-size: 11.5px; }
+.hqc-card-foot .btn { font-size: 12px; padding: 2px 8px; }
+
+/* the Comments button and its list */
+.hqc-pill { position: fixed; right: 16px; bottom: calc(16px + env(safe-area-inset-bottom, 0px)); z-index: 20; font: 500 12.5px var(--font-body); padding: 7px 12px; border-radius: 99px; border: 1px solid var(--color-divider); background: var(--color-surface); color: var(--color-neutral-400); cursor: pointer; box-shadow: var(--shadow-md); }
+.hqc-pill b { margin-left: 4px; }
+.hqc-pill.has { color: var(--color-bg); background: var(--color-accent-400); border-color: var(--color-accent-400); }
+/* moved: the other corner, or tucked into a thin tab on the right edge, below Chat's */
+.hqc-pill[data-place="left"] { right: auto; left: 16px; }
+.hqc-pill[data-place="tucked"] { right: 0; bottom: 96px; writing-mode: vertical-rl; padding: 10px 6px; font-size: 11.5px;
+  border-radius: var(--radius-md) 0 0 var(--radius-md); border-right: 0; }
+.hqc-pill[data-place="tucked"] b { margin: 4px 0 0; }
+.hqc-place { display: flex; align-items: center; gap: 10px; margin: 0 0 10px; }
+.hqc-panel { width: min(720px, calc(100vw - 32px)); max-height: calc(100vh - 64px); padding: 18px 22px; border: 1px solid var(--color-divider); border-radius: var(--radius-lg); background: var(--color-bg); color: var(--color-text); box-shadow: var(--shadow-lg); }
+.hqc-panel::backdrop { background: rgb(0 0 0 / .55); }
+.hqc-head { display: flex; justify-content: space-between; align-items: center; } .hqc-head h2 { margin: 0; font-size: 20px; }
+.hqc-actions { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin: 10px 0; }
+.hqc-actions label { display: inline-flex; gap: 6px; align-items: center; white-space: nowrap; } .hqc-actions select { padding: 3px 6px; }
+.hqc-danger { color: #f0a6a6; }
+.hqc-said { min-height: 1.2em; margin: 0 0 8px; font-size: 13px; }
+.hqc-list section + section { margin-top: 14px; }
+.hqc-list h3 { font-size: 13px; margin: 0 0 6px; color: var(--color-neutral-300); overflow-wrap: anywhere; }
+.hqc-list ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.hqc-list li { display: grid; grid-template-columns: 1fr auto; gap: 2px 10px; padding: 8px 10px; background: var(--color-surface); border-radius: var(--radius-md); }
+.hqc-list li p { margin: 0; grid-column: 1; } .hqc-list li .hint { grid-column: 1; font-size: 11.5px; }
+.hqc-where { grid-column: 1; font-size: 12px; color: var(--color-neutral-400); overflow-wrap: anywhere; }
+.hqc-tag { grid-column: 1; justify-self: start; font-size: 10.5px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; padding: 1px 7px; border-radius: 99px; color: #f0c38a; background: color-mix(in srgb, #f0c38a 14%, transparent); }
+.hqc-tag.detached { color: #f0a6a6; background: color-mix(in srgb, #f0a6a6 14%, transparent); }
+.hqc-del { grid-column: 2; grid-row: 1 / span 4; align-self: start; font-size: 12px; }
+.hqc-text { white-space: pre-wrap; font-size: 12px; }

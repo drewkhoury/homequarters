@@ -1,0 +1,14 @@
+{
+  "brand": "HQ",
+  "wordmark": "HomeQuarters",
+  "owner": "your-org",
+  "repo": "your-repo",
+  "home": "you",
+  "standIns": [["Alex", "Morgan"], ["Sam", "Rivera"], ["Robin", "Hayes"], ["Jordan", "Lee"], ["Casey", "Brooks"], ["Riley", "Quinn"], ["Avery", "Park"], ["Jamie", "Ellis"]],
+  "names": {},
+  "words": ["drew", "rose", "will", "mark", "bill", "grace", "pat", "rob", "sue", "art", "may", "ray", "jack", "frank", "hope", "joy", "dawn", "robin", "faith", "sandy", "chase", "hunter", "iris", "ivy", "penny", "ruby", "holly", "summer"],
+  "hide": ["web/images/"],
+  "keepSources": ["sdk-cli"],
+  "keep": [],
+  "keepEmailDomains": ["example.com", "example.org", "example.net", "anthropic.com", "github.com", "gserviceaccount.com"]
+}

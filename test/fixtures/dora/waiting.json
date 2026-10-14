@@ -1,0 +1,154 @@
+{
+ "open": [
+  {
+   "number": 1,
+   "title": "Task list: easy, medium and hard tasks, grouped in the hint",
+   "html_url": "https://github.com/example-org/questkeep/pull/1",
+   "created_at": "2026-09-25T20:27:14Z",
+   "draft": false,
+   "head": {
+    "sha": "a1500c958f40893213f7633835e91544956f2afd",
+    "ref": "task_list_fixes"
+   }
+  },
+  {
+   "number": 157,
+   "title": "feat: a theme's accent colour shows on the shared page",
+   "html_url": "https://github.com/example-org/questkeep/pull/157",
+   "created_at": "2026-10-04T22:17:52Z",
+   "draft": false,
+   "head": {
+    "sha": "0a7a7f57184d8dd6ef8b9f495548dc5c6c4ea079",
+    "ref": "feat/theme-accent"
+   }
+  },
+  {
+   "number": 179,
+   "title": "feat: lists can be sorted by due date",
+   "html_url": "https://github.com/example-org/questkeep/pull/179",
+   "created_at": "2026-10-06T02:56:36Z",
+   "draft": false,
+   "head": {
+    "sha": "5f5e51a28ec220f2a64573fd8cd03e6fe71ed1b7",
+    "ref": "feat/sort-by-due"
+   }
+  },
+  {
+   "number": 199,
+   "title": "fix: a device whose own list is stuck far ahead comes back to today",
+   "html_url": "https://github.com/example-org/questkeep/pull/199",
+   "created_at": "2026-10-06T17:05:32Z",
+   "draft": false,
+   "head": {
+    "sha": "0af26fbc5004a6b53075d2cabb09e22cfce791c2",
+    "ref": "fix/stuck-list-own-device"
+   },
+   "merge_commit_sha": "ddec62ab379f94b210fe9e0b08434de505991b1c",
+   "closed_at": null
+  }
+ ],
+ "merged": [
+  {
+   "number": 2,
+   "title": "Task list: easy, medium and hard tasks, grouped in the hint",
+   "html_url": "https://github.com/example-org/questkeep/pull/2",
+   "created_at": "2026-09-25T20:55:31Z",
+   "draft": false,
+   "head": {
+    "sha": "3668ed4f2c6d07b5e75c19dc4410f193006b205a",
+    "ref": "task_list_fixes"
+   },
+   "merged_at": "2026-09-25T21:53:20Z",
+   "merge_commit_sha": "3894c8ff7089b5c93a9edf643462b7c14632ef82",
+   "closed_at": "2026-09-25T21:53:20Z"
+  },
+  {
+   "number": 197,
+   "title": "feat: lists can be sorted by due date",
+   "html_url": "https://github.com/example-org/questkeep/pull/197",
+   "created_at": "2026-10-06T15:03:49Z",
+   "draft": false,
+   "head": {
+    "sha": "ac868ef3fb37920849a47868e257417797a65a62",
+    "ref": "feat/sort-by-due-rebased"
+   },
+   "merged_at": "2026-10-06T15:10:23Z",
+   "merge_commit_sha": "5933d86343300455e7ae972164e6e35a7fe88127",
+   "closed_at": "2026-10-06T15:10:23Z"
+  }
+ ],
+ "runs": [
+  {
+   "id": 37239479411,
+   "path": ".github/workflows/test.yml",
+   "event": "pull_request",
+   "head_branch": "feat/theme-accent",
+   "head_sha": "0a7a7f57184d8dd6ef8b9f495548dc5c6c4ea079",
+   "created_at": "2026-10-04T22:17:55Z",
+   "status": "completed",
+   "conclusion": "failure",
+   "run_attempt": 1,
+   "html_url": "https://github.com/example-org/questkeep/actions/runs/37239479411"
+  },
+  {
+   "id": 37239479449,
+   "path": ".github/workflows/unit.yml",
+   "event": "pull_request",
+   "head_branch": "feat/theme-accent",
+   "head_sha": "0a7a7f57184d8dd6ef8b9f495548dc5c6c4ea079",
+   "created_at": "2026-10-04T22:17:55Z",
+   "status": "completed",
+   "conclusion": "success",
+   "run_attempt": 1,
+   "html_url": "https://github.com/example-org/questkeep/actions/runs/37239479449"
+  },
+  {
+   "id": 37406600857,
+   "path": ".github/workflows/test.yml",
+   "event": "pull_request",
+   "head_branch": "feat/sort-by-due",
+   "head_sha": "5f5e51a28ec220f2a64573fd8cd03e6fe71ed1b7",
+   "created_at": "2026-10-06T02:56:40Z",
+   "status": "completed",
+   "conclusion": "success",
+   "run_attempt": 1,
+   "html_url": "https://github.com/example-org/questkeep/actions/runs/37406600857"
+  },
+  {
+   "id": 37406600897,
+   "path": ".github/workflows/unit.yml",
+   "event": "pull_request",
+   "head_branch": "feat/sort-by-due",
+   "head_sha": "5f5e51a28ec220f2a64573fd8cd03e6fe71ed1b7",
+   "created_at": "2026-10-06T02:56:40Z",
+   "status": "completed",
+   "conclusion": "success",
+   "run_attempt": 1,
+   "html_url": "https://github.com/example-org/questkeep/actions/runs/37406600897"
+  },
+  {
+   "id": 37500849472,
+   "path": ".github/workflows/unit.yml",
+   "event": "pull_request",
+   "head_branch": "fix/stuck-list-own-device",
+   "head_sha": "0af26fbc5004a6b53075d2cabb09e22cfce791c2",
+   "created_at": "2026-10-06T17:05:37Z",
+   "status": "completed",
+   "conclusion": "success",
+   "run_attempt": 1,
+   "html_url": "https://github.com/example-org/questkeep/actions/runs/37500849472"
+  },
+  {
+   "id": 37500849479,
+   "path": ".github/workflows/test.yml",
+   "event": "pull_request",
+   "head_branch": "fix/stuck-list-own-device",
+   "head_sha": "0af26fbc5004a6b53075d2cabb09e22cfce791c2",
+   "created_at": "2026-10-06T17:05:37Z",
+   "status": "completed",
+   "conclusion": "success",
+   "run_attempt": 1,
+   "html_url": "https://github.com/example-org/questkeep/actions/runs/37500849479"
+  }
+ ]
+}

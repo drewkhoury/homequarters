@@ -1,0 +1,113 @@
+/* Folders on the Code page as icons, a list or a gallery (hq/lib/folder.mjs, hq/static/hq-files.js). */
+
+.hqf-folderview .hq-filehead-right { gap: 12px; }
+.hqf-views .seg-opt { font-size: 12.5px; padding: 5px 12px; text-decoration: none; }
+.hqf-views .seg-opt[aria-current="true"] { color: var(--color-accent); box-shadow: inset 0 0 0 1px var(--color-accent); }
+
+/* Icons: a grid of tiles, each a small page showing the start of the file */
+.hqf-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(136px, 1fr)); gap: 18px 12px; }
+.hqf-tile { display: grid; justify-items: center; align-content: start; gap: 6px; padding: 10px 6px 8px; border-radius: var(--radius-md); color: var(--color-text); text-decoration: none; }
+.hqf-tile:hover { background: color-mix(in srgb, var(--color-text) 6%, transparent); }
+.hqf-tile:focus-visible { outline: 2px solid var(--color-accent); outline-offset: 0; }
+.hqf-name { font-size: 12.5px; line-height: 1.3; text-align: center; overflow-wrap: anywhere; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; max-width: 100%; }
+.hqf-sub { font-size: 11px; color: var(--color-neutral-500); margin-top: -3px; }
+
+.hqf-thumb { position: relative; display: block; width: 92px; height: 116px; }
+.hqf-dirthumb { display: grid; place-items: center; }
+/* the page: a sheet with its top right corner folded */
+.hqf-sheet { position: absolute; inset: 0; overflow: hidden; border-radius: 3px; background: color-mix(in srgb, var(--color-surface) 70%, var(--color-text) 6%);
+  border: 1px solid color-mix(in srgb, var(--color-text) 14%, transparent); box-shadow: 0 2px 6px rgb(0 0 0 / .35);
+  clip-path: polygon(0 0, calc(100% - 16px) 0, 100% 16px, 100% 100%, 0 100%); padding: 9px 8px 8px; display: flex; flex-direction: column; gap: 3px; }
+.hqf-sheet::after { content: ""; position: absolute; top: 0; right: 0; width: 16px; height: 16px; background: linear-gradient(225deg, transparent 50%, color-mix(in srgb, var(--color-text) 22%, transparent) 50%); border-bottom-left-radius: 2px; }
+.hqf-tile:hover .hqf-sheet { border-color: color-mix(in srgb, var(--color-accent) 55%, transparent); }
+.hqf-blank { background: color-mix(in srgb, var(--color-surface) 80%, var(--color-text) 4%); }
+.hqf-h { font-size: 7.5px; line-height: 1.25; color: var(--color-text); font-weight: 700; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; flex: none; }
+.hqf-l { font-size: 5.5px; line-height: 1.45; color: var(--color-neutral-400); display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden; flex: none; }
+.hqf-chip { display: block; flex: none; margin-bottom: 1px; }
+.hqf-chip .bl-type { font-size: 6px; padding: 1px 4px; letter-spacing: .04em; }
+/* code: drawn at a readable size and scaled down, so browsers with a minimum font size still shrink it */
+.hqf-code { padding: 7px 0 0 6px; background: color-mix(in srgb, var(--color-surface) 85%, black 15%); }
+.hqf-codein { display: block; width: 250%; transform: scale(.4); transform-origin: 0 0; font: 10px/1.45 ui-monospace, Menlo, Consolas, monospace; color: var(--color-neutral-300); white-space: pre; }
+.hqf-cl { display: block; overflow: hidden; text-overflow: clip; }
+.hqf-img { padding: 0; background: repeating-conic-gradient(color-mix(in srgb, var(--color-text) 8%, transparent) 0 25%, transparent 0 50%) 0 0 / 10px 10px; }
+.hqf-img img { width: 100%; height: 100%; object-fit: contain; }
+.hqf-ext { position: absolute; left: -6px; bottom: 10px; font: 700 8.5px/1 var(--font-body); letter-spacing: .05em; padding: 3px 5px; border-radius: 3px;
+  background: var(--color-accent-700); color: var(--color-accent-100); box-shadow: 0 1px 3px rgb(0 0 0 / .4); }
+
+/* a folder in Icons: its back and tab, sheets rising out of it (none, 1, 2, 3, or 3 with a stack behind for 10 or
+   more), and its front with the count. The sheets are miniatures of real files. */
+.hqf-dirthumb { display: block; }
+.hqf-fback { position: absolute; left: 4px; right: 4px; bottom: 10px; height: 64px; border-radius: 3px 7px 7px 7px; background: var(--color-accent-700); box-shadow: 0 2px 6px rgb(0 0 0 / .35); }
+.hqf-fback::before { content: ""; position: absolute; left: 0; top: -8px; width: 38%; height: 10px; border-radius: 5px 5px 0 0; background: var(--color-accent-700); }
+.hqf-peek { position: absolute; left: 10px; right: 10px; bottom: 34px; height: 64px; }
+.hqf-ffront { position: absolute; left: 4px; right: 4px; bottom: 10px; height: 46px; border-radius: 6px; background: linear-gradient(180deg, var(--color-accent-500), var(--color-accent-600));
+  box-shadow: inset 0 1px 0 color-mix(in srgb, white 25%, transparent), 0 -1px 3px rgb(0 0 0 / .25); }
+.hqf-tile.dir:hover .hqf-ffront { background: linear-gradient(180deg, var(--color-accent-400), var(--color-accent-500)); }
+.hqf-count { position: absolute; right: 6px; bottom: 5px; font: 600 10px/1 var(--font-body); padding: 2px 6px; border-radius: 99px; background: color-mix(in srgb, var(--color-accent-900) 55%, transparent); color: var(--color-accent-100); }
+/* one sheet, a miniature of a file: prose on paper, code on dark with coloured lines, an image, or a small folder */
+.hqf-ps { position: absolute; bottom: 0; left: 50%; width: 40px; height: 52px; margin-left: -20px; border-radius: 2px; overflow: hidden; padding: 5px 4px; display: flex; flex-direction: column; gap: 2.5px;
+  background: #e8e6f1; box-shadow: 0 1px 3px rgb(0 0 0 / .45); transform-origin: 50% 100%; }
+.hqf-ps i { display: block; height: 2px; border-radius: 1px; background: #9a97ad; flex: none; }
+.hqf-ps.md i.t { height: 3px; background: #4b4760; width: 75% !important; margin-bottom: 1px; }
+.hqf-ps.code { background: #22242f; }
+.hqf-ps.code i { background: #7cc4e8; } .hqf-ps.code i:nth-child(3n+2) { background: #b5abfc; } .hqf-ps.code i:nth-child(4n+3) { background: #f0c38a; } .hqf-ps.code i:nth-child(5n) { background: #8cc9a0; }
+.hqf-ps.blank { background: #d9d7e3; }
+.hqf-ps.img { padding: 0; background: #d9d7e3; } .hqf-ps.img img { width: 100%; height: 100%; object-fit: cover; }
+.hqf-ps.dir { background: var(--color-accent-400); border-radius: 2px 4px 4px 4px; }
+/* where the sheets stand: one in the middle; two fanned; three fanned, the middle one highest */
+[data-fill="1"] .hqf-ps:nth-child(1) { transform: rotate(-2deg); }
+[data-fill="2"] .hqf-ps:nth-child(1) { transform: translateX(-12px) rotate(-8deg); }
+[data-fill="2"] .hqf-ps:nth-child(2) { transform: translateX(12px) translateY(-3px) rotate(6deg); }
+[data-fill="3"] .hqf-ps:nth-child(1), [data-fill="heaps"] .hqf-ps:nth-child(2) { transform: translateX(-17px) rotate(-11deg); }
+[data-fill="3"] .hqf-ps:nth-child(2), [data-fill="heaps"] .hqf-ps:nth-child(3) { transform: translateY(-6px) rotate(-1deg); }
+[data-fill="3"] .hqf-ps:nth-child(3), [data-fill="heaps"] .hqf-ps:nth-child(4) { transform: translateX(17px) translateY(-2px) rotate(10deg); }
+/* heaps: a stack of page edges behind the three */
+.hqf-stack { position: absolute; left: 50%; bottom: 2px; width: 58px; height: 50px; margin-left: -29px; border-radius: 2px; background: #cfccdc;
+  box-shadow: 0 -3px 0 -1px #dcd9e7, 0 -6px 0 -2px #cfccdc, 0 -9px 0 -3px #dcd9e7, 0 -12px 0 -4px #cfccdc, 0 1px 3px rgb(0 0 0 / .4); }
+
+/* the old single folder drawing, still used for the small icon in List */
+.hqf-folder { width: 84px; height: 68px; filter: drop-shadow(0 2px 4px rgb(0 0 0 / .35)); }
+.hqf-folder-back { fill: var(--color-accent-700); }
+.hqf-folder-front { fill: var(--color-accent-500); }
+.hqf-folder text { font: 600 11px var(--font-body); fill: var(--color-accent-100); }
+.hqf-tile.dir:hover .hqf-folder-front { fill: var(--color-accent-400); }
+.hqf-mini { width: 18px; height: 15px; filter: none; flex: none; }
+
+/* List: Finder's list view, with the icon in the name column */
+.hqf-row { display: inline-flex; align-items: center; gap: 8px; color: var(--color-text); text-decoration: none; max-width: 100%; }
+.hqf-row:hover span:first-of-type { color: var(--color-accent-300); text-decoration: underline; }
+.hqf-row .hq-i { width: 16px; height: 16px; color: var(--color-neutral-400); flex: none; }
+.hqf-row .bl-type { font-size: 9.5px; }
+
+/* Gallery: one file large, the others in a strip underneath */
+.hqf-gallery { display: grid; gap: 12px; }
+.hqf-stage { padding: 0; overflow: hidden; }
+.hqf-stage-head { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 10px; padding: 10px 14px; border-bottom: 1px solid var(--color-divider); }
+.hqf-stage-head .hq-i { width: 18px; height: 18px; color: var(--color-neutral-400); }
+.hqf-stage-head b { font-size: 14px; }
+.hqf-open { margin-left: auto; font-size: 12.5px; padding: 4px 12px; }
+.hqf-stage-body { max-height: 62vh; overflow: auto; padding: 14px 18px; }
+.hqf-stage-body .hq-md > :first-child { margin-top: 0; }
+.hqf-big-code { margin: 0; }
+.hqf-big-img { display: grid; place-items: center; min-height: 240px; }
+.hqf-big-img img { max-height: 58vh; }
+.hqf-more { margin-top: 10px; }
+.hqf-strip { display: flex; gap: 6px; overflow-x: auto; padding: 4px 2px 10px; scroll-snap-type: x proximity; }
+.hqf-strip-item { flex: 0 0 96px; display: grid; justify-items: center; gap: 4px; padding: 8px 4px 6px; border-radius: var(--radius-md); color: var(--color-neutral-300); text-decoration: none; scroll-snap-align: start; }
+.hqf-strip-item .hqf-thumb { width: 60px; height: 76px; }
+.hqf-strip-item .hqf-ext { font-size: 7px; left: -4px; bottom: 6px; }
+.hqf-strip-item .hqf-name { font-size: 11px; -webkit-line-clamp: 1; }
+.hqf-strip-item:hover { background: color-mix(in srgb, var(--color-text) 6%, transparent); }
+.hqf-strip-item.on { background: color-mix(in srgb, var(--color-accent) 18%, transparent); color: var(--color-text); }
+.hqf-strip-item.on .hqf-sheet { border-color: var(--color-accent); }
+.hqf-strip-item:focus-visible { outline: 2px solid var(--color-accent); }
+
+/* narrow pages (a small window, or the Chat panel beside): smaller tiles, the stage shorter */
+@container page (max-width: 700px) {
+  .hqf-grid { grid-template-columns: repeat(auto-fill, minmax(108px, 1fr)); gap: 12px 6px; }
+  .hqf-thumb { width: 74px; height: 94px; }
+  .hqf-folder { width: 70px; height: 56px; }
+  .hqf-stage-body { max-height: 50vh; padding: 12px; }
+  .hqf-folderview .hq-filehead-right .hint { display: none; }
+}
+@media (prefers-reduced-motion: reduce) { .hqf-strip { scroll-behavior: auto; } }

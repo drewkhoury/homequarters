@@ -1,0 +1,13 @@
+{
+  "name": "homequarters",
+  "version": "0.1.0",
+  "description": "HQ: a local website for keeping up with your own repo. Reads what your project writes; runs no code from it.",
+  "type": "module",
+  "license": "MIT",
+  "bin": { "hq": "bin/hq.mjs" },
+  "files": ["bin", "lib", "pages", "static", "theme", "deck", "demo.json", "README.md"],
+  "engines": { "node": ">=20" },
+  "scripts": { "test": "node --test test/" },
+  "dependencies": { "highlight.js": "11.12.0", "marked": "18.0.14" },
+  "devDependencies": { "playwright": "1.63.0" }
+}

@@ -1,0 +1,90 @@
+{
+  "about": "What each kind of test is and is not. The one source: docs/TESTING.md's 'The layers' section is generated from it (node tests/layers-doc.mjs) and HQ shows it. Times are measured, not hoped: the laptop and container on 26 September 2026, CI from the deploy runs of that day.",
+  "layers": [
+    {
+      "id": "unit",
+      "name": "Unit tests",
+      "status": "built",
+      "oneLine": "Pure logic in Node. No browser, no server, no Firebase.",
+      "proves": "The app's pure modules do what they say: Moss's walking, motion and camera maths, the frame statistics, and what the app builds to send (contract.js). Also the guards on the tests themselves, such as no fixed sleeps.",
+      "doesNotProve": "Anything that needs a page, Firebase, the rules or the network. A passing unit test cannot tell you a screen works or a save reaches the server.",
+      "needs": { "app": false, "emulators": false, "browser": false, "network": false },
+      "data": "None. Every input is written in the test.",
+      "files": ["tests/unit/*.test.mjs"],
+      "command": "make test-unit",
+      "time": { "laptop": "under a second", "container": "under a second", "ci": "under a second" },
+      "runsIn": ["make test, first", "every pull request and push on CI", "the pre-commit hook, once built (backlog 32)"],
+      "blocksDeploy": true,
+      "runWhen": "Always. They take under a second."
+    },
+    {
+      "id": "rules",
+      "name": "Rules and contract tests",
+      "status": "built",
+      "oneLine": "The Firestore rules, checked against the Firestore emulator, and the app's writes checked against the rules.",
+      "proves": "Who can read and write what, and which shapes are refused: each account's own data, limits on fields, rounds that can only be added to, the public record's keys, feedback. The contract test proves that what the app builds is exactly what the rules accept, so the two cannot drift apart.",
+      "doesNotProve": "The Storage rules (no test yet). What the app does after a refusal (smoke-reject covers that). Anything only production has, such as App Check and real sign-in.",
+      "needs": { "app": false, "emulators": "Firestore only, started for the run if it is not already running", "browser": false, "network": false },
+      "data": "Throwaway documents in a test-only project, cleared between tests. Nothing real.",
+      "files": ["tests/rules.test.js", "tests/unit/contract.test.mjs"],
+      "command": "make test-rules",
+      "time": { "laptop": "about a second with the emulators running", "container": "a few seconds", "ci": "about 7 seconds, starting the emulator included" },
+      "runsIn": ["make test, after the unit tests", "every pull request and push on CI"],
+      "blocksDeploy": true,
+      "runWhen": "Any change to firestore.rules, web/contract.js, or what the app saves."
+    },
+    {
+      "id": "browser",
+      "name": "Browser smoke tests (the gate)",
+      "status": "built",
+      "oneLine": "The real app in a real browser against the emulators, one feature per test.",
+      "proves": "Features work end to end, the way a person uses them: signing in, adding and finishing tasks, stamps, sync to a second browser, refused saves keeping your work, a reload keeping unsaved edits, two time zones, the universe loading worlds, the world opening with Moss moving, feedback, the app without 3D, and the page loading with production render settings.",
+      "doesNotProve": "Speed or frame rate; these are never performance tests. Phone layouts (every test is 1280 wide). Real Google sign-in, App Check and production caching. Long 3D exploring, which is the walkthroughs' job.",
+      "needs": { "app": "on port 8765, from make serve or make up", "emulators": "Auth, Firestore and Storage, started for the run if not running", "browser": "Playwright's Chromium, with software 3D", "network": false },
+      "data": "Each test signs in as a brand-new account on the emulators and makes its own data. Nothing real. A plain make test on the laptop reuses make up's emulators, so old test accounts pile up there (backlog 20).",
+      "files": ["tests/smoke-*.js", "tests/load-check.js"],
+      "command": "make test, or one test: S=/tmp node tests/smoke-sync.js",
+      "time": { "laptop": "2 to 3 minutes in two lanes", "container": "about 2¼ minutes in two lanes, 3¼ in one", "ci": "about 6 minutes, one lane" },
+      "runsIn": ["make test", "make docker-test", "make deploy, in the test container, before anything goes live", "every pull request and push on CI"],
+      "blocksDeploy": true,
+      "runWhen": "The one test that covers your change while you work; the whole gate before a deploy."
+    },
+    {
+      "id": "walkthroughs",
+      "name": "Walkthroughs (after a deploy)",
+      "status": "built",
+      "oneLine": "Long 3D tours of the world and the universe, reported after a deploy.",
+      "proves": "Exploring holds together: walking and driving, the cameras, Moss's eyes, the map, entering worlds, stairs, the walk stick.",
+      "doesNotProve": "Anything about saved data, since they write none, and nothing about speed. They do not block a deploy: a failure means deciding whether to roll back.",
+      "needs": { "app": "on port 8765", "emulators": "Auth and Firestore", "browser": "Playwright's Chromium, with software 3D", "network": false },
+      "data": "Demo records and made-up worlds on the emulators. Nothing real.",
+      "files": ["tests/walk-world.js", "tests/walk-universe.js"],
+      "command": "make test-after",
+      "time": { "laptop": "a few minutes", "container": "a few minutes", "ci": "4 to 5 minutes" },
+      "runsIn": ["CI, beside the deploy", "make deploy, once the deploy is done"],
+      "blocksDeploy": false,
+      "runWhen": "Changes to the world, the universe, Moss's movement, the cameras or the controls."
+    },
+    {
+      "id": "prod-smoke",
+      "name": "Production smoke test",
+      "status": "planned (backlog 7)",
+      "oneLine": "A five-second check of the real site on the next channel, before it goes live.",
+      "proves": "The build deployed is the one expected, it loads, App Check gives it a token, a public read works, and a world draws.",
+      "doesNotProve": "Signing in or saving anything; it only reads (signing in is a Later item).",
+      "needs": { "app": "the deployed next channel", "emulators": false, "browser": "Playwright's Chromium", "network": "the real site" },
+      "data": "Production, public reads only.",
+      "files": [],
+      "command": "part of make deploy and CI's deploy, once built",
+      "time": { "laptop": "about 5 seconds", "container": "about 5 seconds", "ci": "about 5 seconds" },
+      "runsIn": ["every deploy, between the next channel and going live"],
+      "blocksDeploy": true,
+      "runWhen": "Every deploy, automatically."
+    }
+  ],
+  "places": [
+    { "id": "laptop", "name": "On the laptop", "about": "make test with your own emulators and browser. Quickest to start, but it reuses make up's emulators, so a failure seen only here is suspect until backlog 20." },
+    { "id": "container", "name": "In the test container", "about": "make docker-test: the same tests in the test image with fresh emulators. With LIMITS='--cpuset-cpus=0,1 --memory=4g' it has CI's two cores. make deploy runs its gate here." },
+    { "id": "ci", "name": "On CI", "about": "GitHub's runner, two cores, one lane, fresh emulators, on every pull request and push to main. Its results are kept and make ci-history reads them." }
+  ]
+}

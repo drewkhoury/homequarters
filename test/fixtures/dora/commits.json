@@ -1,0 +1,99 @@
+[
+ {
+  "sha": "b61152e483c0ba41088b4f2c63af775166a5be6a",
+  "at": "2026-09-30T04:51:06-04:00",
+  "subject": "fix(app): a new account's start date no longer shows a time zone",
+  "body": "A new account's start date is now midnight UTC, the same in every zone.\n\nA unit test checks it in four zones.",
+  "paths": [
+   "docs/DATA.md",
+   "docs/TESTING.md",
+   "docs/backlog/next/joined-at-shows-time-zone.md",
+   "docs/plans/sync-review.md",
+   "docs/sessions/2026-09-30-stability-batch.md",
+   "tests/smoke-public.js",
+   "tests/unit/quest-core.test.mjs",
+   "web/app.js",
+   "web/quest-core.js"
+  ]
+ },
+ {
+  "sha": "e6b4837829db97bbb97405f712dcf524224e93e6",
+  "at": "2026-10-01T02:28:49-04:00",
+  "subject": "fix: deploys go green and the backlog is tidied (#65)",
+  "body": "Deploy run 36692304266 went red on check 4 because a third-party frame logged a\nreport-only policy warning. Nothing was blocked.",
+  "paths": [
+   ".github/workflows/deploy.yml",
+   ".github/workflows/test.yml",
+   ".github/workflows/unit.yml",
+   "Makefile",
+   "docs/DATA.md",
+   "docs/DECISIONS.md",
+   "docs/DEPLOY.md",
+   "docs/TESTING.md",
+   "docs/backlog/inbox/chat-renders-while-streaming.md",
+   "docs/backlog/inbox/hq-line-link-in-split.md",
+   "docs/backlog/inbox/map-islands-small-on-phone.md",
+   "docs/backlog/inbox/prod-smoke-recaptcha-frame.md",
+   "docs/backlog/next/away-device-undoes-delete.md",
+   "docs/backlog/next/close-fast-deploy-plan.md",
+   "docs/backlog/next/coverage-pass-rest.md",
+   "docs/backlog/next/deploy-first-real-runs.md",
+   "docs/backlog/next/deploy-safety-later.md",
+   "docs/backlog/next/deploy-through-channel.md",
+   "docs/backlog/next/devpipe-flake-detection.md",
+   "docs/backlog/next/gate-across-two-ci-jobs.md",
+   "docs/backlog/next/rig-probes-in-repo.md",
+   "docs/backlog/next/soak-smoke-fields.md",
+   "docs/backlog/next/tests-without-shadows.md",
+   "docs/backlog/parked/bound-universe-read.md",
+   "docs/backlog/parked/cache-node-modules.md",
+   "docs/backlog/parked/decide-git-container-failure.md",
+   "docs/backlog/parked/delete-gap.md",
+   "docs/backlog/parked/layout-past-5000.md",
+   "docs/backlog/parked/map-islands-small-on-phone.md",
+   "docs/backlog/parked/preview-urls-on-prs.md",
+   "docs/backlog/parked/prod-smoke-signs-in.md",
+   "docs/backlog/parked/public-record-from-device-behind.md",
+   "docs/backlog/parked/self-hosted-runner.md",
+   "docs/backlog/parked/smoke-prep-out-of-step.md",
+   "docs/backlog/parked/staging-project.md",
+   "docs/history/fast-deploy-evidence.md",
+   "docs/history/fast-deploy-findings.md",
+   "docs/history/fast-deploy.md",
+   "docs/plans/coverage-pass.md",
+   "hq/pipeline.json",
+   "scripts/decide.mjs",
+   "tests/helpers.js",
+   "tests/prod-smoke-checks.mjs",
+   "tests/smoke-accounts.js",
+   "tests/smoke-reset.js",
+   "tests/unit/decide.test.mjs",
+   "tests/unit/prod-smoke.test.mjs",
+   "web/app.js",
+   "web/sync.js"
+  ]
+ },
+ {
+  "sha": "7ad072257e1ba21a1c17649c6a3f8a7924c57e35",
+  "at": "2026-10-02T05:35:41-04:00",
+  "subject": "fix(hq): the Decisions page is one table with one search",
+  "body": "A search on the page filtered only the table it sat above, so \"gate\"\nleft all 177 earlier lines showing. Every decision is now a row of one\ndataTable: the files newest first, then the frozen lines in the file's\norder, with a Part column (\"From 2 Oct 2026\", \"To 2 Oct 2026\") that\ncan also be filtered. The two headings and their notes move into the\npage's info button and one line of counts.\n\nOn a 390 px phone the Text cell overflowed: as a card, a cell is a grid\nof label and value, and each run of text and each <code> in it became\na grid cell, so code sat over the next words and the sentence was cut\nmid-word. The cell's contents are now one span, and hq.css lets that\ncell and its code wrap on a narrow screen. The CSS has no test; the\nsingle span does.",
+  "paths": [
+   "hq/pages/decisions.mjs",
+   "hq/static/hq.css"
+  ]
+ },
+ {
+  "sha": "c5b78b046a0b867443cafe2f008915e7cea60c8b",
+  "at": "2026-10-05T18:08:33-04:00",
+  "subject": "test: an item heard twice is held once",
+  "body": "A review of the move. The unit tests never applied the most common record,\nso a typo in that branch would have passed them.",
+  "paths": [
+   "docs/TESTING.md",
+   "tests/smoke-rollover.js",
+   "tests/smoke-stuck-board.js",
+   "tests/smoke-twozone.js",
+   "tests/unit/sync-apply.test.mjs"
+  ]
+ }
+]

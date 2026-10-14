@@ -46,7 +46,7 @@ test('a request picks its sections in the file\'s order; unknown names drop out;
 test('tokens are about four characters each, and the file is named for the day and the commit', () => {
   assert.equal(estimateTokens('abcd'.repeat(10)), 10);
   assert.equal(estimateTokens('abcde'), 2);
-  assert.equal(fileName('2026-09-29T05:38:04Z', '79ee20916bb4edb573'), 'questkeep-hq-2026-09-29-79ee209.md');
+  assert.equal(fileName('2026-09-29T05:38:04Z', '79ee20916bb4edb573'), 'hq-2026-09-29-79ee209.md');
 });
 
 test('binary, minified, generated, lock and huge files stay out of Source; the project\'s own code goes in', () => {
@@ -104,7 +104,7 @@ test('Conversations lists each one, and adds what was written only when asked', 
 test('the file opens with what it is and what is in it, then the chosen sections in order', () => {
   const body = assemble({ repo: '/r', branch: 'main', sha: 'abc1234', at: '2026-09-29T05:00:00Z', ids: ['repo', 'docs'],
     sections: { repo: '## Repo state\n\nclean', docs: '## Docs\n\nhello', source: '## Source code\n\nnot chosen' } });
-  assert.match(body, /^# QuestKeep HQ export\n\nWhat QuestKeep HQ, the project's local intranet, showed at 2026-09-29T05:00:00.000Z: the repo `\/r` on branch `main` at commit `abc1234`/);
+  assert.match(body, /^# HQ export\n\nWhat HQ showed at 2026-09-29T05:00:00.000Z: the repo `\/r` on branch `main` at commit `abc1234`/);
   assert.match(body, /- Repo state: about \d+ tokens\n- Docs: about \d+ tokens/);
   assert.ok(body.indexOf('## Repo state') < body.indexOf('## Docs'));
   assert.ok(!body.includes('not chosen'));
@@ -123,13 +123,13 @@ const AT = Date.parse('2026-09-29T10:00:00Z');
 
 test('the zip is one folder: a README first, the summaries, and the tracked files at their repo paths under repo/', () => {
   const e = zipEntries({ repo: '/r', branch: 'main', sha: 'cf0d3c5aaa', at: AT, ids: ['repo', 'docs', 'backlog', 'source'], parts: ZIP_PARTS, files: ZIP_FILES });
-  const root = 'questkeep-hq-2026-09-29-cf0d3c5/';
+  const root = 'hq-2026-09-29-cf0d3c5/';
   assert.deepEqual(e.map(x => x.name.replace(root, '')), ['README.md', 'repo-state.md', 'backlog.md', 'repo/docs/backlog/next/sprint.md', 'repo/README.md', 'repo/docs/DATA.md', 'repo/web/app.js']);
   assert.ok(e.every(x => x.name.startsWith(root)));
   assert.match(e[0].data, /## What is where\n\n- `repo-state.md`/);
   assert.match(e[0].data, /Left out of the source:\n  - lock files: 1/);
   assert.equal(e.find(x => x.name.endsWith('web/app.js')).data.toString(), 'export const x = 1;\n', 'a file goes in as it is, not fenced');
-  assert.equal(zipName(AT, 'cf0d3c5aaa'), 'questkeep-hq-2026-09-29-cf0d3c5.zip');
+  assert.equal(zipName(AT, 'cf0d3c5aaa'), 'hq-2026-09-29-cf0d3c5.zip');
 });
 
 test('sections left out leave their files out, and conversations get a file each only when asked', () => {

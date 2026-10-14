@@ -14,12 +14,12 @@ import { EventEmitter } from 'node:events';
 import { PassThrough, Writable } from 'node:stream';
 import { execFileSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
-import { start } from '../server.mjs';
-import { demoConfig, demoFacts, demoSettings } from '../lib/demo.mjs';
-import { escapePath } from '../lib/conversations.mjs';
-import { loadItems } from '../lib/backlog.mjs';
-import { compute, summarise } from '../lib/dora.mjs';
-import { parseRemote } from '../lib/outside.mjs';
+import { start } from '../../server.mjs';
+import { demoConfig, demoFacts, demoSettings } from '../../lib/demo.mjs';
+import { escapePath } from '../../lib/conversations.mjs';
+import { loadItems } from '../../lib/backlog.mjs';
+import { compute, summarise } from '../../lib/dora.mjs';
+import { parseRemote } from '../../lib/outside.mjs';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..', '..');
 const LAPTOP = process.env.HQ_CACHE || join(homedir(), '.cache', 'questkeep');

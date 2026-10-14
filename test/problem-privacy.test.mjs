@@ -6,9 +6,11 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { textProblems } from '../lib/problem-privacy.mjs';
 
-// a laptop as the check sees it: its home, the email domains HQ's demo setting keeps, and the strings it lists as private
-// (the demo lists the home folder's own name as private too, as this laptop's does)
-const CTX = { home: '/Users/someone', keepEmailDomains: ['example.com', 'github.com'], private: ['Hollowmere', 'Pip Bramble', 'someone'] };
+// a laptop as the check sees it: its home, the repo and the cache the manifest names (privacyContext gives them), the
+// email domains HQ's demo setting keeps, and the strings it lists as private (the demo lists the home folder's own name
+// as private too, as this laptop's does)
+const CTX = { home: '/Users/someone', repo: '/Users/someone/repos/questkeep', cache: '/Users/someone/.cache/questkeep',
+  keepEmailDomains: ['example.com', 'github.com'], private: ['Hollowmere', 'Pip Bramble', 'someone'] };
 const ok = text => assert.deepEqual(textProblems(text, CTX), [], text);
 const refused = (text, why) => {
   const r = textProblems(text, CTX);
@@ -94,11 +96,17 @@ test('the other secrets this laptop holds are refused', () => {
   refused('key sk-ant-api03-abcdefghijklmnopqrstuvwx', /token/);
 });
 
-// Theo's review of the build, finding 5: backfill step 2 cites a transcript or meta-analysis's extracted corrections by
-// file and line, as the plan's Privacy section says, and the check refused both.
-test("a pointer into this project's transcripts or the meta-analysis repo is written", () => {
+// Theo's review of the build, finding 5: backfill step 2 cites a transcript by file and line, as the plan's Privacy
+// section says, and the check refused it. (QuestKeep's HQ also allowed a pointer into the meta-analysis repo beside it;
+// the check now allows only the repo, its worktrees, the cache and the repo's transcripts, so that allowance is gone.)
+test("a pointer into this project's transcripts is written, and one into another project's is not", () => {
   ok('~/.claude/projects/-Users-someone-repos-questkeep/3d143a95-6a0f-413e-aff8-88f937701c4b.jsonl:412');
-  ok('/Users/someone/repos/meta-analysis/knowledge/testing/corrections.md:30');
   refused('~/.claude/projects/-Users-someone-repos-othergame/abc.jsonl:3', /outside/);
   refused('~/.claude/settings.json', /outside/);
+});
+
+test('with no repo and no cache given, only the private folders are refused, since nothing says where the project is', () => {
+  const bare = { ...CTX, repo: null, cache: null };
+  assert.deepEqual(textProblems('read /Users/someone/Documents/plan.pdf', bare), []);
+  assert.ok(textProblems('see ~/personal/taxes', bare).some(x => /private folder/.test(x)));
 });

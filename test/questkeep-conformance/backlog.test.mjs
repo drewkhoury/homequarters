@@ -6,7 +6,7 @@ import assert from 'node:assert/strict';
 import { existsSync, readFileSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { loadItems, check, normTitle } from '../lib/backlog.mjs';
+import { loadItems, check, normTitle } from '../../lib/backlog.mjs';
 
 const REPO = join(dirname(fileURLToPath(import.meta.url)), '..', '..');
 const items = loadItems(REPO);

@@ -51,7 +51,7 @@ test('a conversation continues by its session id, and nothing else from the brow
 
 test('the question tells claude where in HQ it was asked', () => {
   assert.equal(askPrompt({ question: ' What calls this? ', file: 'web/app.js', title: 'app.js', page: '/code/web/app.js' }),
-    'I am looking at the file web/app.js titled "app.js" (HQ page /code/web/app.js) in QuestKeep HQ.\n\nWhat calls this?');
+    'I am looking at the file web/app.js titled "app.js" (HQ page /code/web/app.js) in HQ.\n\nWhat calls this?');
   assert.equal(askPrompt({ question: 'Hi' }), 'Hi');
 });
 

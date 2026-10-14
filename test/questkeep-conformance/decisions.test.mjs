@@ -7,7 +7,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { loadDecisions, check, OLD_FILE } from '../lib/decisions.mjs';
+import { loadDecisions, check, OLD_FILE } from '../../lib/decisions.mjs';
 
 const REPO = join(dirname(fileURLToPath(import.meta.url)), '..', '..');
 const OLD = readFileSync(join(REPO, OLD_FILE), 'utf8');

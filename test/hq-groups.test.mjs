@@ -1,14 +1,12 @@
-// hq/groups.json sorts the repo's files for the Code page's filter. Every tracked file must land in exactly one group,
-// so a new folder or a README inside hq/ makes this fail until the file says where it belongs.
+// The groups a project's groups file sorts the Code page's files into (lib/groups.mjs): the three kinds of pattern, a
+// pattern that takes a folder back out of a wider group, and what a repo with no groups file gets. Whether QuestKeep's
+// own hq/groups.json places every tracked file is QuestKeep's check (test/questkeep-conformance/hq-groups.test.mjs).
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { execFileSync } from 'node:child_process';
-import { join, dirname } from 'node:path';
-import { fileURLToPath } from 'node:url';
-import { loadGroups, groupsOf, groupOf, matches } from '../lib/groups.mjs';
-
-const REPO = join(dirname(fileURLToPath(import.meta.url)), '..', '..');
-const groups = loadGroups(REPO);
+import { mkdtempSync, writeFileSync, rmSync } from 'node:fs';
+import { join } from 'node:path';
+import { tmpdir } from 'node:os';
+import { loadGroups, groupsOf, groupOf, matches, DEFAULT_GROUPS } from '../lib/groups.mjs';
 
 test('the three kinds of pattern: a folder, a kind of file, one file', () => {
   assert.equal(matches('web/app.js', 'web/'), true);
@@ -25,17 +23,20 @@ test('a ! pattern takes a folder back out of a wider group', () => {
   assert.deepEqual(groupsOf('docs/DATA.md', g), ['docs']);
 });
 
-test('every tracked file matches at most one group, and so lands in exactly one', () => {
-  const files = execFileSync('git', ['ls-files'], { cwd: REPO }).toString().trim().split('\n');
-  assert.ok(files.length > 50, 'git ls-files found the repo');
-  const twice = files.map(f => [f, groupsOf(f, groups)]).filter(([, g]) => g.length > 1);
-  assert.deepEqual(twice, [], 'files in two groups');
-  const ids = new Set(groups.map(g => g.id));
-  for (const f of files) assert.ok(ids.has(groupOf(f, groups)), f);
+test('a path that matches no group lands in the one with no patterns, else in other', () => {
+  const g = [{ id: 'app', paths: ['web/'] }, { id: 'rest', paths: [] }];
+  assert.equal(groupOf('web/app.js', g), 'app');
+  assert.equal(groupOf('Makefile', g), 'rest');
+  assert.equal(groupOf('Makefile', [{ id: 'app', paths: ['web/'] }]), 'other');
 });
 
-test('the groups land where Drew asked', () => {
-  const where = f => groupOf(f, groups);
-  assert.deepEqual(['web/app.js', 'tests/helpers.js', 'devpipe.toml', 'README.md', 'docs/DATA.md', 'firestore.rules', '.github/workflows/test.yml', 'Makefile', 'hq/server.mjs', 'package.json', 'docs/backlog/README.md', 'docs/backlog/next/sprint.md'].map(where),
-    ['app', 'tests', 'tests', 'docs', 'docs', 'infra', 'infra', 'infra', 'hq', 'other', 'backlog', 'backlog']);
+test('the groups file the manifest names is read; with none, or one that cannot be read, there are no groups to narrow to', t => {
+  const dir = mkdtempSync(join(tmpdir(), 'hq-groups-'));
+  t.after(() => rmSync(dir, { recursive: true, force: true }));
+  writeFileSync(join(dir, 'groups.json'), JSON.stringify({ groups: [{ id: 'app', title: 'The app', paths: ['web/'] }, { id: 'other', title: 'Other', paths: [] }] }));
+  assert.deepEqual(loadGroups(join(dir, 'groups.json')).map(g => g.id), ['app', 'other']);
+  assert.equal(loadGroups(null), DEFAULT_GROUPS);
+  assert.equal(loadGroups(join(dir, 'missing.json')), DEFAULT_GROUPS);
+  assert.deepEqual(DEFAULT_GROUPS, [], 'the Code page adds All itself, so a default group would show twice');
+  assert.equal(groupOf('anything/at/all.txt', DEFAULT_GROUPS), 'other');
 });

@@ -8,8 +8,8 @@ import assert from 'node:assert/strict';
 import { mkdtempSync, mkdirSync, writeFileSync, readFileSync, readdirSync, existsSync } from 'node:fs';
 import { join } from 'node:path';
 import { tmpdir } from 'node:os';
-import { keep } from '../../scripts/ci-keep.mjs';
-import { allRuns } from '../lib/runs.mjs';
+import { keep } from '../../../scripts/ci-keep.mjs';
+import { allRuns } from '../../lib/runs.mjs';
 
 // a job's results folder as the workflows leave it: run.json from tests/run-info.mjs and a JUnit file per task
 const results = (meta = { kind: 'load', where: 'ci', who: 'ci', branch: 'main', commit: '3f21a4b7', run: '38153884477', attempt: '1', at: '2026-10-11T16:32:00Z' }) => {

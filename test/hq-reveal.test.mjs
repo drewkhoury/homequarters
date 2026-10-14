@@ -7,7 +7,7 @@ import { mkdtempSync, mkdirSync, writeFileSync, rmSync, realpathSync } from 'nod
 import { join } from 'node:path';
 import { tmpdir } from 'node:os';
 import { request } from 'node:http';
-import { start, REPO } from '../server.mjs';
+import { start } from '../server.mjs';
 import * as outside from '../lib/outside.mjs';
 
 const { parseRemote, githubFileUrl, chooseGithubRef, revealCommand, reveal } = outside;
@@ -79,7 +79,8 @@ before(async () => {
   mkdirSync(join(repo, 'web'), { recursive: true }); mkdirSync(join(cache, 'runs'), { recursive: true });
   writeFileSync(join(repo, 'web', 'app.js'), '');
   writeFileSync(join(base, 'secret.txt'), '');
-  ({ server, url } = await start({ port: 0, repo: REPO, cache, platform: 'darwin', run: async (cmd, args, opts) => { ran.push([cmd, ...args]); lastOpts = opts; return null; } }));
+  // the server runs against the repo made here, not the folder the tests were started from
+  ({ server, url } = await start({ port: 0, repo, cache, platform: 'darwin', run: async (cmd, args, opts) => { ran.push([cmd, ...args]); lastOpts = opts; return null; } }));
 });
 after(() => { server.close(); rmSync(base, { recursive: true, force: true }); });
 
@@ -109,9 +110,9 @@ const post = (path, { method = 'POST', origin = url, type = 'application/json', 
 
 test('the server shows a repo file when HQ itself asks', async () => {
   ran.length = 0;
-  const r = await post('/reveal', { body: JSON.stringify({ root: 'repo', path: 'Makefile' }) });
+  const r = await post('/reveal', { body: JSON.stringify({ root: 'repo', path: 'web/app.js' }) });
   assert.equal(r.status, 200, r.text);
-  assert.deepEqual(ran, [['open', '-R', join(realpathSync(REPO), 'Makefile')]]);
+  assert.deepEqual(ran, [['open', '-R', join(repo, 'web', 'app.js')]]);
 });
 
 test('GET is refused, so no link or prefetch can set it off', async () => {
@@ -149,7 +150,7 @@ test('Fetch runs git fetch --prune in the repo when HQ itself asks', async () =>
   const r = await post('/git/fetch', { body: '{}' });
   assert.equal(r.status, 200, r.text);
   assert.deepEqual(ran, [['git', 'fetch', '--prune']]);
-  assert.equal(lastOpts.cwd, REPO, 'in this repo, not wherever HQ was started');
+  assert.equal(lastOpts.cwd, repo, 'in this repo, not wherever HQ was started');
 });
 
 test('Fetch refuses GET, another origin, none, and a form post, and runs nothing', async () => {

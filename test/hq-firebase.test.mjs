@@ -4,13 +4,16 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { mkdtempSync, writeFileSync, mkdirSync, rmSync } from 'node:fs';
-import { join, dirname } from 'node:path';
+import { join } from 'node:path';
 import { tmpdir } from 'node:os';
-import { fileURLToPath } from 'node:url';
+import { after } from 'node:test';
 import { projectId, release, channel, compareLive, consoleLinks, firebaseData } from '../lib/firebase.mjs';
 import { githubPart } from '../pages/github.mjs';
 
-const REPO = join(dirname(fileURLToPath(import.meta.url)), '..', '..');
+// a repo made here whose .firebaserc names the project, as a Firebase project's does; no git, so main is not known
+const REPO = mkdtempSync(join(tmpdir(), 'hq-fb-repo-'));
+writeFileSync(join(REPO, '.firebaserc'), JSON.stringify({ projects: { default: 'questkeep' } }));
+after(() => rmSync(REPO, { recursive: true, force: true }));
 // a release and channels shaped as the Hosting API answered them on 26 September
 const RELEASE = { name: 'sites/questkeep/channels/live/releases/1790459156578000', type: 'DEPLOY', releaseTime: '2026-09-26T21:45:56.578Z',
   releaseUser: { email: 'github-deploy@questkeep.iam.gserviceaccount.com' },
@@ -29,6 +32,8 @@ test('the project comes from .firebaserc, else from web/firebase-config.js', () 
     mkdirSync(join(d, 'web'));
     writeFileSync(join(d, 'web', 'firebase-config.js'), 'export const firebaseConfig = {\n  "apiKey": "x",\n  "projectId": "other-one"\n};');
     assert.equal(projectId(d), 'other-one');
+    writeFileSync(join(d, '.firebaserc'), JSON.stringify({ projects: { default: 'from-rc' } }));
+    assert.equal(projectId(d), 'from-rc', '.firebaserc wins when both are there');
     assert.equal(projectId(join(d, 'nowhere')), null);
   } finally { rmSync(d, { recursive: true, force: true }); }
 });

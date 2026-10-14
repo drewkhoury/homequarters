@@ -1,43 +1,26 @@
-// hq/pipeline.json is the one place the Pipeline page's picture is described. It must name only test sets and tests
-// the Makefile and tests/ really have, or the page would quietly show a step with nothing in it.
+// The pipeline (lib/pipeline.mjs, pages/pipeline.mjs): which run stands for a step's last result, and the full drawing
+// of a pipeline file. The pipeline here is a small one written in the test. Whether QuestKeep's own hq/pipeline.json
+// names real sets and tests is QuestKeep's check (test/questkeep-conformance/hq-pipeline.test.mjs).
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { readFileSync } from 'node:fs';
-import { join, dirname } from 'node:path';
-import { fileURLToPath } from 'node:url';
-import { loadPipeline, allSteps, lastResult } from '../lib/pipeline.mjs';
-import { makeSets, catalogue } from '../lib/catalogue.mjs';
-import { loadItems } from '../lib/backlog.mjs';
+import { lastResult, allSteps } from '../lib/pipeline.mjs';
+import { pipelineSvg, wrapText } from '../pages/pipeline.mjs';
 
-const REPO = join(dirname(fileURLToPath(import.meta.url)), '..', '..');
-const pipeline = loadPipeline(REPO);
-const sets = makeSets(readFileSync(join(REPO, 'Makefile'), 'utf8'));
-const files = catalogue(REPO);
+// Two paths: a pull request's steps, one of them in two parts, and a merge's, one of them not built yet.
+const PIPELINE = { paths: [
+  { title: 'A pull request', steps: [
+    { title: 'Unit tests', layers: ['unit'], results: [{ where: 'laptop', task: 'unit' }] },
+    { title: 'The gate', sets: ['gate'], results: [{ where: 'container', task: 'docker-gate' }], parts: [{ title: 'Lane one', tests: ['smoke-sync'] }, { title: 'Lane two', tests: ['smoke-reject'] }] },
+  ] },
+  { title: 'A merge to main', steps: [
+    { title: 'Deploy', what: 'The served files go to Hosting.' },
+    { title: 'Live check', planned: 'prod-smoke' },
+  ] },
+] };
+const FILES = [{ path: 'tests/smoke-sync.js', name: 'smoke-sync', set: 'gate' }, { path: 'tests/smoke-reject.js', name: 'smoke-reject', set: 'gate' }, { path: 'tests/unit/day.test.mjs', name: 'day', set: 'unit' }];
 
-test('every set a step names is a set of tests that exists', () => {
-  const known = new Set([...Object.keys(sets), ...files.map(f => f.set)]);
-  for (const s of allSteps(pipeline)) for (const set of s.sets || []) {
-    assert.ok(known.has(set), `${s.title} names the set ${set}`);
-    assert.ok(files.some(f => f.set === set), `${s.title}: no test files in ${set}`);
-  }
-});
-
-test("every test a step names is in one of the Makefile's sets", () => {
-  const inMakefile = new Set(Object.values(sets).flat());
-  for (const s of allSteps(pipeline)) for (const name of s.tests || []) assert.ok(inMakefile.has(name), `${s.title} names ${name}`);
-});
-
-test("the gate and long-set steps cover the Makefile's gate and after sets, so no browser test is missing from the picture", () => {
-  const named = new Set(allSteps(pipeline).flatMap(s => [...(s.sets || []), ...(s.tests || [])]));
-  for (const set of Object.keys(sets)) assert.ok(named.has(set) || sets[set].every(t => named.has(t)), `the ${set} set is on no step`);
-});
-
-test('every step has a title, and a planned step names a backlog item that is still open', () => {
-  const open = new Set(loadItems(REPO).map(i => i.slug));
-  for (const s of allSteps(pipeline)) {
-    assert.ok(s.title, JSON.stringify(s));
-    if ('planned' in s) assert.ok(open.has(s.planned), `${s.title}: planned names ${s.planned}, which is not in docs/backlog/ (shipped? then the step is built)`);
-  }
+test('every step and part is listed flat, so a part is checked like a step', () => {
+  assert.deepEqual(allSteps(PIPELINE).map(s => s.title), ['Unit tests', 'The gate', 'Lane one', 'Lane two', 'Deploy', 'Live check']);
 });
 
 test('a result comes from the newest run in that place that ran that task', () => {
@@ -55,10 +38,9 @@ test('a run of only some of a set\'s tests is not the set\'s result, and a full 
   assert.equal(lastResult([run('1', 'unit', true)], { where: 'container', task: 'unit' }).run.id, '1', 'a partial run still counts for unit');
 });
 
-test('the full drawing has a box for every step, in a row per path, none overlapping', async () => {
-  const { pipelineSvg, wrapText } = await import('../pages/pipeline.mjs');
-  const { boxes, width, height, svg } = pipelineSvg(pipeline, files, [], { where: '', branch: '' });
-  assert.equal(boxes.length, pipeline.paths.reduce((n, p) => n + p.steps.length, 0));
+test('the full drawing has a box for every step, in a row per path, none overlapping', () => {
+  const { boxes, width, height, svg } = pipelineSvg(PIPELINE, FILES, [], { where: '', branch: '' });
+  assert.equal(boxes.length, PIPELINE.paths.reduce((n, p) => n + p.steps.length, 0));
   for (const a of boxes) for (const b of boxes) {
     if (a === b) continue;
     const apart = a.x + a.w <= b.x || b.x + b.w <= a.x || a.y + a.h <= b.y || b.y + b.h <= a.y;
@@ -66,12 +48,6 @@ test('the full drawing has a box for every step, in a row per path, none overlap
   }
   for (const b of boxes) assert.ok(b.x + b.w <= width && b.y + b.h <= height, `${b.title} is inside the drawing`);
   assert.equal((svg.match(/class="box planned"/g) || []).length, boxes.filter(b => b.planned).length);
+  assert.equal(boxes.filter(b => b.planned).length, 1, 'the one step not built yet is drawn as planned');
   assert.deepEqual(wrapText('one two three four', 9), ['one two', 'three', 'four']);
-});
-
-test('every kind of test a step names is in tests/layers.json (or, until it lands, the copy the layer tests use)', async () => {
-  const { loadLayers, layersPath } = await import('../lib/layers.mjs');
-  const L = loadLayers(layersPath(REPO)) || loadLayers(join(REPO, 'tests', 'unit', 'fixtures', 'hq-layers.json'));
-  const ids = new Set(L.layers.map(l => l.id));
-  for (const s of allSteps(pipeline)) for (const id of s.layers || []) assert.ok(ids.has(id), `${s.title} names ${id}`);
 });

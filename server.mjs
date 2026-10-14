@@ -112,7 +112,8 @@ export function handler({ repo = REPO, m = loadManifest(repo).m, plugins = [], p
   if (m.backlog) configureBacklog({ rel: m.backlog.rel, mapRel: m.backlog.map ? m.backlog.map.slice(repo.length + 1) : null, earlierRel: m.backlog.earlierRel, stages: m.backlog.stages });
   if (m.decisions) configureDecisions({ rel: m.decisions.rel, earlierRel: m.decisions.earlierRel });
   configureDelivery(m.delivery);
-  setNav(pagesFor(m, plugins)); setBrand(m.name);
+  // in the demo a plugin that keeps out of it (demo: false) is out of the nav too, and its page below answers not found
+  setNav(pagesFor(m, demo ? plugins.filter(p => p.demo) : plugins)); setBrand(m.name);
   const ctx = { repo, cache, m, plugins, pluginsFailed, warnings, links, gh, fb, demo, ...(projectsDir ? { projectsDir } : {}) };
   const off = f => !m.features[f];
   const cw = claudeWatcher({ find: claude.find, env: claude.env || process.env, platform, repo });
@@ -221,7 +222,7 @@ export function handler({ repo = REPO, m = loadManifest(repo).m, plugins = [], p
         default: {
           // a plugin's page, when one claims this path
           const pl = plugins.find(p => p.path === top && (!demo || p.demo));
-          if (!pl) return notFound(res);
+          if (!pl) return notFound(res, plugins.some(p => p.path === top) ? 'That page is not in the demo.' : 'Nothing here.');
           const html = await pl.page(ctx, url.searchParams, rest);
           return html ? send(res, 200, html) : notFound(res);
         }
@@ -412,7 +413,7 @@ async function claudeFollowRoute(req, res, params, { repo, projectsDir, claude, 
 }
 
 // Listens on the port given, or on 8780 and upwards past any port in use. Port 0 takes any free one, for the tests.
-export function start({ port = +(process.env.HQ_PORT || 8780), repo = REPO, m = loadManifest(repo).m, plugins = [], pluginsFailed = [], warnings = [], cache = m.cache, gh, run, platform, fb, claude, projectsDir, demo = loadDemo({ repo, cache, file: m.demo }) } = {}) {
+export function start({ port = +(process.env.HQ_PORT || 8780), repo = REPO, m = loadManifest(repo).m, plugins = [], pluginsFailed = [], warnings = [], cache = m.cache, gh, run, platform, fb, claude, projectsDir, demo = loadDemo({ repo, cache, name: m.name }) } = {}) {
   const server = createServer(handler({ repo, m, plugins, pluginsFailed, warnings, cache, gh, run, platform, fb, claude, projectsDir, demo }));
   const fixed = !!process.env.HQ_PORT || port === 0;
   return new Promise((resolve, reject) => {

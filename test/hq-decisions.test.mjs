@@ -12,6 +12,8 @@ import { tmpdir } from 'node:os';
 import { fileURLToPath } from 'node:url';
 import { parseFrozen, parseDecision, loadDecisions, check } from '../lib/decisions.mjs';
 import { decisionsPage } from '../pages/decisions.mjs';
+import { resolveManifest, pagesFor } from '../lib/manifest.mjs';
+import { setNav } from '../lib/page.mjs';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const FIXTURE = join(HERE, 'fixtures', 'decisions');
@@ -83,7 +85,12 @@ test('the fixture keeps to the rules, and each rule a file can break is named', 
   assert.deepEqual(check([by('2026-10-05-coffee.md'), file('2026-10-05-coffee.md')]), [], 'a replacement from the same day is fine');
 });
 
-const page = (repo, params = '') => decisionsPage({ repo, cache: null }, new URLSearchParams(params));
+// the nav as the server sets it for a repo whose manifest names its decisions, so the page can mark its own entry
+const page = (repo, params = '') => {
+  const { m } = resolveManifest({ schemaVersion: 1, name: 'scratch', decisions: { dir: 'docs/decisions', earlier: 'docs/DECISIONS.md' } }, { repo });
+  setNav(pagesFor(m));
+  return decisionsPage({ repo, cache: null, m }, new URLSearchParams(params));
+};
 // each table row's HTML, in the order the page draws them
 const rowsOf = html => [...html.matchAll(/<tr\b[^>]*>(?:(?!<\/tr>)[\s\S])*<\/tr>/g)].map(m => m[0]).filter(r => !r.includes('<th'));
 
@@ -145,7 +152,7 @@ test('the reader and the page start no program, so the page needs no git', () =>
       else reached.push(spec);
     }
   };
-  walk(join(HERE, '..', '..', 'hq', 'pages', 'decisions.mjs'));
-  assert.ok(seen.has(join(HERE, '..', '..', 'hq', 'lib', 'decisions.mjs')));
+  walk(join(HERE, '..', 'pages', 'decisions.mjs'));
+  assert.ok(seen.has(join(HERE, '..', 'lib', 'decisions.mjs')));
   assert.deepEqual(reached.filter(s => /child_process/.test(s)), []);
 });

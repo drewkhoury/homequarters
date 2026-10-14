@@ -5,17 +5,20 @@
 // plain lists, since they are the CLI's to ask.
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { readFileSync, existsSync } from 'node:fs';
+import { readFileSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { compute, summarise, deploysOf, failuresOf, recoveriesOf, changesOf, mergesOf, prRedsOf, gatesOf, fixesOf, rowFromLog, slotOf, stats, dayStart, dayKey, addDays, windowsAt, lateDays, COUNTING_CHANGES, P90_FROM } from '../lib/dora.mjs';
+import { compute, summarise, deploysOf, failuresOf, recoveriesOf, changesOf, mergesOf, prRedsOf, gatesOf, fixesOf, rowFromLog, slotOf, stats, dayStart, dayKey, addDays, windowsAt, lateDays, COUNTING_CHANGES, P90_FROM, configureDelivery } from '../lib/dora.mjs';
 import * as dora from '../lib/dora.mjs';
 
-const here = dirname(fileURLToPath(import.meta.url)), root = join(here, '..', '..');
+const here = dirname(fileURLToPath(import.meta.url));
 const fixture = name => JSON.parse(readFileSync(join(here, 'fixtures', 'dora', `${name}.json`), 'utf8'));
 const runs = fixture('runs'), jobs = fixture('jobs'), pulls = fixture('pulls'), lock = fixture('lock'), commits = fixture('commits');
 const logs = new Map(Object.entries(fixture('logs')).map(([id, line]) => [Number(id), line]));
 const jobsOf = (id, attempt) => jobs[`${id}-${attempt}`] || null;
+// what reaches players in the repo these runs came from: its manifest would say delivery.userPaths; without one, every
+// change counts as reaching users (tested below)
+configureDelivery({ userPaths: ['web'] });
 
 // main's pushes in the order they landed, which is how "a contains b" is answered on a straight line
 const MAIN = runs.filter(r => r.path.endsWith('deploy.yml') && r.event === 'push').map(r => r.head_sha);
@@ -194,11 +197,6 @@ test('an empty figure says why instead of showing 0, and machine figures are not
   assert.equal(empty.windows[0].portable.leadTime.n, 0);
   assert.match(empty.windows[0].portable.leadTime.reason, /No change/);
   assert.equal(empty.windows[0].portable.rework.status, 'none');
-});
-
-test('every decision a counting change names is still in docs/decisions', () => {
-  const missing = COUNTING_CHANGES.filter(c => c.decision && !existsSync(join(root, 'docs', 'decisions', c.decision))).map(c => c.decision);
-  assert.deepEqual(missing, []);
 });
 
 // From 6 October 2026 the lock logs the Actions run on each line (ciRun, ciAttempt), and a line with the run is
@@ -494,6 +492,17 @@ test('rework counts the fix: commits that changed what players get, out of the d
   assert.equal(r.proxy, true);
   assert.equal(r.tagged, 0);
   assert.equal(r.n, 0);
+});
+
+// A project whose manifest names no delivery.userPaths: nothing says which paths reach users, so every fix with known
+// paths counts, as a deploy counts when changed() diffs no particular paths.
+test('with no user paths declared, every fix: commit with known paths counts as reaching users', () => {
+  configureDelivery({ userPaths: [] });
+  try {
+    const w = summarise(compute({ runs, jobsOf, logs, pulls, lock, commits, git }), { asOf: Date.parse('2026-10-06T12:00:00Z'), sources: {} }).windows[1];
+    assert.equal(w.portable.rework.fixes, 3);
+    assert.equal(w.portable.rework.playerFixes, 3, '7ad0722 changed only hq/, which reaches users when no paths are named');
+  } finally { configureDelivery({ userPaths: ['web'] }); }
 });
 
 test('a fix: commit whose changed paths are unknown is not counted as changing what players get', () => {

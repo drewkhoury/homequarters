@@ -11,9 +11,10 @@ import {
 } from '../lib/demo.mjs';
 
 // Two made-up people, one a git author with a name that is also a word (Rose, rose), one only ever in the backlog.
-// A made-up home folder and GitHub remote. None of these is anyone real.
+// A made-up home folder and GitHub remote, and the project's name as its manifest gives it. None of these is anyone real.
 const FACTS = {
   home: '/Users/rosefake',
+  name: 'QuestKeep',
   slug: 'fakeowner/fakerepo',
   authors: [['rose quartzfake', 'rose.q@mail.invalid'], ['Rose Quartzfake', 'rose.q@mail.invalid'], ['dependabot[bot]', 'bot@mail.invalid'], ['Claude', 'noreply@anthropic.com']],
   asked: ['Pip', 'unknown', 'review', 'plan fast-deploy'],
@@ -96,19 +97,16 @@ test('the GitHub owner and repo become your-org/your-repo, and the owner alone y
   assert.equal(swap('fakerepo on its own'), 'fakerepo on its own', 'a bare repo name can be the product name');
 });
 
-test('the header reads HQ with a HomeQuarters wordmark, and the old name becomes HQ', () => {
-  const page = '<title>Home · QuestKeep HQ</title><a class="brand" href="/"><div class="hq-moss"></div>QUESTKEEP HQ</a><p>Comments from QuestKeep HQ</p>';
+test('the header reads HQ with a HomeQuarters wordmark, and the project\'s name beside HQ becomes HQ', () => {
+  // the header as lib/page.mjs draws it: HQ, then the project's name from the manifest
+  const page = '<title>Home · QuestKeep HQ</title><a class="brand" href="/">HQ <span class="hq-brand-name">QuestKeep</span></a><p>Comments from QuestKeep HQ</p>';
   const out = demoPage(page, cfg);
   assert.match(out, /<title>Home · HQ<\/title>/);
-  assert.match(out, /<div class="hq-moss"><\/div>HQ<small class="hq-wordmark"[^>]*>HomeQuarters<\/small><\/a>/);
+  assert.match(out, /<a class="brand" href="\/">HQ<small class="hq-wordmark"[^>]*>HomeQuarters<\/small><\/a>/);
   assert.match(out, /Comments from HQ</);
-  assert.doesNotMatch(out, /QuestKeep HQ|QUESTKEEP HQ/i);
-});
-
-test('the Launch page leaves the nav, and the pages beside it stay', () => {
-  const nav = '<nav class="hq-nav"><a href="/github">GitHub &amp; Firebase</a><a href="/launch" class="on" aria-current="page">Launch</a><a href="/export">Export</a></nav>';
-  assert.equal(demoPage(nav, cfg), '<nav class="hq-nav"><a href="/github">GitHub &amp; Firebase</a><a href="/export">Export</a></nav>');
-  assert.equal(demoPage(nav, null), nav);
+  assert.doesNotMatch(out, /QuestKeep HQ|hq-brand-name/i);
+  // a repo with no manifest has no name beside HQ, and gets the wordmark all the same
+  assert.match(demoPage('<a class="brand" href="/">HQ</a>', cfg), /<a class="brand" href="\/">HQ<small class="hq-wordmark"[^>]*>HomeQuarters<\/small><\/a>/);
 });
 
 test('the paths the settings hide are hidden in any letter case, and nothing else is', () => {
@@ -146,7 +144,7 @@ function fakeRes() {
 test('what leaves through the response is swapped when it is text, and left as it is otherwise', () => {
   const html = demoResponse(fakeRes(), cfg);
   html.writeHead(200, { 'content-type': 'text/html; charset=utf-8' });
-  html.end('<a class="brand" href="/">QUESTKEEP HQ</a> Rose in /Users/rosefake/x');
+  html.end('<a class="brand" href="/">HQ <span class="hq-brand-name">QuestKeep</span></a> Rose in /Users/rosefake/x');
   assert.match(html.sent[0], /HQ<small class="hq-wordmark"[^>]*>HomeQuarters<\/small><\/a> Sam in ~\/x/);
 
   const json = demoResponse(fakeRes(), cfg);

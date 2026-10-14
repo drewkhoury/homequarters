@@ -69,6 +69,7 @@ import { configureDecisions } from './lib/decisions.mjs';
 import { configureDelivery } from './lib/dora.mjs';
 import { configureStages } from './lib/problems.mjs';
 import { configureSets } from './lib/sets.mjs';
+import { conventionWarnings } from './lib/schema.mjs';
 import { stagesFrom } from './lib/stages.mjs';
 import { loadPipeline } from './lib/pipeline.mjs';
 
@@ -117,6 +118,7 @@ export function handler({ repo = REPO, m = loadManifest(repo).m, plugins = [], p
   if (m.decisions) configureDecisions({ rel: m.decisions.rel, earlierRel: m.decisions.earlierRel });
   configureDelivery(m.delivery);
   configureSets({ file: m.tests && m.tests.sets });
+  warnings.push(...conventionWarnings(m));
   // the problem register's stages: the pipeline file's, with HQ's fixed five around them, or the shipped default
   const stageSpec = stagesFrom(loadPipeline(m.tests && m.tests.pipeline));
   configureStages(stageSpec);

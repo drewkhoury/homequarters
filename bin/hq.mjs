@@ -3,6 +3,7 @@
 //   hq [serve] [--port N] [--repo DIR]   start HQ for the repo you are in (or DIR), on 8780 or the next free port
 //   hq setup [--repo DIR]                scan the repo and this machine, print a proposed hq.json and make lines
 //   hq machine                           what the machine is doing now, as JSON (the block recorded with each run)
+//   hq run-info <kind> [--json FILE]     the `=== run {json}` line a recorded run starts with (lib/run-info.mjs)
 //   hq --version
 // HQ reads the repo's hq.json if there is one, and shows the baseline without it. It never writes to the repo.
 import { execFileSync } from 'node:child_process';
@@ -27,7 +28,10 @@ function findRepo() {
 if (args.includes('--version') || cmd === 'version') { console.log(PKG.version); process.exit(0); }
 if (args.includes('--help') || cmd === 'help') { console.log(readFileSync(fileURLToPath(import.meta.url), 'utf8').split('\n').filter(l => l.startsWith('//')).map(l => l.slice(3)).join('\n')); process.exit(0); }
 
-if (cmd === 'machine') {
+if (cmd === 'run-info') {
+  const { main } = await import('../lib/run-info.mjs');
+  main(args.filter(a => a !== 'run-info'));
+} else if (cmd === 'machine') {
   const { hostInfo } = await import('../lib/machine.mjs');
   console.log(JSON.stringify(hostInfo(), null, 2));
 } else if (cmd === 'setup') {

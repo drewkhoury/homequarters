@@ -45,7 +45,7 @@ function card(s, files, runs, f, L, part = false) {
   const parts = s.parts ? `<div class="hq-subflow">${s.parts.map(p => card(p, files, runs, f, L, true)).join('')}</div>` : '';
   const kinds = L && s.layers && !s.parts ? s.layers.map(id => L.layers.find(l => l.id === id)).filter(Boolean) : [];
   return `<div class="${part ? 'hq-substep' : 'hq-step'}${s.planned ? ' planned' : ''}${s.parts ? ' wide' : ''}">
-    <div class="hq-step-title"><b>${esc(s.title)}</b>${s.what ? info(s.what, `About ${s.title}`) : ''}</div>
+    <div class="hq-step-title"><b>${esc(s.title)}</b>${s.what ? info(s.what, `About ${s.title}`) : ''}${s.stage ? ` <span class="hint" title="The problem register's stage for a problem found here">${esc(s.stage)}</span>` : ''}</div>
     ${s.planned ? `<a class="hq-planned" href="/backlog#${esc(s.planned)}" title="Not built yet: ${esc(s.planned)}">planned</a>` : ''}
     ${kinds.length ? `<div class="hq-step-kinds">${kinds.map(l => layerButton(l)).join('')}</div>` : ''}
     ${results.length ? `<ul class="hq-step-results">${results.map(resultLine).join('')}</ul>` : ''}

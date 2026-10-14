@@ -8,6 +8,9 @@ import { readFileSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { findersOf, trailersOf, signatureOf, fixEntry, FINDERS } from '../lib/problem-trailers.mjs';
+import { useQuestKeepStages } from './fixtures/stages.mjs';
+
+useQuestKeepStages();
 
 // every Found-by line on main on 11 October 2026, one per spelling (git log origin/main --format=%B)
 const ON_MAIN = readFileSync(join(dirname(fileURLToPath(import.meta.url)), 'fixtures', 'found-by-on-main.txt'), 'utf8').trim().split('\n');
@@ -50,7 +53,7 @@ test('a trailer with a value the register does not have is reported, not guessed
   const t = trailersOf(BODY.replace('Kind: flaky-test', 'Kind: flake').replace('Found-at: pr-gate', 'Found-at: CI'));
   assert.equal(t.kind, null);
   assert.equal(t.foundAt, null);
-  assert.deepEqual(t.problems, ['Kind: flake is not a kind (hq/lib/problems.mjs)', 'Found-at: CI is not a stage (hq/lib/problems.mjs)']);
+  assert.deepEqual(t.problems, ['Kind: flake is not a kind (HQ\'s eight kinds)', 'Found-at: CI is not a stage (the pipeline file\'s stages, or HQ\'s own five)']);
   assert.deepEqual(trailersOf('no trailers here'), { playerFacing: null, finders: [], kind: null, foundAt: null, signature: null, problems: [] });
 });
 

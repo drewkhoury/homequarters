@@ -18,6 +18,7 @@ Node 20 or later. Nothing else is needed for the baseline; `gh`, `docker`, `devp
 hq            # in any git repo: start HQ for it
 hq setup      # what HQ found in the repo and on this machine, and the hq.json it would propose
 hq machine    # what the machine is doing now, as JSON
+hq problem note --title "..." --kind <kind> --evidence <pointer>   # write to the problem register (hq problem --help)
 ```
 
 With no `hq.json`, HQ shows the baseline: Home (the files and docs, with search), Repo (git state and worktrees), Machine (this computer, the software found, and the manifest HQ would propose), GitHub (when the remote is GitHub and `gh` is logged in), Conversations (Claude Code's transcripts for this folder) and Export.

@@ -291,7 +291,7 @@ export function problemPage(ctx, id) {
   const body = `${STYLE}<div class="pr-detail">
     <p class="hint pr-crumbs"><a href="/problems?tab=list">Problems</a> · ${esc(p.id)} ${exportButtons(`/problems/${urlPath(p.id)}.json`, 'This entry as JSON: its fields, what the reader worked out, every observation it owns and its events.')}</p>
     <div class="pr-title">${kindTag(p.kind)}<h1>${esc(p.title || p.id)}</h1></div>
-    ${(p.missing || []).length ? `<section class="card bl-panel pr-missing"><h2 class="pr-h">Still to say</h2><p class="hint">Found by ${esc(stageLabel(p.foundAt))}, so it needs where it should have been caught: node hq/problem.mjs set ${esc(p.id)} --should-have-caught-at &lt;stage&gt;.</p></section>` : ''}
+    ${(p.missing || []).length ? `<section class="card bl-panel pr-missing"><h2 class="pr-h">Still to say</h2><p class="hint">Found by ${esc(stageLabel(p.foundAt))}, so it needs where it should have been caught: hq problem set ${esc(p.id)} --should-have-caught-at &lt;stage&gt;.</p></section>` : ''}
     <div class="bl-stats">${tile(String(obs.length), 'observations it owns')}${tile(p.notMeasured ? 'not measured' : dur(p.machineMinutes), 'machine time')}${p.waitMinutes ? tile(dur(p.waitMinutes), 'waiting') : ''}${tile(dayOf(p.firstSeen) || 'not seen', 'first seen')}${tile(dayOf(p.lastSeen) || 'not seen', 'last seen')}</div>
     <div class="bl-charts">
       ${panel('The entry', '', `<dl class="bl-facts">${facts.map(([k, v]) => `<dt>${k}</dt><dd>${v}</dd>`).join('')}</dl>`)}
@@ -314,7 +314,7 @@ export function groupPage(ctx, sig, family) {
   } }));
   const body = `${STYLE}<div class="pr-detail"><p class="hint pr-crumbs"><a href="/problems?tab=list">Problems</a> · unexplained</p>
     <div class="pr-title"><h1>${esc(g.sig)}</h1><span class="hint">${esc(familyOf(g))}, ${esc(g.state)}</span></div>
-    <p class="pr-story">${plural(g.count, 'observation')} no entry owns, first ${esc(dayOf(g.firstSeen))}, last ${esc(dayOf(g.lastSeen))}. A fix commit with a Kind: trailer and this signature, or a note (node hq/problem.mjs note --signature ${esc(shellWord(g.sig))}), would explain them.</p>
+    <p class="pr-story">${plural(g.count, 'observation')} no entry owns, first ${esc(dayOf(g.firstSeen))}, last ${esc(dayOf(g.lastSeen))}. A fix commit with a Kind: trailer and this signature, or a note (hq problem note --signature ${esc(shellWord(g.sig))}), would explain them.</p>
     ${panel('Each one', '', dataTable({ id: 'pr-group', columns: [{ key: 'at', label: 'When', w: 'md' }, { key: 'ref', label: 'Run, pull request or who waited', w: 'lg' }, { key: 'branch', label: 'Branch or worktree', filter: 'chips', w: 'lg' }, { key: 'cost', label: 'Cost', num: true, w: 'sm' }], rows }), 'dv-wide')}</div>`;
   return layout({ title: g.sig, active: 'problems', wide: true, body });
 }

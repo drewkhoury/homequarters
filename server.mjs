@@ -67,6 +67,9 @@ import { machinePage } from './pages/machine.mjs';
 import { configureBacklog } from './lib/backlog.mjs';
 import { configureDecisions } from './lib/decisions.mjs';
 import { configureDelivery } from './lib/dora.mjs';
+import { configureStages } from './lib/problems.mjs';
+import { stagesFrom } from './lib/stages.mjs';
+import { loadPipeline } from './lib/pipeline.mjs';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 // HQ's own files, served at /hq and /theme. With no manifest, the repo is the folder HQ was started for and the cache
@@ -112,6 +115,10 @@ export function handler({ repo = REPO, m = loadManifest(repo).m, plugins = [], p
   if (m.backlog) configureBacklog({ rel: m.backlog.rel, mapRel: m.backlog.map ? m.backlog.map.slice(repo.length + 1) : null, earlierRel: m.backlog.earlierRel, stages: m.backlog.stages });
   if (m.decisions) configureDecisions({ rel: m.decisions.rel, earlierRel: m.decisions.earlierRel });
   configureDelivery(m.delivery);
+  // the problem register's stages: the pipeline file's, with HQ's fixed five around them, or the shipped default
+  const stageSpec = stagesFrom(loadPipeline(m.tests && m.tests.pipeline));
+  configureStages(stageSpec);
+  warnings.push(...stageSpec.warnings);
   // in the demo a plugin that keeps out of it (demo: false) is out of the nav too, and its page below answers not found
   setNav(pagesFor(m, demo ? plugins.filter(p => p.demo) : plugins)); setBrand(m.name);
   const ctx = { repo, cache, m, plugins, pluginsFailed, warnings, links, gh, fb, demo, ...(projectsDir ? { projectsDir } : {}) };

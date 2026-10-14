@@ -5,6 +5,9 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { entriesFromRedGates, reconcile } from '../problem-backfill.mjs';
+import { useQuestKeepStages } from './fixtures/stages.mjs';
+
+useQuestKeepStages();
 
 const line = (over = {}) => ({ run: 'r1', source: 'laptop', when: '2026-10-08T07:00:00Z', commit: 'a6cc739', branch: 'main', runKind: 'docker-gate', partial: false, tests: ['smoke-sync'],
   verdict: 'flaky', kind: 'Flaky test', mode: 'network', factors: [], confidence: 'confirmed', evidence: 'run r1, smoke-sync passed on a6cc739 in run r2', fix: 'a1700cff', record: 'backfill', ...over });
@@ -40,9 +43,10 @@ test('factors read by their labels, an unknown mode stays out of the title, and 
   assert.equal(e.note.confidence, 'confirmed', 'confirmed when any of its reds is');
 });
 
-test('a CI gate red was found at the PR gate, and a laptop red at no stage the line names', () => {
+test('a red is found at the stage the pipeline file gives its place and task, and at no stage when the file gives none', () => {
   assert.equal(entriesFromRedGates([line({ source: 'ci', runKind: 'gate' })], { infraSig })[0].note.foundAt, 'pr-gate');
-  assert.equal(entriesFromRedGates([line()], { infraSig })[0].note.foundAt, undefined);
+  assert.equal(entriesFromRedGates([line({ source: 'container', runKind: 'docker-gate' })], { infraSig })[0].note.foundAt, 'pr-gate');
+  assert.equal(entriesFromRedGates([line({ source: 'laptop', runKind: 'docker-gate' })], { infraSig })[0].note.foundAt, undefined);
 });
 
 test('each entry has a key of its own, the same on every import, so a second import opens nothing new', () => {

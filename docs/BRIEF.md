@@ -103,7 +103,7 @@ Sized in agent time. Waits are named separately.
 2. The Machine page and `hq setup`. Half a day.
 3. The convention tier read through the manifest: Backlog, Decisions, Testing, Export. Half a day.
 4. The stores and the writer kit as subcommands: slot, run-info, machine, space, info, ci-keep. One day.
-5. Delivery and Problems with stages from the pipeline file. Half a day.
+5. Delivery and Problems with stages from the pipeline file. Half a day. Built 14 October: `lib/stages.mjs`, `docs/standards/pipeline.md`.
 6. The plugin seam, Launch as the first plugin, Firebase Hosting as the first provider. Half a day.
 7. The standards documents. Half a day.
 8. QuestKeep's side: the manifest, the Makefile calling `hq`, `hq/` removed, the hunter as a plugin, the stylesheets unlinked. One day, then a pull request that waits for Drew's click.
@@ -134,7 +134,7 @@ Changes to the manifest, built the same day:
 Changes to the plan, not yet built:
 
 - **The slot is a guard, not a record** (Nell). `hq slot take` must stop the run when `hq` is missing, since two gates at once is what it prevents. The proposed make lines now have `hq-record` (quiet) and `hq-guard` (loud) and QuestKeep keeps `scripts/lock.mjs` until the guard line is proven.
-- **Stages are the pipeline's steps plus a fixed set HQ ships** (both reviewers): self, reviewer, you, you-after, users. 84 of 106 trailers on QuestKeep's main name one of those five. The pipeline file gains `schema: 1`, a `stages` list and a `stage` per step. Every convention file gets `schema: 1`.
+- **Stages are the pipeline's steps plus a fixed set HQ ships** (both reviewers): self, reviewer, you, you-after, users. 84 of 106 trailers on QuestKeep's main name one of those five. The pipeline file gains `schema: 1`, a `stages` list and a `stage` per step. Every convention file gets `schema: 1`. Built 14 October (`lib/stages.mjs`, `docs/standards/pipeline.md`): the old names person, person-after and players read as aliases, so QuestKeep's recorded events and trailers still fold; the other convention files do not carry `schema: 1` yet.
 - **Every appended line gets a `v` field** (both): the slot log, the problem events, the run line, CI's run.json. Readers treat a missing one as version 0. Four of the seven stores carry no version today.
 - **A `tests.sets` key** (Nell) names a file of set name to test list, so Testing and the live-run page stop parsing `GATE :=` out of a Makefile. QuestKeep writes it from the Makefile with a target and a test keeps them equal.
 - **A `delivery` key with the deploy workflow, the test workflow, the user-facing paths and the time zone** (Nell); the `questkeep` block in dora.json becomes `project`. Step 5 is a day, not half.

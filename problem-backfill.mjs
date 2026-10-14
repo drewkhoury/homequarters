@@ -12,7 +12,7 @@ import { readFileSync, appendFileSync, mkdirSync } from 'node:fs';
 import { createHash } from 'node:crypto';
 import { homedir } from 'node:os';
 import { join } from 'node:path';
-import { KINDS, FACTORS, fold } from './lib/problems.mjs';
+import { KINDS, FACTORS, fold, stageOfResult } from './lib/problems.mjs';
 import { privacyContext } from './lib/problem-privacy.mjs';
 import { eventFor } from './problem.mjs';
 
@@ -46,7 +46,9 @@ export function entriesFromRedGates(lines, { infraSig = () => null, keyOf = (tas
     const runs = [...new Set(byTime.map(l => l.run))];
     const factors = [...new Set(g.lines.flatMap(l => l.factors || []).map(f => FACTOR_BY_LABEL[String(f).toLowerCase()]).filter(Boolean))].slice(0, 3);
     const label = KINDS.find(([k]) => k === g.kind)[1];
-    const foundAt = g.lines.every(l => l.source === 'ci' && l.runKind === 'gate') ? 'pr-gate' : undefined;
+    // the stage the pipeline file gives a gate run from that place (a CI gate is the PR gate), when every red is from one
+    const stages = new Set(g.lines.map(l => stageOfResult(l.source, l.runKind)));
+    const foundAt = stages.size === 1 && [...stages][0] ? [...stages][0] : undefined;
     const note = {
       title: `${label} in ${g.signature}${g.mode && g.mode !== 'unknown' ? ` (${g.mode})` : ''}`, kind: g.kind, ...(g.mode ? { mode: g.mode } : {}), signature: g.signature,
       ...(factors.length ? { factors } : {}), ...(foundAt ? { foundAt } : {}),

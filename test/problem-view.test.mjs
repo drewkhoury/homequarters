@@ -6,6 +6,9 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { windowOf, overview, trends, slot, exportJSON, clockMinutes, testsView } from '../lib/problem-view.mjs';
+import { useQuestKeepStages } from './fixtures/stages.mjs';
+
+useQuestKeepStages();
 
 const DAY = 86400000, START = Date.parse('2026-09-24T00:00:00Z'), NOW = Date.parse('2026-10-11T12:00:00Z');
 const at = d => new Date(Date.parse('2026-10-01T12:00:00Z') + d * DAY).toISOString(); // day 0 is 1 October
@@ -46,7 +49,7 @@ test('Live only leaves backfilled entries out of entry counts, and costs stay th
 
 test('product bugs caught before the merge are counted against all product bugs whose finder is known, with both counts', () => {
   const bug = (id, foundAt) => ({ id, kind: 'product-bug', record: 'live', foundAt, openedAt: at(8), observations: [] });
-  const o = overview(reg({ entries: [bug('a', 'pr-gate'), bug('b', 'reviewer'), bug('c', 'players'), bug('d', undefined)] }), windowOf('7d', NOW, START));
+  const o = overview(reg({ entries: [bug('a', 'pr-gate'), bug('b', 'reviewer'), bug('c', 'users'), bug('d', undefined)] }), windowOf('7d', NOW, START));
   assert.deepEqual(o.caughtBeforeMerge, { caught: 2, of: 3 });
 });
 

@@ -5,6 +5,9 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { eventFor, parseArgs } from '../problem.mjs';
+import { useQuestKeepStages } from './fixtures/stages.mjs';
+
+useQuestKeepStages();
 
 const NOW = new Date('2026-10-11T06:00:00.123Z');
 const CTX = { home: '/Users/someone', keepEmailDomains: ['example.com'], private: ['Hollowmere'] };
@@ -79,8 +82,8 @@ test('an event the reader would refuse is refused before it is written', () => {
 
 // Juno's review, finding 7: without it a problem found late is never counted late, and nothing asks for it.
 test('closing a problem found by a reviewer, the person or anything after the merge needs where it should have been caught', () => {
-  for (const foundAt of ['reviewer', 'person', 'merge', 'prod-smoke', 'nightly', 'person-after', 'players']) {
-    const opened = noted({ foundAt, ...(foundAt === 'players' ? { evidence: 'feedback/8ZQ3k2' } : {}) }), id = opened.id;
+  for (const foundAt of ['reviewer', 'you', 'merge', 'prod-smoke', 'nightly', 'you-after', 'users']) {
+    const opened = noted({ foundAt, ...(foundAt === 'users' ? { evidence: 'feedback/8ZQ3k2' } : {}) }), id = opened.id;
     assert.match(eventFor('close', { id, disposition: 'fixed' }, env([opened])).refused.join(' '), /shouldHaveCaughtAt/, foundAt);
     assert.ok(eventFor('close', { id, disposition: 'fixed', shouldHaveCaughtAt: 'pr-gate' }, env([opened])).event, foundAt);
   }
@@ -123,7 +126,8 @@ test('evidence must point at something: a run, a file and line, a commit, a repo
 });
 
 test('a problem players found cites their report or the fix, never their words', () => {
-  assert.match(eventFor('note', { ...NOTE, foundAt: 'players', evidence: 'run 2026-10-11T04-50-29Z_058624' }, env()).refused.join(' '), /feedback\/<id>/);
-  assert.ok(noted({ foundAt: 'players', evidence: 'feedback/8ZQ3k2' }));
-  assert.ok(noted({ foundAt: 'players', evidence: 'fix 1e79f371' }));
+  assert.match(eventFor('note', { ...NOTE, foundAt: 'users', evidence: 'run 2026-10-11T04-50-29Z_058624' }, env()).refused.join(' '), /feedback\/<id>/);
+  assert.ok(noted({ foundAt: 'users', evidence: 'feedback/8ZQ3k2' }));
+  assert.ok(noted({ foundAt: 'users', evidence: 'fix 1e79f371' }));
+  assert.equal(noted({ foundAt: 'players', evidence: 'feedback/8ZQ3k2' }).fields.foundAt, 'users', 'an old stage name is written as the stage it became');
 });

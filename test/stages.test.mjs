@@ -7,6 +7,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { stagesFrom, DEFAULT_STAGES, FIXED } from '../lib/stages.mjs';
 import { configureStages, STAGES, STAGE, BEFORE_MERGE, canonStage, afterMerge, lateFinder, stageOfResult, fold } from '../lib/problems.mjs';
+import { vocabulary } from '../lib/problem-view.mjs';
 import { QK_PIPELINE } from './fixtures/stages.mjs';
 
 const ids = s => s.stages.map(([k]) => k);
@@ -25,7 +26,7 @@ test("QuestKeep's pipeline: its stages in order, split at the one marked merge, 
   assert.deepEqual(ids(s), ['self', 'test-fast', 'pre-push', 'smoke', 'pr-gate', 'reviewer', 'you', 'merge', 'prod-smoke', 'nightly', 'you-after', 'users']);
   assert.equal(s.merge, 'merge');
   assert.equal(s.stages.find(([k]) => k === 'pr-gate')[1], 'PR gate', 'a stage keeps the label the file gives it');
-  assert.deepEqual(s.resultStages, { 'ci/gate': 'pr-gate', 'laptop/gate': 'pr-gate', 'ci/after': 'nightly', 'laptop/after': 'nightly', 'container/docker-gate': 'pr-gate' });
+  assert.deepEqual(s.resultStages, { 'ci/gate': 'pr-gate', 'laptop/gate': 'pr-gate', 'ci/rules': 'pr-gate', 'ci/after': 'nightly', 'laptop/after': 'nightly', 'container/docker-gate': 'pr-gate' }, "a part takes its step's stage");
   assert.deepEqual(s.warnings, []);
 });
 
@@ -64,6 +65,7 @@ test('configured, the register reads old names as the new ones, and knows which 
   const { entries } = fold([{ at: '2026-10-11T09:00:00Z', ev: 'opened', id: 'P-2026-10-11-product-bug-a1b2', by: 'x', fields: { title: 't', kind: 'product-bug', foundAt: 'players', shouldHaveCaughtAt: 'person' } }]);
   assert.equal(entries[0].foundAt, 'users', 'an old name on a recorded line is read as the new one');
   assert.equal(entries[0].shouldHaveCaughtAt, 'you');
+  assert.equal(vocabulary().stages.map(s => s.key).join(' '), STAGES.map(([k]) => k).join(' '), 'the export names the configured stages, not the ones at load');
   configureStages();
   assert.deepEqual(STAGES.map(([k]) => k), ['self', 'checks', 'reviewer', 'you', 'merge', 'after', 'you-after', 'users'], 'configured with nothing, back to the default');
 });

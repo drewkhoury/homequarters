@@ -5,6 +5,9 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { fold, KINDS, MODES, STAGES, STAGE, BEFORE_MERGE, FIELDS } from '../lib/problems.mjs';
+import { useQuestKeepStages } from './fixtures/stages.mjs';
+
+useQuestKeepStages();
 
 const ID = 'P-2026-10-11-smoke-wake-a1b2', OTHER = 'P-2026-10-11-smoke-sync-c3d4';
 const at = (day, rest = 'T09:00:00.000Z') => `2026-10-${String(day).padStart(2, '0')}${rest}`;
@@ -111,8 +114,8 @@ test('a redaction hides its fields from the entry and from every one of its even
 });
 
 test('the stages run earliest first, and the ones before the merge are the ones the gate and review can catch at', () => {
-  assert.deepEqual(STAGES.map(([k]) => k), ['self', 'test-fast', 'pre-push', 'smoke', 'pr-gate', 'reviewer', 'person', 'merge', 'prod-smoke', 'nightly', 'person-after', 'players']);
-  assert.deepEqual([...BEFORE_MERGE], ['self', 'test-fast', 'pre-push', 'smoke', 'pr-gate', 'reviewer', 'person']);
+  assert.deepEqual(STAGES.map(([k]) => k), ['self', 'test-fast', 'pre-push', 'smoke', 'pr-gate', 'reviewer', 'you', 'merge', 'prod-smoke', 'nightly', 'you-after', 'users']);
+  assert.deepEqual([...BEFORE_MERGE], ['self', 'test-fast', 'pre-push', 'smoke', 'pr-gate', 'reviewer', 'you']);
   assert.ok(STAGE.smoke.i < STAGE['pr-gate'].i, 'smoke before the PR gate (Mags and Hollis)');
 });
 

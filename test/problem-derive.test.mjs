@@ -5,6 +5,9 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { derive, testResults } from '../lib/problem-derive.mjs';
+import { useQuestKeepStages } from './fixtures/stages.mjs';
+
+useQuestKeepStages();
 
 const DAY = 86400000, T0 = Date.parse('2026-10-01T12:00:00Z');
 const day = n => new Date(T0 + n * DAY).toISOString();
@@ -93,8 +96,8 @@ test("a merged duplicate's observations go to the entry it was merged into, and 
 
 // Juno's finding 7, and the plan's Late.
 test('a closed entry found late without where it should have been caught says so, and one with it is late', () => {
-  assert.deepEqual(one(run([closed('P-bug', 15, { kind: 'product-bug', foundAt: 'person' })]), 'P-bug').missing, ['shouldHaveCaughtAt']);
-  const late = one(run([closed('P-bug', 15, { kind: 'product-bug', foundAt: 'players', shouldHaveCaughtAt: 'pr-gate' })]), 'P-bug');
+  assert.deepEqual(one(run([closed('P-bug', 15, { kind: 'product-bug', foundAt: 'you' })]), 'P-bug').missing, ['shouldHaveCaughtAt']);
+  const late = one(run([closed('P-bug', 15, { kind: 'product-bug', foundAt: 'users', shouldHaveCaughtAt: 'pr-gate' })]), 'P-bug');
   assert.deepEqual([late.missing, late.late], [[], true]);
   assert.equal(one(run([closed('P-bug', 15, { kind: 'product-bug', foundAt: 'pr-gate', shouldHaveCaughtAt: 'pr-gate' })]), 'P-bug').late, false);
 });
@@ -178,7 +181,7 @@ test("a red whose commit git cannot place against the fix falls back to the clos
 
 // Juno's review of the build, finding 9: a note never closes, so a note found late was never asked for this.
 test('an open entry found late without where it should have been caught says so too', () => {
-  assert.deepEqual(one(run([entry('P-note', { kind: 'agent-mistake', foundAt: 'person' })]), 'P-note').missing, ['shouldHaveCaughtAt']);
+  assert.deepEqual(one(run([entry('P-note', { kind: 'agent-mistake', foundAt: 'you' })]), 'P-note').missing, ['shouldHaveCaughtAt']);
 });
 
 // Juno's check of the import: a backfilled tooling entry named the tests that went red when the environment broke, and

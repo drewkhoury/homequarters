@@ -1,25 +1,31 @@
-// The problem register's writer, and the only way into it (docs/plans/problem-register.md). Each command appends one
-// event, as one whole line, to events.jsonl in QK_PROBLEMS_DIR (~/.cache/questkeep/problems when unset), the way the
+// The problem register's writer, and the only way into it: `hq problem`. Each command appends one event, as one whole
+// line, to events.jsonl in the repo's problems store (hq.json names it; <cache>/problems when it does not), the way the
 // lock log is written, so many sessions can write at once and nothing is ever read, changed and written back. HQ's
-// Problems page reads the file through hq/lib/problems.mjs.
+// Problems page reads the file through lib/problems.mjs. HQ_PROBLEMS_DIR points the writer elsewhere; --repo or HQ_REPO
+// names the repo when the writer runs outside its checkout.
 // The writer stamps the time, takes only the fields the register defines with values from its vocabulary, puts every
 // free-text field through hq/lib/problem-privacy.mjs, and refuses any event the reader would not place. Evidence is a
 // pointer (a run id, a file and line, a commit, feedback/<id>), never copied text.
 // Usage:
-//   node hq/problem.mjs note --title <one line> --kind <kind> --evidence <pointer> [--signature, --mode, --factors a,b,
+//   hq problem note --title <one line> --kind <kind> --evidence <pointer> [--signature, --mode, --factors a,b,
 //        --found-at, --found-by, --should-have-caught-at, --player-facing yes|no, --effect, --guard-type, --guard,
 //        --believed, --actual, --fix, --repeat-of, --confidence, --record]
-//   node hq/problem.mjs set <id> [--status fixing] [the same fields]
-//   node hq/problem.mjs close <id> --disposition <disposition> [the same fields]
-//   node hq/problem.mjs reopen <id>
-//   node hq/problem.mjs merge <id> --into <id>
-//   node hq/problem.mjs redact <id> --fields <field,field>
-// The kinds, modes, stages, factors and dispositions are in hq/lib/problems.mjs. A refusal writes nothing and exits 1.
+//   hq problem set <id> [--status fixing] [the same fields]
+//   hq problem close <id> --disposition <disposition> [the same fields]
+//   hq problem reopen <id>
+//   hq problem merge <id> --into <id>
+//   hq problem redact <id> --fields <field,field>
+// The kinds, modes, factors and dispositions are in lib/problems.mjs; the stages come from the repo's pipeline file
+// (docs/standards/pipeline.md) and --help lists them. A refusal writes nothing and exits 1.
 import { appendFileSync, mkdirSync, readFileSync } from 'node:fs';
 import { randomBytes } from 'node:crypto';
 import { homedir } from 'node:os';
 import { join } from 'node:path';
-import { FIELDS, fold, STAGE, KIND } from './lib/problems.mjs';
+import { execFileSync } from 'node:child_process';
+import { FIELDS, fold, KIND, STAGES, lateFinder, canonStage, configureStages } from './lib/problems.mjs';
+import { stagesFrom } from './lib/stages.mjs';
+import { loadPipeline } from './lib/pipeline.mjs';
+import { loadManifest } from './lib/manifest.mjs';
 import { textProblems, privacyContext, pointsAt, citesReport } from './lib/problem-privacy.mjs';
 
 const FIELD_NAMES = Object.keys(FIELDS);
@@ -32,8 +38,6 @@ const OPTIONS = {
   redact: ['id', 'fields'],
 };
 const EV = { note: 'opened', set: 'set', close: 'closed', reopen: 'reopened', merge: 'merged-into', redact: 'redacted' };
-// a problem found this late, or by a reviewer or the person, is closed only with where it should have been caught
-const LATE_FINDERS = new Set(['reviewer', 'person', ...Object.keys(STAGE).filter(k => STAGE[k].i >= STAGE.merge.i)]);
 const kebab = s => s.replace(/[A-Z]/g, c => `-${c.toLowerCase()}`);
 const camel = s => s.replace(/-([a-z])/g, (_, c) => c.toUpperCase());
 
@@ -73,13 +77,13 @@ export function eventFor(cmd, opts, { events = [], now = new Date(), by = 'someo
     const f = FIELDS[name], v = valueOf(name, opts[name]);
     const kind = Object.hasOwn(opts, 'kind') ? opts.kind : entry && entry.kind;
     const fine = f.list ? Array.isArray(v) && v.length > 0 && v.length <= f.max && v.every(f.list) : f.valid(v, { kind });
-    if (!fine) { refused.push(`${name}: ${JSON.stringify(opts[name]).slice(0, 40)} is not a value it takes (hq/lib/problems.mjs)`); continue; }
+    if (!fine) { refused.push(`${name}: ${JSON.stringify(opts[name]).slice(0, 40)} is not a value it takes (hq problem --help lists them)`); continue; }
     if (name === 'seenFrom' && opts.record !== 'backfill') { refused.push('seenFrom: only a backfilled entry (--record backfill) says when its problem was first seen'); continue; }
     const leaks = f.text ? textProblems(v, ctx) : [];
     if (name === 'evidence' && !pointsAt(v)) leaks.push('it names no pointer: a run id, a file and line, a commit, feedback/<id> or a pull request');
-    if (name === 'evidence' && (opts.foundAt || (entry && entry.foundAt)) === 'players' && !citesReport(v)) leaks.push('a problem players found cites their report, feedback/<id>, or the fix commit, never their words');
+    if (name === 'evidence' && canonStage(opts.foundAt || (entry && entry.foundAt)) === 'users' && !citesReport(v)) leaks.push('a problem users found cites their report, feedback/<id>, or the fix commit, never their words');
     if (leaks.length) { refused.push(`${name}: ${leaks.join('; ')}`); continue; }
-    fields[name] = v;
+    fields[name] = f.norm ? f.norm(v) : v;
   }
   // the writer's own name meets the same checks as any text
   if (typeof by !== 'string' || !/^[\w .:-]{1,40}$/.test(by)) refused.push('by: the writer is named in at most 40 letters, digits, spaces, dots, colons and dashes');
@@ -94,7 +98,7 @@ export function eventFor(cmd, opts, { events = [], now = new Date(), by = 'someo
     event = { ...base, id: opts.id, by, fields: { ...fields, ...(Object.hasOwn(opts, 'status') ? { status: opts.status } : {}) } };
   } else if (cmd === 'close') {
     const foundAt = fields.foundAt || (entry && entry.foundAt);
-    if (LATE_FINDERS.has(foundAt) && !fields.shouldHaveCaughtAt && !(entry && entry.shouldHaveCaughtAt)) {
+    if (lateFinder(foundAt) && !fields.shouldHaveCaughtAt && !(entry && entry.shouldHaveCaughtAt)) {
       refused.push(`found at ${foundAt}, so closing it needs --should-have-caught-at (shouldHaveCaughtAt): the stage that should have caught it`);
     }
     event = { ...base, id: opts.id, by, fields: { ...(opts.disposition ? { disposition: opts.disposition } : {}), ...fields } };
@@ -111,17 +115,37 @@ export function eventFor(cmd, opts, { events = [], now = new Date(), by = 'someo
   return after.length > before ? { refused: [after.at(-1).why] } : { event };
 }
 
-if (import.meta.url === `file://${process.argv[1]}`) {
-  const env = process.env, dir = env.QK_PROBLEMS_DIR || join(homedir(), '.cache', 'questkeep', 'problems'), file = join(dir, 'events.jsonl');
-  const { cmd, opts } = parseArgs(process.argv.slice(2));
-  if (!cmd || !OPTIONS[cmd]) { console.error('Usage: node hq/problem.mjs note|set|close|reopen|merge|redact ... (the file\'s header says more)'); process.exit(2); }
+// The repo the writer works in: --repo, else HQ_REPO, else the git checkout the current folder is in, else the folder.
+function repoOf(argv, env) {
+  const i = argv.indexOf('--repo');
+  if (i >= 0 && argv[i + 1]) return argv[i + 1];
+  if (env.HQ_REPO) return env.HQ_REPO;
+  try { return execFileSync('git', ['rev-parse', '--show-toplevel'], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] }).trim(); } catch { return process.cwd(); }
+}
+
+// The command line in: the repo's manifest says where the events file is (its problems store, else <cache>/problems)
+// and which pipeline file names the stages. HQ_PROBLEMS_DIR (QK_PROBLEMS_DIR for one release) points elsewhere.
+export function main(argv = process.argv.slice(2), env = process.env) {
+  const repo = repoOf(argv, env), { m } = loadManifest(repo);
+  configureStages(stagesFrom(loadPipeline(m.tests && m.tests.pipeline)));
+  const dir = env.HQ_PROBLEMS_DIR || env.QK_PROBLEMS_DIR || m.store('problems') || join(m.cache, 'problems'), file = join(dir, 'events.jsonl');
+  if (argv.includes('--help') || argv[0] === 'help') {
+    console.log(readFileSync(new URL(import.meta.url), 'utf8').split('\n').filter(l => l.startsWith('//')).map(l => l.slice(3)).join('\n'));
+    console.log(`\nKinds: ${Object.keys(KIND).join(', ')}\nStages for ${m.name}, earliest first: ${STAGES.map(([k]) => k).join(', ')}`);
+    return;
+  }
+  const i = argv.indexOf('--repo');
+  const { cmd, opts } = parseArgs(i >= 0 ? [...argv.slice(0, i), ...argv.slice(i + 2)] : argv);
+  if (!cmd || !OPTIONS[cmd]) { console.error('Usage: hq problem note|set|close|reopen|merge|redact ... [--repo <dir>] (the file\'s header says more)'); process.exit(2); }
   let events = [];
   try { events = readFileSync(file, 'utf8').split('\n').filter(Boolean).map(l => { try { return JSON.parse(l); } catch { return null; } }).filter(Boolean); } catch { /* none yet */ }
   // who writes: the agent that names itself, else the Claude session, else the person at the terminal
-  const by = env.QK_AGENT || (env.CLAUDE_CODE_SESSION_ID ? `session ${env.CLAUDE_CODE_SESSION_ID.slice(0, 8)}` : 'person');
+  const by = env.HQ_AGENT || env.QK_AGENT || (env.CLAUDE_CODE_SESSION_ID ? `session ${env.CLAUDE_CODE_SESSION_ID.slice(0, 8)}` : 'person');
   const r = eventFor(cmd, opts, { events, now: new Date(), by, ctx: privacyContext({ home: homedir() }) });
   if (r.refused) { console.error(`Not written:\n${r.refused.map(x => `  ${x}`).join('\n')}`); process.exit(1); }
   mkdirSync(dir, { recursive: true });
   appendFileSync(file, JSON.stringify(r.event) + '\n');
   console.log(`${{ opened: 'Noted', set: 'Set', closed: 'Closed', reopened: 'Reopened', 'merged-into': 'Merged', redacted: 'Redacted' }[r.event.ev]} ${r.event.id}`);
 }
+
+if (import.meta.url === `file://${process.argv[1]}`) main();

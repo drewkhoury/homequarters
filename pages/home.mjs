@@ -8,6 +8,7 @@ import { esc, urlPath, layout, revealButton, moss } from '../lib/page.mjs';
 import { walk, isText, kindIn } from '../lib/files.mjs';
 import { renderMarkdown, sectionsOf } from '../lib/markdown.mjs';
 import { safePath } from '../lib/paths.mjs';
+import { gitInfo } from '../lib/outside.mjs';
 import { languageOf, highlight, splitLines } from '../lib/highlight.mjs';
 import { MAX_FILE } from '../lib/search.mjs';
 import { openOutside } from '../lib/outside.mjs';
@@ -133,6 +134,8 @@ function linksCard({ cache, repo, origin, hasDashboard }) {
 
 export function homePage(ctx, rel, params = new URLSearchParams(), { home = false } = {}) {
   const { repo, cache, links } = ctx;
+  // the cards the manifest turns on, and GitHub only when the repo has a GitHub remote
+  const f = ctx.m?.features || {}, github = !!gitInfo(repo)?.slug;
   const real = safePath(repo, rel || '.');
   if (!real) return null;
   const files = walk(repo).filter(f => !hiddenPath(ctx.demo, f)), groups = loadGroups(ctx.m?.docs?.groups);
@@ -142,15 +145,15 @@ export function homePage(ctx, rel, params = new URLSearchParams(), { home = fals
   const body = `<div class="hq-home">
     <div class="hq-side">${groupBar}${fileTree(files, { current: rel, href: f => `/code/${urlPath(f)}`, name: 'code', groupOf: f => groupOf(f, groups) })}</div>
     <div class="hq-codemain${got.rail ? ' has-rail' : ''}">${got.rail ? `${got.rail}<div class="hq-doc">${main}</div>` : main}</div>
-    <aside class="hq-panel" aria-label="The repo at a glance">${ctx.repoCard ? ctx.repoCard() : ''}${ctx.backlogCard ? ctx.backlogCard() : ''}${liveCard(ctx)}${testsCard(repo, cache)}
-      <section class="card hq-card hq-linkcard"><div class="hq-card-head"><span class="kicker">CI now</span><span class="hint" data-updated-for="ci-now"></span></div>
-        <div data-load-part="ci-now" data-mini><p class="hq-loading">Loading…</p></div></section>
-      ${ctx.demo ? '' : `<section class="card hq-card hq-linkcard"><div class="hq-card-head"><span class="kicker">Actions minutes</span><span class="hint" data-updated-for="actions"></span></div>
+    <aside class="hq-panel" aria-label="The repo at a glance">${ctx.repoCard ? ctx.repoCard() : ''}${f.backlog && ctx.backlogCard ? ctx.backlogCard() : ''}${f.testing ? liveCard(ctx) + testsCard(repo, cache) : ''}
+      ${github ? `<section class="card hq-card hq-linkcard"><div class="hq-card-head"><span class="kicker">CI now</span><span class="hint" data-updated-for="ci-now"></span></div>
+        <div data-load-part="ci-now" data-mini><p class="hq-loading">Loading…</p></div></section>` : ''}
+      ${ctx.demo || !github ? '' : `<section class="card hq-card hq-linkcard"><div class="hq-card-head"><span class="kicker">Actions minutes</span><span class="hint" data-updated-for="actions"></span></div>
         <div data-load-part="actions" data-mini><p class="hq-loading">Loading…</p></div>
         <a class="hq-details" href="/github?tab=dashboard">Details →</a></section>`}
-      <section class="card hq-card hq-linkcard"><div class="hq-card-head"><span class="kicker">Live site</span><span class="hint" data-updated-for="firebase"></span></div>
+      ${f.deploys ? `<section class="card hq-card hq-linkcard"><div class="hq-card-head"><span class="kicker">Live site</span><span class="hint" data-updated-for="firebase"></span></div>
         <div data-load-part="firebase" data-mini><p class="hq-loading">Loading…</p></div>
-        <a class="hq-details" href="/github?tab=firebase">Details →</a></section>
+        <a class="hq-details" href="/github?tab=firebase">Details →</a></section>` : ''}
       ${linksCard(links)}</aside>
   </div>`;
   return layout({ title: home ? 'Home' : rel || 'Code', active: 'home', body, wide: true, full: true });

@@ -22,7 +22,7 @@ import { randomBytes } from 'node:crypto';
 import { homedir } from 'node:os';
 import { join } from 'node:path';
 import { execFileSync } from 'node:child_process';
-import { FIELDS, fold, KIND, STAGES, lateFinder, canonStage, configureStages } from './lib/problems.mjs';
+import { FIELDS, fold, KIND, STAGES, EVENT_V, lateFinder, canonStage, configureStages } from './lib/problems.mjs';
 import { stagesFrom } from './lib/stages.mjs';
 import { loadPipeline } from './lib/pipeline.mjs';
 import { loadManifest } from './lib/manifest.mjs';
@@ -88,7 +88,7 @@ export function eventFor(cmd, opts, { events = [], now = new Date(), by = 'someo
   // the writer's own name meets the same checks as any text
   if (typeof by !== 'string' || !/^[\w .:-]{1,40}$/.test(by)) refused.push('by: the writer is named in at most 40 letters, digits, spaces, dots, colons and dashes');
   else { const leaks = textProblems(by, ctx); if (leaks.length) refused.push(`by: ${leaks.join('; ')}`); }
-  const base = { at: now.toISOString(), ev: EV[cmd] };
+  const base = { v: EVENT_V, at: now.toISOString(), ev: EV[cmd] };
   let event;
   if (cmd === 'note') {
     for (const need of ['title', 'kind', 'evidence']) if (!Object.hasOwn(opts, need)) refused.push(`a note needs --${need}`);

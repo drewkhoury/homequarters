@@ -113,6 +113,15 @@ test('a redaction hides its fields from the entry and from every one of its even
   assert.ok(entry.events.every(e => !JSON.stringify(e).includes('should not') && !JSON.stringify(e).includes('still not')));
 });
 
+test('a line without v is read as the first shape, and a line from a newer writer is read and counted', () => {
+  const base = { at: at(11), ev: 'opened', id: ID, by: 'x', fields: { title: 't', kind: 'flaky-test' } };
+  const r = fold([base, { ...base, v: 2, id: OTHER, fields: { title: 'u', kind: 'flaky-test', brandNew: 1 } }]);
+  assert.deepEqual(r.entries.map(p => p.id).sort(), [ID, OTHER].sort(), 'both are placed');
+  assert.equal(r.newer, 1);
+  assert.deepEqual(r.notPlaced, []);
+  assert.equal(r.entries.find(p => p.id === OTHER).brandNew, undefined, 'what this reader does not know is left out');
+});
+
 test('the stages run earliest first, and the ones before the merge are the ones the gate and review can catch at', () => {
   assert.deepEqual(STAGES.map(([k]) => k), ['self', 'test-fast', 'pre-push', 'smoke', 'pr-gate', 'reviewer', 'you', 'merge', 'prod-smoke', 'nightly', 'you-after', 'users']);
   assert.deepEqual([...BEFORE_MERGE], ['self', 'test-fast', 'pre-push', 'smoke', 'pr-gate', 'reviewer', 'you']);

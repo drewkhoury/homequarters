@@ -21,6 +21,7 @@ test('a note opens an entry with an id from its date, its kind and random digits
   assert.equal(e.id, 'P-2026-10-11-flaky-test-a1b2c3', 'never words of its title, which a redaction could not take back');
   assert.equal(e.at, '2026-10-11T06:00:00.123Z');
   assert.equal(e.by, 'builder');
+  assert.equal(e.v, 1, 'every line says which shape it has');
   assert.deepEqual(e.fields, { ...NOTE, record: 'live' });
 });
 
@@ -65,7 +66,7 @@ test('a set, a close, a reopen, a merge and a redaction name their entry and car
   assert.deepEqual([close.ev, close.id, close.fields], ['closed', id, { disposition: 'fixed', fix: '1e79f371' }]);
   assert.equal(eventFor('reopen', { id }, env([...after, close])).event.ev, 'reopened');
   const other = { ...opened, id: 'P-2026-10-11-flaky-test-d4e5f6' };
-  assert.deepEqual(eventFor('merge', { id: other.id, into: id }, env([...after, other])).event, { at: NOW.toISOString(), ev: 'merged-into', id: other.id, into: id, by: 'builder' });
+  assert.deepEqual(eventFor('merge', { id: other.id, into: id }, env([...after, other])).event, { v: 1, at: NOW.toISOString(), ev: 'merged-into', id: other.id, into: id, by: 'builder' });
   assert.deepEqual(eventFor('redact', { id, fields: 'evidence,title' }, env(after)).event.fields, ['evidence', 'title']);
   assert.match(eventFor('redact', { id, fields: 'nonsense' }, env(after)).refused.join(' '), /fields/);
 });

@@ -10,7 +10,7 @@ const machine = () => ({ load1: 1, cores: 8 });
 
 test('on a laptop, a person running make test gets kind, where, who, branch and commit from git', () => {
   const { info } = runInfo({ env: {}, args: ['gate'], git, machine });
-  assert.deepEqual(info, { kind: 'gate', where: 'laptop', who: 'person', branch: 'feat/thing', commit: 'abc1234', dirty: false, machine: { load1: 1, cores: 8 } });
+  assert.deepEqual(info, { v: 1, kind: 'gate', where: 'laptop', who: 'person', branch: 'feat/thing', commit: 'abc1234', dirty: false, machine: { load1: 1, cores: 8 } });
 });
 
 test('an agent in a Claude Code session is named, with its own name when it is one of several', () => {

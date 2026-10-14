@@ -56,7 +56,8 @@ if (cmd === 'run-info') {
   const { loadPlugins } = await import('../lib/plugins.mjs');
   const repo = findRepo();
   const { m, warnings, present } = loadManifest(repo);
-  const { plugins, failed } = await loadPlugins(m);
+  const { plugins, failed, warnings: pluginWarnings } = await loadPlugins(m);
+  warnings.push(...pluginWarnings);
   const port = flag('--port') ? +flag('--port') : undefined;
   try {
     const { url } = await start({ repo, m, plugins, pluginsFailed: failed, warnings, ...(port ? { port } : {}) });

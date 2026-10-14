@@ -36,7 +36,7 @@ With no `hq.json`, HQ shows the baseline: Home (the files and docs, with search)
   "docs": { "home": "README.md", "groups": "hq/groups.json" },
   "backlog": { "dir": "docs/backlog", "stages": ["inbox", "next", "parked"], "map": "hq/backlog-map.json", "earlier": "docs/BACKLOG.md" },
   "decisions": { "dir": "docs/decisions", "earlier": "docs/DECISIONS.md" },
-  "tests": { "layers": "tests/layers.json", "pipeline": "hq/pipeline.json" },
+  "tests": { "layers": "tests/layers.json", "pipeline": "hq/pipeline.json", "sets": "tests/sets.json" },
   "stores": ["runs", "lock", "problems", "dora", "ci"],
   "info": true,
   "deploy": [{ "provider": "firebase-hosting", "site": "https://questkeep.web.app" }],
@@ -51,7 +51,7 @@ With no `hq.json`, HQ shows the baseline: Home (the files and docs, with search)
 | `docs` | where Home opens, and the groups the file tree narrows to |
 | `backlog` | the Backlog page: one markdown file per item in stage folders |
 | `decisions` | the Decisions page: one dated file per decision, and an earlier one-line file |
-| `tests` | the Testing page's layers and pipeline |
+| `tests` | the Testing page's layers, pipeline and sets (`docs/standards/`) |
 | `stores` | which folders under `cache` HQ reads: runs, lock, problems, dora, ci |
 | `info` | the status line's `.git/project-info.json` |
 | `deploy` | deploy providers; `firebase-hosting` is the first |

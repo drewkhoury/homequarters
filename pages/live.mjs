@@ -7,7 +7,7 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { esc, layout } from '../lib/page.mjs';
 import { info } from '../lib/ui.mjs';
-import { makeSets } from '../lib/catalogue.mjs';
+import { testSets } from '../lib/sets.mjs';
 import { parseProgress, expectedTests, ansiToHtml, stripAnsi, runTasks, liveNow, isLive, finishedRun, safeId, folderTime, liveStream as streamOf } from '../lib/live.mjs';
 
 export { liveNow };
@@ -16,7 +16,7 @@ import { runInfoLine } from '../lib/runs.mjs';
 // The stream for /runs/<id>/live/stream?task=&from=: what the log gains, as NDJSON (hq/lib/live.mjs).
 export const liveStream = (ctx, runId, task, from) => streamOf(ctx, runId, task, from, { sets: sets(ctx.repo) });
 
-const sets = repo => { try { return makeSets(readFileSync(join(repo, 'Makefile'), 'utf8')); } catch { return {}; } };
+const sets = repo => testSets(repo);
 const secs = s => (s == null ? '' : s < 60 ? `${Math.round(s)} s` : `${Math.floor(s / 60)} min ${Math.round(s % 60)} s`);
 const ago = ms => { const s = Math.max(0, (Date.now() - ms) / 1000); return s < 60 ? `${Math.round(s)} s` : s < 3600 ? `${Math.round(s / 60)} min` : `${(s / 3600).toFixed(1)} h`; };
 const STATE_WORD = { waiting: 'waiting', running: 'running', passed: 'passed', failed: 'failed', notrun: 'not run' };

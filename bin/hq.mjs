@@ -57,6 +57,12 @@ if (cmd === 'run-info') {
   if (scan.caches.length) console.log(`  cache folder: ${scan.caches[0]}${scan.stores.length ? ` with ${[...new Set(scan.stores.map(s => s.store))].join(', ')}` : ''}`);
   console.log(`\n## ${scan.manifest ? 'hq.json is already there; this is what setup would propose from scratch' : 'Proposed hq.json (add it to the repo root yourself)'}\n`);
   console.log(JSON.stringify(proposeManifest(scan), null, 2));
+  // a Makefile that names its test sets the way QuestKeep did: propose the file HQ reads them from instead
+  if (!scan.found.some(f => f.key === 'tests.sets') && scan.found.some(f => f.rel === 'Makefile')) {
+    const { proposeSets } = await import('../lib/sets.mjs');
+    const sets = proposeSets(readFileSync(join(repo, 'Makefile'), 'utf8'));
+    if (sets) { console.log('\n## Proposed tests/sets.json, from the Makefile\'s GATE and AFTER lines (add it, and tests.sets to hq.json)\n'); console.log(JSON.stringify(sets, null, 2)); }
+  }
   console.log('\n## Make lines to add, if you want runs recorded\n');
   console.log(MAKE_SNIPPET);
 } else if (cmd === 'serve') {

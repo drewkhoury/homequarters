@@ -7,6 +7,9 @@
 //   hq problem note|set|close|... [--repo DIR]   write to the problem register (problem.mjs says the options)
 //   hq slot take <name> | release <name> <status> | who | status [msg] | claim [why] | unclaim [force]
 //                                        one test run at a time on this machine (lib/slot.mjs)
+//   hq space host | figures | vm         free space on the disks a test run fills; exit 1 stops the run (lib/space.mjs)
+//   hq ci-keep <results> <name>          keep a self-hosted runner job's results in the ci store (lib/ci-keep.mjs)
+//   hq problem-backfill red-gates ...    import a sort of red gate runs into the register (problem-backfill.mjs)
 //   hq --version
 // HQ reads the repo's hq.json if there is one, and shows the baseline without it. It never writes to the repo.
 import { execFileSync } from 'node:child_process';
@@ -37,6 +40,15 @@ if (cmd === 'run-info') {
 } else if (cmd === 'slot') {
   const { main } = await import('../lib/slot.mjs');
   await main(args.filter(a => a !== 'slot'), process.env);
+} else if (cmd === 'space') {
+  const { main } = await import('../lib/space.mjs');
+  process.exitCode = main(args.filter(a => a !== 'space'), process.env);
+} else if (cmd === 'ci-keep') {
+  const { main } = await import('../lib/ci-keep.mjs');
+  process.exitCode = main(args.filter(a => a !== 'ci-keep'), process.env);
+} else if (cmd === 'problem-backfill') {
+  const { main } = await import('../problem-backfill.mjs');
+  await main(args.filter(a => a !== 'problem-backfill'), process.env);
 } else if (cmd === 'problem') {
   const { main } = await import('../problem.mjs');
   main(args.filter(a => a !== 'problem'), process.env);

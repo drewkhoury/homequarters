@@ -20,6 +20,8 @@ hq setup      # what HQ found in the repo and on this machine, and the hq.json i
 hq machine    # what the machine is doing now, as JSON
 hq problem note --title "..." --kind <kind> --evidence <pointer>   # write to the problem register (hq problem --help)
 hq slot take <name> | release <name> <status> | who | status <msg> | claim <why> | unclaim   # one test run at a time
+hq space host | figures | vm      # free space on the disks a test run fills; exit 1 stops the run
+hq ci-keep <results> <name>       # keep a self-hosted runner job's results in the ci store as the job ends
 ```
 
 With no `hq.json`, HQ shows the baseline: Home (the files and docs, with search), Repo (git state and worktrees), Machine (this computer, the software found, and the manifest HQ would propose), GitHub (when the remote is GitHub and `gh` is logged in), Conversations (Claude Code's transcripts for this folder) and Export.

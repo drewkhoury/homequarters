@@ -1,5 +1,5 @@
 // Backfill step 1 of the problem register (docs/plans/problem-register.md, Backfill): imports another session's sort of
-// red gate runs, ~/.cache/questkeep/problems/backfill/red-gates.jsonl, one line per red gate run with its verdict, kind,
+// red gate runs, <problems store>/backfill/red-gates.jsonl, one line per red gate run with its verdict, kind,
 // mode, factors, confidence, evidence and fix. Reds of one test and kind become one entry, with its commonest mode, its
 // latest fix and the runs it was judged from (it owns its reds in them), written through
 // hq/problem.mjs's eventFor as record backfill, so every field meets the writer's checks, and closed as fixed when
@@ -7,10 +7,9 @@
 // Importing again reconciles (reconcile below): an entry already in the register with the same kind and signature gets
 // only what changed, and one the sort no longer makes is merged into the entry that took its runs, so importing twice
 // adds nothing.
-// Usage: node hq/problem-backfill.mjs red-gates [<file>] [--write]   (without --write it says what it would write)
+// Usage: hq problem-backfill red-gates [<file>] [--write] [--repo DIR]   (without --write it says what it would write)
 import { readFileSync, appendFileSync, mkdirSync } from 'node:fs';
 import { createHash } from 'node:crypto';
-import { homedir } from 'node:os';
 import { join } from 'node:path';
 import { KINDS, FACTORS, fold, stageOfResult } from './lib/problems.mjs';
 import { privacyContext } from './lib/problem-privacy.mjs';
@@ -86,14 +85,22 @@ export function reconcile(planned, entries) {
   return [...notes, ...changes, ...merges];
 }
 
-if (import.meta.url === `file://${process.argv[1]}`) {
+export async function main(argv = process.argv.slice(2), env = process.env) {
   const { allRuns } = await import('./lib/runs.mjs');
   const { observeReds, testKeyer } = await import('./lib/problem-observations.mjs');
   const { catalogue } = await import('./lib/catalogue.mjs');
-  const keyOf = testKeyer(catalogue(join(new URL('..', import.meta.url).pathname)));
-  const [cmd, fileArg] = process.argv.slice(2).filter(a => !a.startsWith('--')), write = process.argv.includes('--write');
-  if (cmd !== 'red-gates') { console.error('Usage: node hq/problem-backfill.mjs red-gates [<file>] [--write]'); process.exit(2); }
-  const cache = join(homedir(), '.cache', 'questkeep'), dir = process.env.QK_PROBLEMS_DIR || join(cache, 'problems'), events = join(dir, 'events.jsonl');
+  const { loadManifest } = await import('./lib/manifest.mjs');
+  const { configureStages } = await import('./lib/problems.mjs');
+  const { stagesFrom } = await import('./lib/stages.mjs');
+  const { loadPipeline } = await import('./lib/pipeline.mjs');
+  const at = argv.indexOf('--repo'), repo = at >= 0 && argv[at + 1] ? argv[at + 1] : env.HQ_REPO || process.cwd();
+  const rest = at >= 0 ? [...argv.slice(0, at), ...argv.slice(at + 2)] : argv;
+  const { m } = loadManifest(repo);
+  configureStages(stagesFrom(loadPipeline(m.tests && m.tests.pipeline)));
+  const keyOf = testKeyer(catalogue(repo));
+  const [cmd, fileArg] = rest.filter(a => !a.startsWith('--')), write = rest.includes('--write');
+  if (cmd !== 'red-gates') { console.error('Usage: hq problem-backfill red-gates [<file>] [--write] [--repo DIR]'); process.exit(2); }
+  const cache = m.cache, dir = env.HQ_PROBLEMS_DIR || env.QK_PROBLEMS_DIR || m.store('problems') || join(cache, 'problems'), events = join(dir, 'events.jsonl');
   const file = fileArg || join(cache, 'problems', 'backfill', 'red-gates.jsonl');
   const lines = readFileSync(file, 'utf8').split('\n').filter(Boolean).map(l => JSON.parse(l));
   const infra = new Map(observeReds(allRuns(cache), { keyOf }).filter(o => o.class === 'infra').map(o => [o.run, o.sig]));
@@ -128,3 +135,5 @@ if (import.meta.url === `file://${process.argv[1]}`) {
   const changed = new Set(acts.filter(a => a.op === 'set' || a.op === 'close').map(a => a.id)).size;
   console.log(`${write ? 'Wrote' : 'Would write'} ${counts.opened} new entries, ${counts.set} sets, ${counts.closed} closes as fixed (${counts.leftOpen} left open), ${counts.merged} merges; ${planned.length - counts.opened - counts.refused - changed} entries already as the sort says, ${counts.left} left as they are, ${counts.refused} refused, from ${lines.length} lines of ${file}${write ? ` to ${events}` : '; --write writes them'}.`);
 }
+
+if (import.meta.url === `file://${process.argv[1]}`) main();

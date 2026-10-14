@@ -102,7 +102,7 @@ Sized in agent time. Waits are named separately.
 1. The package skeleton: `bin/hq.mjs`, the manifest loader, the baseline pages, the copied theme, running from outside any repo. Half a day.
 2. The Machine page and `hq setup`. Half a day.
 3. The convention tier read through the manifest: Backlog, Decisions, Testing, Export. Half a day.
-4. The stores and the writer kit as subcommands: slot, run-info, machine, space, info, ci-keep. One day. Built 14 October: slot, run-info, machine, problem; space, info and ci-keep remain.
+4. The stores and the writer kit as subcommands: slot, run-info, machine, space, info, ci-keep. One day. Built 14 October: slot, run-info, machine, problem, space, ci-keep. `hq info` remains: `scripts/project-info.mjs` writes the status line's file through `~/.claude/bin/project-info`, so it belongs with claude-statusline's contract and wants a decision of its own.
 5. Delivery and Problems with stages from the pipeline file. Half a day. Built 14 October: `lib/stages.mjs`, `docs/standards/pipeline.md`.
 6. The plugin seam, Launch as the first plugin, Firebase Hosting as the first provider. Half a day.
 7. The standards documents. Half a day.

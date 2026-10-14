@@ -19,6 +19,7 @@ hq            # in any git repo: start HQ for it
 hq setup      # what HQ found in the repo and on this machine, and the hq.json it would propose
 hq machine    # what the machine is doing now, as JSON
 hq problem note --title "..." --kind <kind> --evidence <pointer>   # write to the problem register (hq problem --help)
+hq slot take <name> | release <name> <status> | who | status <msg> | claim <why> | unclaim   # one test run at a time
 ```
 
 With no `hq.json`, HQ shows the baseline: Home (the files and docs, with search), Repo (git state and worktrees), Machine (this computer, the software found, and the manifest HQ would propose), GitHub (when the remote is GitHub and `gh` is logged in), Conversations (Claude Code's transcripts for this folder) and Export.
@@ -66,7 +67,7 @@ A plugin is an ES module the manifest names. Its default export takes `{ ui, m }
 
 ## Recording runs
 
-HQ is the recorder, never a dependency of your tests. `hq setup` proposes make lines where every `hq` call falls through when `hq` is not installed or fails. `test/make-snippet.test.mjs` proves it.
+HQ is the recorder, never a dependency of your tests. `hq setup` proposes make lines where every recording call falls through when `hq` is not installed or fails. The one exception is the test slot: `hq slot take` is a guard, so the proposed slot line stops the run with the install command when `hq` is missing, since two browser runs at once is what the slot prevents. `test/make-snippet.test.mjs` proves both. `docs/standards/slot.md` says what the slot writes.
 
 ## Tests
 

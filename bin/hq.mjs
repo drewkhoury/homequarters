@@ -5,6 +5,8 @@
 //   hq machine                           what the machine is doing now, as JSON (the block recorded with each run)
 //   hq run-info <kind> [--json FILE]     the `=== run {json}` line a recorded run starts with (lib/run-info.mjs)
 //   hq problem note|set|close|... [--repo DIR]   write to the problem register (problem.mjs says the options)
+//   hq slot take <name> | release <name> <status> | who | status [msg] | claim [why] | unclaim [force]
+//                                        one test run at a time on this machine (lib/slot.mjs)
 //   hq --version
 // HQ reads the repo's hq.json if there is one, and shows the baseline without it. It never writes to the repo.
 import { execFileSync } from 'node:child_process';
@@ -27,11 +29,14 @@ function findRepo() {
 }
 
 if (args.includes('--version') || cmd === 'version') { console.log(PKG.version); process.exit(0); }
-if ((args.includes('--help') && cmd !== 'problem') || cmd === 'help') { console.log(readFileSync(fileURLToPath(import.meta.url), 'utf8').split('\n').filter(l => l.startsWith('//')).map(l => l.slice(3)).join('\n')); process.exit(0); }
+if ((args.includes('--help') && !['problem', 'slot'].includes(cmd)) || cmd === 'help') { console.log(readFileSync(fileURLToPath(import.meta.url), 'utf8').split('\n').filter(l => l.startsWith('//')).map(l => l.slice(3)).join('\n')); process.exit(0); }
 
 if (cmd === 'run-info') {
   const { main } = await import('../lib/run-info.mjs');
   main(args.filter(a => a !== 'run-info'));
+} else if (cmd === 'slot') {
+  const { main } = await import('../lib/slot.mjs');
+  await main(args.filter(a => a !== 'slot'), process.env);
 } else if (cmd === 'problem') {
   const { main } = await import('../problem.mjs');
   main(args.filter(a => a !== 'problem'), process.env);

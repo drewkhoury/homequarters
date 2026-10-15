@@ -99,11 +99,12 @@ test('the GitHub owner and repo become your-org/your-repo, and the owner alone y
 
 test('the header reads HQ with a HomeQuarters wordmark, and the project\'s name beside HQ becomes HQ', () => {
   // the header as lib/page.mjs draws it: HQ, then the project's name from the manifest
-  const page = '<title>Home · QuestKeep HQ</title><a class="brand" href="/">HQ <span class="hq-brand-name">QuestKeep</span></a><p>Comments from QuestKeep HQ</p>';
+  // the name is the manifest's slug, but a transcript or a doc may write it in any case
+  const page = '<title>Home · QuestKeep HQ</title><a class="brand" href="/">HQ <span class="hq-brand-name">QuestKeep</span></a><p>Comments from QuestKeep HQ, questkeep HQ and QUESTKEEP HQ</p>';
   const out = demoPage(page, cfg);
+  assert.match(out, /Comments from HQ, HQ and HQ</, 'the project\'s name beside HQ is swapped in any case');
   assert.match(out, /<title>Home · HQ<\/title>/);
   assert.match(out, /<a class="brand" href="\/">HQ<small class="hq-wordmark"[^>]*>HomeQuarters<\/small><\/a>/);
-  assert.match(out, /Comments from HQ</);
   assert.doesNotMatch(out, /QuestKeep HQ|hq-brand-name/i);
   // a repo with no manifest has no name beside HQ, and gets the wordmark all the same
   assert.match(demoPage('<a class="brand" href="/">HQ</a>', cfg), /<a class="brand" href="\/">HQ<small class="hq-wordmark"[^>]*>HomeQuarters<\/small><\/a>/);

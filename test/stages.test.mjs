@@ -53,6 +53,14 @@ test('a project may give an old name for a stage of its own, and the fixed five 
   assert.deepEqual(s.aliases, { 'ci-gate': 'gate', 'pr-gate': 'gate', person: 'you', 'person-after': 'you-after', players: 'users' });
 });
 
+test("a project's old name may not be one of HQ's own stages or their old names: the shipped aliases stand, with a warning", () => {
+  const s = stagesFrom({ schema: 1, stages: [{ id: 'gate', was: ['players', 'you', 'ci-gate'] }, { id: 'merge', merge: true }], paths: [] });
+  assert.equal(s.aliases.players, 'users', 'the shipped players alias is not overwritten');
+  assert.equal(s.aliases.you, undefined, 'a fixed id is never an alias');
+  assert.equal(s.aliases['ci-gate'], 'gate');
+  assert.equal(s.warnings.filter(w => /is HQ's own|an old name of HQ's/.test(w)).length, 2, s.warnings.join('\n'));
+});
+
 test('configured, the register reads old names as the new ones, and knows which stages are after the merge', () => {
   configureStages(stagesFrom(QK_PIPELINE));
   assert.deepEqual(STAGES.map(([k]) => k).slice(0, 3), ['self', 'test-fast', 'pre-push']);
@@ -60,6 +68,7 @@ test('configured, the register reads old names as the new ones, and knows which 
   assert.ok(STAGE.smoke.i < STAGE['pr-gate'].i, 'smoke before the PR gate (Mags and Hollis)');
   assert.equal(canonStage('person'), 'you'); assert.equal(canonStage('pr-gate'), 'pr-gate'); assert.equal(canonStage('nope'), 'nope');
   assert.equal(afterMerge('players'), true); assert.equal(afterMerge('pr-gate'), false); assert.equal(afterMerge('nope'), false);
+  assert.equal(afterMerge('person'), false, 'an old name of a stage before the merge is before the merge (the adversary)');
   assert.equal(lateFinder('reviewer'), true); assert.equal(lateFinder('person'), true); assert.equal(lateFinder('nightly'), true); assert.equal(lateFinder('smoke'), false);
   assert.equal(stageOfResult('ci', 'gate'), 'pr-gate'); assert.equal(stageOfResult('laptop', 'unit'), null);
   const { entries } = fold([{ at: '2026-10-11T09:00:00Z', ev: 'opened', id: 'P-2026-10-11-product-bug-a1b2', by: 'x', fields: { title: 't', kind: 'product-bug', foundAt: 'players', shouldHaveCaughtAt: 'person' } }]);

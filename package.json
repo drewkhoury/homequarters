@@ -26,7 +26,8 @@
     "node": ">=20"
   },
   "scripts": {
-    "test": "node --test test/*.test.mjs"
+    "test": "node --test test/*.test.mjs",
+    "prepublishOnly": "HQ_RACE_ROUNDS=5 npm test"
   },
   "dependencies": {
     "highlight.js": "11.12.0",
@@ -34,5 +35,15 @@
   },
   "devDependencies": {
     "playwright": "1.63.0"
-  }
+  },
+  "keywords": [
+    "dashboard",
+    "repo",
+    "delivery",
+    "ci",
+    "backlog",
+    "decisions",
+    "testing",
+    "local"
+  ]
 }

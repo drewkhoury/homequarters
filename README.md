@@ -78,5 +78,7 @@ HQ is the recorder, never a dependency of your tests. `hq setup` proposes make l
 ## Tests
 
 ```sh
-npm test
+npm test                       # about seven seconds; needs node, git, npm and the npm registry once (the pack test)
+HQ_OFFLINE=1 npm test          # skips the pack test, the one that reaches the registry
+HQ_RACE_ROUNDS=5 npm test      # more rounds of the slot's dead-holder race; `npm publish` runs this first
 ```

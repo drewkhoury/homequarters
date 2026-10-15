@@ -17,6 +17,7 @@ Node 20 or later. Nothing else is needed for the baseline; `gh`, `docker`, `devp
 ```sh
 hq            # in any git repo: start HQ for it
 hq setup      # what HQ found in the repo and on this machine, and the hq.json it would propose
+hq check      # the contract, checked: what breaks the conventions hq.json names (backlog, decisions, groups, pipeline, sets, layers, test headers); exit 1 if anything
 hq machine    # what the machine is doing now, as JSON
 hq problem note --title "..." --kind <kind> --evidence <pointer>   # write to the problem register (hq problem --help)
 hq slot take <name> | release <name> <status> | who | status <msg> | claim <why> | unclaim   # one test run at a time

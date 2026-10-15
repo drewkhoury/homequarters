@@ -2,6 +2,7 @@
 // hq: HomeQuarters from the command line.
 //   hq [serve] [--port N] [--repo DIR]   start HQ for the repo you are in (or DIR), on 8780 or the next free port
 //   hq setup [--repo DIR]                scan the repo and this machine, print a proposed hq.json and make lines
+//   hq check [--repo DIR]                the contract, checked: what breaks the conventions hq.json names; exit 1 if anything
 //   hq machine                           what the machine is doing now, as JSON (the block recorded with each run)
 //   hq run-info <kind> [--json FILE]     the `=== run {json}` line a recorded run starts with (lib/run-info.mjs)
 //   hq problem note|set|close|... [--repo DIR]   write to the problem register (problem.mjs says the options)
@@ -55,6 +56,9 @@ if (cmd === 'run-info') {
 } else if (cmd === 'problem') {
   const { main } = await import('../problem.mjs');
   main(args.filter(a => a !== 'problem'), process.env);
+} else if (cmd === 'check') {
+  const { main } = await import('../lib/check.mjs');
+  process.exitCode = main(args.filter(a => a !== 'check'), process.env);
 } else if (cmd === 'backlog') {
   const { main } = await import('../backlog.mjs');
   await main(args.filter(a => a !== 'backlog'), process.env);

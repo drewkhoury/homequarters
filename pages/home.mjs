@@ -4,7 +4,9 @@
 import { liveCard } from './live.mjs';
 import { readFileSync, statSync } from 'node:fs';
 import { extname } from 'node:path';
-import { esc, urlPath, layout, revealButton, moss } from '../lib/page.mjs';
+import { esc, urlPath, layout, revealButton } from '../lib/page.mjs';
+import { scanRepo, proposeManifest } from '../lib/scan.mjs';
+import { FILE } from '../lib/manifest.mjs';
 import { walk, isText, kindIn } from '../lib/files.mjs';
 import { renderMarkdown, sectionsOf } from '../lib/markdown.mjs';
 import { safePath } from '../lib/paths.mjs';
@@ -113,23 +115,37 @@ function testsCard(repo, cache) {
       : '<span class="hint">no runs yet</span>'}</li>`;
   }).join('');
   // Moss looks as well as the newest run went: in bloom when it passed, a sprout when it failed
-  const newest = runs[0];
-  return `<section class="card hq-card"><div class="hq-card-head">${moss(newest ? (newest.ok ? 5 : 1) : 3, 'hq-moss-card')}<a class="kicker" href="/testing">Tests</a><span class="hint">${n} files</span></div>
+  return `<section class="card hq-card"><div class="hq-card-head"><a class="kicker" href="/testing">Tests</a><span class="hint">${n} files</span></div>
     <ul class="hq-glance">${rows}</ul>
     ${flaky.length ? `<p class="hq-warn"><a href="/testing?tab=tests&amp;flaky=1">${flaky.length} flaky</a> ${info(flaky.map(f => `${f.test} on ${f.commit}`).join('; '), 'Which')}</p>` : ''}</section>`;
 }
 
-function linksCard({ cache, repo, origin, hasDashboard }) {
+// Where things are on disk, for the pages the manifest turns on: the checkout always, the stores when there are any.
+function linksCard({ cache, repo, origin, hasDashboard, m }) {
+  const store = n => m?.store?.(n);
   const rows = [
-        hasDashboard && ["devpipe's report", `${origin}/cache/runs/report.html`, "devpipe's page for the saved test runs."],
+    hasDashboard && ["devpipe's report", `${origin}/cache/runs/report.html`, "devpipe's page for the recorded test runs."],
     ['This checkout', repo, 'The repo HQ is showing.', ['repo', '']],
-    ['Saved test runs', `${cache}/runs`, 'Every make test on this laptop, from any checkout.', ['cache', 'runs']],
-    ['Screenshots', `${cache}/shots`, 'Test screenshots. Empty for now: the tests save theirs to /tmp, or to the folder S names.', ['cache', 'shots']],
-    ['CI results', `${cache}/ci`, 'Test results from CI. make ci-history fetches them.', ['cache', 'ci']],
+    store('runs') && ['Recorded test runs', store('runs'), 'Every run devpipe recorded on this machine, from any checkout of this repo.', ['cache', 'runs']],
+    store('ci') && ['CI results', store('ci'), 'Test results from CI, kept by hq ci-fetch or hq ci-keep.', ['cache', 'ci']],
   ].filter(Boolean);
   return `<section class="card hq-card"><div class="hq-card-head"><span class="kicker">Links</span></div><ul class="hq-linklist">${rows.map(([title, where, note, reveal]) => `<li>
     ${/^https?:/.test(where) ? `<a href="${esc(where)}" target="_blank" rel="noopener">${esc(title)}</a>` : `<span class="hq-linkname">${esc(title)}</span>`}
     <code title="${esc(where)}">${esc(where.replace(/^https?:\/\//, ''))}</code>${info(note, `About ${title}`)}${reveal ? revealButton(reveal[0], reveal[1], 'Finder') : ''}</li>`).join('')}</ul></section>`;
+}
+
+// The card a repo with no manifest gets first: what HQ is, what it found here, the hq.json it would propose and the
+// pages that would turn on. Noor: a stranger has just typed hq, and nothing on the page said what it was.
+function firstRunCard(repo) {
+  const scan = scanRepo(repo), proposal = proposeManifest(scan);
+  const found = scan.found.length ? `<ul class="hq-found">${scan.found.map(f => `<li><code>${esc(f.rel)}</code> <span class="hint">${esc(f.note)}</span></li>`).join('')}</ul>` : '<p class="hint">No convention HQ reads by name: a backlog folder, decisions, test layers or a pipeline file.</p>';
+  const unlocks = ['Testing (recorded runs, the pipeline, the test catalogue)', 'Backlog', 'Decisions', 'Delivery', 'Problems', 'GitHub & Deploys'];
+  return `<section class="card hq-card hq-firstrun"><div class="hq-card-head"><span class="kicker">First run</span>${info(`${FILE} at the repo root says what HQ may read. Without it HQ shows the baseline: the files, the repo's state, this machine, your Claude Code conversations here, and an export. Every key is optional.`, 'About the manifest')}</div>
+    <p>HQ is a local website for this repo: what changed and why, what guards it, and what is next. It reads what the repo writes and runs no code from it. There is no <code>${esc(FILE)}</code> here yet, so these are the baseline pages.</p>
+    <h3>Found in this repo</h3>${found}${scan.remote ? `<p class="hint">GitHub remote: <code>${esc(scan.remote)}</code></p>` : ''}
+    <h3>A manifest to start from</h3><p class="hint">What <code>hq setup</code> proposes; save it as <code>${esc(FILE)}</code> at the repo root and restart hq.</p>
+    <pre class="hq-pre" data-copy>${esc(JSON.stringify(proposal, null, 2))}</pre>
+    <h3>What a manifest turns on</h3><p class="hint">${unlocks.map(esc).join(' · ')}. <a href="/machine">Machine</a> shows the make lines, and what else is on this machine.</p></section>`;
 }
 
 export function homePage(ctx, rel, params = new URLSearchParams(), { home = false } = {}) {
@@ -145,7 +161,7 @@ export function homePage(ctx, rel, params = new URLSearchParams(), { home = fals
   const body = `<div class="hq-home">
     <div class="hq-side">${groupBar}${fileTree(files, { current: rel, href: f => `/code/${urlPath(f)}`, name: 'code', groupOf: f => groupOf(f, groups) })}</div>
     <div class="hq-codemain${got.rail ? ' has-rail' : ''}">${got.rail ? `${got.rail}<div class="hq-doc">${main}</div>` : main}</div>
-    <aside class="hq-panel" aria-label="The repo at a glance">${ctx.repoCard ? ctx.repoCard() : ''}${f.backlog && ctx.backlogCard ? ctx.backlogCard() : ''}${f.testing ? liveCard(ctx) + testsCard(repo, cache) : ''}
+    <aside class="hq-panel" aria-label="The repo at a glance">${ctx.m && !ctx.m.present ? firstRunCard(repo) : ''}${ctx.repoCard ? ctx.repoCard() : ''}${f.backlog && ctx.backlogCard ? ctx.backlogCard() : ''}${f.testing ? liveCard(ctx) + testsCard(repo, cache) : ''}
       ${github ? `<section class="card hq-card hq-linkcard"><div class="hq-card-head"><span class="kicker">CI now</span><span class="hint" data-updated-for="ci-now"></span></div>
         <div data-load-part="ci-now" data-mini><p class="hq-loading">Loading…</p></div></section>` : ''}
       ${ctx.demo || !github ? '' : `<section class="card hq-card hq-linkcard"><div class="hq-card-head"><span class="kicker">Actions minutes</span><span class="hint" data-updated-for="actions"></span></div>
@@ -154,7 +170,7 @@ export function homePage(ctx, rel, params = new URLSearchParams(), { home = fals
       ${f.deploys ? `<section class="card hq-card hq-linkcard"><div class="hq-card-head"><span class="kicker">Live site</span><span class="hint" data-updated-for="firebase"></span></div>
         <div data-load-part="firebase" data-mini><p class="hq-loading">Loading…</p></div>
         <a class="hq-details" href="/github?tab=firebase">Details →</a></section>` : ''}
-      ${linksCard(links)}</aside>
+      ${linksCard({ ...links, m: ctx.m })}</aside>
   </div>`;
   return layout({ title: home ? 'Home' : rel || 'Code', active: 'home', body, wide: true, full: true });
 }

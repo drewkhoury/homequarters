@@ -43,7 +43,7 @@ import { searchPage } from './pages/search.mjs';
 import { githubPage, githubPart } from './pages/github.mjs';
 import { setStash } from './lib/github.mjs';
 import { makeStash } from './lib/stash.mjs';
-import { reveal, forgetGit } from './lib/outside.mjs';
+import { reveal, forgetGit, gitInfo } from './lib/outside.mjs';
 import { checkoutHealth, repoHealth } from './lib/git.mjs';
 import { repoCard, repoPage } from './pages/repo.mjs';
 import { backlogPage, backlogItemPage, backlogCard } from './pages/backlog.mjs';
@@ -122,7 +122,8 @@ export function handler({ repo = REPO, m = loadManifest(repo).m, plugins = [], p
   configureStages(stageSpec);
   warnings.push(...stageSpec.warnings);
   // in the demo a plugin that keeps out of it (demo: false) is out of the nav too, and its page below answers not found
-  const nav = pagesFor(m, demo ? plugins.filter(p => p.demo) : plugins), brand = m.name;
+  const github = !!gitInfo(repo)?.slug;
+  const nav = pagesFor(m, demo ? plugins.filter(p => p.demo) : plugins, { github }), brand = m.name;
   setNav(nav); setBrand(brand); // the fallback, for anything drawn outside a request
   const ctx = { repo, cache, m, plugins, pluginsFailed, warnings, links, gh, fb, demo, ...(projectsDir ? { projectsDir } : {}) };
   const off = f => !m.features[f];
@@ -164,7 +165,10 @@ export function handler({ repo = REPO, m = loadManifest(repo).m, plugins = [], p
         case '': case 'code': {
           const [c, blCard] = await Promise.all([checkoutHealth(repo), backlogCard(ctx)]);
           const page = { ...ctx, repoCard: () => repoCard(c), backlogCard: () => blCard };
-          const html = top ? homePage(page, rest.replace(/\/$/, ''), url.searchParams) : homePage(page, 'README.md', url.searchParams, { home: true });
+          // Home opens on the manifest's home file (README.md); a repo without one opens on its folder view
+          const homeFile = (m.docs && m.docs.home) || 'README.md';
+          const html = top ? homePage(page, rest.replace(/\/$/, ''), url.searchParams)
+            : existsSync(join(repo, homeFile)) ? homePage(page, homeFile, url.searchParams, { home: true }) : homePage(page, '', url.searchParams, { home: true });
           return html ? send(res, 200, html) : notFound(res, 'No such file.');
         }
         case 'repo': return rest ? notFound(res) : send(res, 200, repoPage(ctx, await repoHealth(repo)));
@@ -219,6 +223,7 @@ export function handler({ repo = REPO, m = loadManifest(repo).m, plugins = [], p
         }
         case 'github':
           if (restParts[0] === 'part' && restParts.length === 2) return json(res, 200, await githubPart(ctx, restParts[1], { fresh: url.searchParams.has('fresh'), wait: url.searchParams.has('wait') }));
+          if (!github) return notFound(res, 'This repo has no GitHub remote, so there is nothing to ask GitHub about.');
           return rest ? notFound(res) : send(res, 200, githubPage(ctx, url.searchParams));
         // the pages before Home and Testing, so old links still land
         case 'docs': return moved(rest ? `/code/${restParts.map(encodeURIComponent).join('/')}${url.hash}` : '/');

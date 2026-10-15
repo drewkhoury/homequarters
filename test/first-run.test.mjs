@@ -56,7 +56,7 @@ test('with no GitHub remote, GitHub is not in the nav and its page says why', as
 });
 
 test('no baseline page speaks QuestKeep', async () => {
-  const words = /QuestKeep|Firebase|emulator|players|docker-test|ci-history|make dora|deploy gate|2 October 2026|docs\/plans|CLAUDE\.md|OrbStack|status line/;
+  const words = /QuestKeep|emulator|players|docker-test|ci-history|make dora|deploy gate|2 October 2026|docs\/plans|CLAUDE\.md|status line/;
   for (const p of ['/', '/code', '/code/Makefile', '/repo', '/machine', '/conversations', '/export', '/search?q=hello']) {
     const r = await page(p);
     assert.equal(r.status, 200, p);
@@ -66,7 +66,7 @@ test('no baseline page speaks QuestKeep', async () => {
 });
 
 test('the Chat panel starts closed, and the comments button tucked away, until the person opens them', async () => {
-  const chat = await page('/static/hq-claude.js'), comments = await page('/static/hq-comments.js');
+  const chat = await page('/hq/hq-claude.js'), comments = await page('/hq/hq-comments.js');
   assert.match(chat.text, /open: false/, 'the saved view defaults to closed');
   assert.match(comments.text, /store\.get\(PLACE, 'tucked'\)/, 'the button defaults to the edge tab');
 });

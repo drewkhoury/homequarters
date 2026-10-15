@@ -5,7 +5,7 @@
 // only when someone ran make dora or make ci-history, up to 3 h 20 later, and the nightly load job's never did.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { mkdtempSync, mkdirSync, writeFileSync, readFileSync, readdirSync, existsSync } from 'node:fs';
+import { mkdtempSync, mkdirSync, writeFileSync, readFileSync, readdirSync, existsSync, rmSync } from 'node:fs';
 import { join } from 'node:path';
 import { tmpdir } from 'node:os';
 import { keep } from '../lib/ci-keep.mjs';

@@ -14,7 +14,7 @@ export function searchPage({ repo, cache }, params) {
   const count = found.code.length + found.docs.length + found.logs.length;
   const body = `<h1>Search</h1>
     <form class="hq-searchform" action="/search" method="get">
-      <input class="input" name="q" value="${esc(q)}" placeholder="Search text" autofocus>
+      <input class="input" name="q" value="${esc(q)}" placeholder="Search text" aria-label="Search text" autofocus>
       ${['code', 'docs', 'logs'].map(s => `<label class="radio"><input type="checkbox" name="in" value="${s}"${scopes.includes(s) ? ' checked' : ''}> ${s === 'logs' ? 'run logs' : s}</label>`).join('')}
       <button class="btn btn-primary">Search</button>
     </form>

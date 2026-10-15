@@ -151,7 +151,7 @@ export function testingPage(ctx, params) {
   const runs = filterRuns(allRuns(ctx.cache), f);
   const keep = tab === 'tests' ? { set: params.get('set') || '', flaky: params.get('flaky') || '' } : tab === 'runs' ? { test: params.get('test') || '', task: params.get('task') || '' } : {};
   const tabs = [['pipeline', 'Pipeline'], ['tests', 'Tests'], ['runs', 'Runs']].map(([k, label]) =>
-    `<a role="tab" href="${esc(testingLink(f, { tab: k === 'pipeline' ? '' : k }))}"${k === tab ? ' aria-selected="true" class="on"' : ' aria-selected="false"'}>${label}</a>`).join('');
+    `<a href="${esc(testingLink(f, { tab: k === 'pipeline' ? '' : k }))}"${k === tab ? ' aria-current="page" class="on"' : ''}>${label}</a>`).join('');
   const notes = {
     pipeline: `How a change gets to production. Each step shows its tests and how they did last time. Dashed steps are planned and not built yet. ${ctx.m?.tests?.pipeline ? ctx.m.tests.pipeline.replace(`${ctx.repo}/`, '') : 'The pipeline file'} describes it.`,
     tests: 'Every test file, which set it is in, and its last result in each place. The dots are the last 12 runs, oldest on the left. A test is flaky when it passes and fails on the same commit with no uncommitted changes. Click a test for its runs.',
@@ -163,9 +163,9 @@ export function testingPage(ctx, params) {
   const dash = tab === 'runs' && existsSync(join(ctx.cache, 'runs', 'report.html')) ? ' <a class="hint" href="/cache/runs/report.html" target="_blank" rel="noopener">devpipe&#39;s report</a>' : '';
   const body = `<div class="hq-pagehead"><h1>Testing${info(notes[tab], 'About this tab')}</h1>${dash}</div>
     ${L ? layerCards(L) : ''}
-    <nav class="hq-tabs" role="tablist" aria-label="Testing">${tabs}</nav>
+    <nav class="hq-tabs" aria-label="Testing">${tabs}</nav>
     ${filterBar(f, tab, keep, branch)}
-    <div class="hq-tabpanel" role="tabpanel">${content}</div>
+    <div class="hq-tabpanel">${content}</div>
     ${L ? layerModals(L, catalogue(ctx.repo)) : ''}`;
   return layout({ title: 'Testing', active: 'testing', body, wide: true });
 }

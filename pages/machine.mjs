@@ -58,9 +58,9 @@ function manifestCard(ctx, scan) {
   const warn = warnings.length ? `<ul class="hq-warnlist">${warnings.map(w => `<li>${esc(w)}</li>`).join('')}</ul>` : '';
   const plug = `${ctx.plugins.length ? `<p>Plugins: ${ctx.plugins.map(p => `<a href="/${esc(p.path)}">${esc(p.label)}</a>`).join(', ')}.</p>` : ''}${failed.length ? `<ul class="hq-warnlist">${failed.map(f => `<li>plugin left out: <code>${esc(f.file)}</code>: ${esc(f.why)}</li>`).join('')}</ul>` : ''}`;
   const found = scan.found.length ? `<ul class="hq-found">${scan.found.map(f => `<li><code>${esc(f.rel)}</code> ${f.key ? `<span class="hint">→ ${esc(f.key)}</span>` : ''} ${esc(f.note)}</li>`).join('')}</ul>` : '<p class="hint">Nothing HQ recognises beyond the files themselves.</p>';
-  const proposal = m.present ? '' : `<h3>Proposed ${esc(FILE)}</h3><pre class="hq-pre">${esc(JSON.stringify(proposeManifest(scan), null, 2))}</pre><h3>Make lines, if you want runs recorded</h3><pre class="hq-pre">${esc(MAKE_SNIPPET)}</pre>`;
+  const proposal = m.present ? '' : `<h2>Proposed ${esc(FILE)}</h2><pre class="hq-pre">${esc(JSON.stringify(proposeManifest(scan), null, 2))}</pre><h2>Make lines to add</h2><pre class="hq-pre">${esc(MAKE_SNIPPET)}</pre>`;
   return `<section class="card hq-card"><div class="hq-card-head"><span class="kicker">The manifest</span>${info('hq.json at the repo root says what HQ may read. HQ reads no folder it does not name. Every key is optional; a missing key turns its page off.', 'About the manifest')}</div>
-    ${head}${warn}${plug}<h3>In the repo</h3>${found}${scan.remote ? `<p>GitHub remote: <code>${esc(scan.remote)}</code></p>` : ''}${proposal}</section>`;
+    ${head}${warn}${plug}<h2>In the repo</h2>${found}${scan.remote ? `<p>GitHub remote: <code>${esc(scan.remote)}</code></p>` : ''}${proposal}</section>`;
 }
 
 export async function machinePage(ctx) {

@@ -163,10 +163,10 @@ export function githubPage({ repo, demo, m }, params = new URLSearchParams()) {
   const body = `<div class="hq-pagehead"><h1>${esc(title)}${info(`HQ asks GitHub through gh${firebase ? ', and Firebase through gcloud or the Firebase CLI,' : ''} logged in as you, and only reads. Answers are kept on disk and shown at once; anything older than 30 seconds is asked again behind the page, every minute while it is on screen. Refresh asks now.`, 'About this page')}</h1>
       ${gi ? ext(`https://github.com/${gi.slug}`, esc(gi.slug)) : ''}${chip}
       <span class="hq-gh-bar"><span class="hint" data-updated>Loading…</span><button type="button" class="btn btn-secondary" data-refresh>${REFRESH} Refresh</button></span></div>
-    <nav class="hq-tabs" role="tablist" aria-label="GitHub">${tabs.map(([k, label]) =>
-      `<a role="tab" href="?tab=${k}" data-tab="${k}"${k === tab ? ' aria-selected="true" class="on"' : ' aria-selected="false"'}>${label} <span class="hq-gh-count" data-count="${k}"></span></a>`).join('')}</nav>
+    <nav class="hq-tabs" aria-label="GitHub">${tabs.map(([k, label]) =>
+      `<a href="?tab=${k}" data-tab="${k}"${k === tab ? ' aria-current="page" class="on"' : ''}>${label} <span class="hq-gh-count" data-count="${k}"></span></a>`).join('')}</nav>
     <noscript><p class="hq-warn">This page needs JavaScript to load from GitHub.</p></noscript>
-    ${tabs.map(([k]) => `<section class="hq-gh-part" data-part="${k}"${k === tab ? '' : ' hidden'} role="tabpanel"><div class="hq-gh-body"><p class="hq-loading">Loading…</p></div>${k === 'dashboard'
+    ${tabs.map(([k]) => `<section class="hq-gh-part" data-part="${k}"${k === tab ? '' : ' hidden'} aria-label="${esc(tabs.find(([x]) => x === k)[1])}"><div class="hq-gh-body"><p class="hq-loading">Loading…</p></div>${k === 'dashboard'
       ? '<div class="hq-ci-slot" data-load-part="ci-now"><p class="hq-loading">Looking for CI runs going now…</p></div>' + (demo ? '' : '<div class="hq-actions-slot" data-load-part="actions"><p class="hq-loading">Loading the Actions minutes…</p></div>') : ''}</section>`).join('')}`;
   return layout({ title, active: 'github', body, wide: true });
 }

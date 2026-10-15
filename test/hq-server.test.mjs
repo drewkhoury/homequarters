@@ -195,7 +195,7 @@ test('the code viewer refuses the same paths the files do', async () => {
 
 test('the GitHub page loads each tab on its own, and says so when gh is not installed', async () => {
   const page = (await get('/github?tab=runs')).body;
-  assert.match(page, /data-part="runs" role="tabpanel"/);
+  assert.match(page, /data-part="runs"[^>]*aria-label="Runs"/);
   assert.match(page, /data-part="dashboard" hidden/);
   assert.match((await get('/github')).body, /data-load-part="actions"/);
   for (const name of ['dashboard', 'prs', 'runs', 'actions']) {
@@ -280,7 +280,7 @@ test('the Firebase tab says what to run when neither gcloud nor the Firebase CLI
   const part = JSON.parse((await get('/github/part/firebase')).body);
   assert.equal(part.ok, false);
   assert.match(part.html, /Could not load Firebase[\s\S]*gcloud auth login/);
-  assert.match((await get('/github?tab=firebase')).body, /data-part="firebase" role="tabpanel"/);
+  assert.match((await get('/github?tab=firebase')).body, /data-part="firebase"[^>]*aria-label="Firebase"/);
 });
 
 // ---- Claude: Ask and Open in Claude, against a claude that replays what the real one printed ----

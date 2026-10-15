@@ -122,7 +122,7 @@ if (ghParts.length) {
   const show = name => {
     open = name;
     for (const p of ghParts) p.hidden = p.dataset.part !== name;
-    for (const t of document.querySelectorAll('.hq-tabs [data-tab]')) { const on = t.dataset.tab === name; t.classList.toggle('on', on); t.setAttribute('aria-selected', String(on)); }
+    for (const t of document.querySelectorAll('.hq-tabs [data-tab]')) { const on = t.dataset.tab === name; t.classList.toggle('on', on); if (on) t.setAttribute('aria-current', 'page'); else t.removeAttribute('aria-current'); }
     history.replaceState(null, '', `?tab=${name}`);
     if (!loadedAt.has(name)) load(name, false); else ago();
   };

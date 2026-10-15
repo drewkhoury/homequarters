@@ -448,7 +448,7 @@ const STYLE = `<style>
 .dv-page { --t1: 12px; --t2: 13px; --t3: 15px; --t4: 18px; --t5: 24px; --t6: 40px; font-size: var(--t2); padding-bottom: 72px; }
 /* HQ's Comments pill and Chat tab sit over the right edge: the page keeps a gutter of the pill's width clear */
 .hq-main:has(> .dv-page) { padding-top: 16px; padding-right: 136px; }
-.dv-page .hq-info { width: 24px; height: 24px; margin-left: 0; align-items: center; justify-content: center; flex: none; }
+.dv-page .hq-info { margin: 0; flex: none; }
 .dv-page h1, .dv-page h2, .dv-page h3 { margin: 0; line-height: 1.25; }
 .dv-head { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 16px; margin: 0 0 6px; }
 .dv-name { display: flex; align-items: center; gap: 4px; flex-wrap: nowrap; }

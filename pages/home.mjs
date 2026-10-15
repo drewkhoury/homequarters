@@ -36,9 +36,9 @@ function menu(rel, out, wrap) {
     ? `<a role="menuitem" href="${esc(out.github.file)}" target="_blank" rel="noopener">Open on GitHub ${info(out.github.note, 'Which copy')}</a>`
     : `<span role="menuitem" aria-disabled="true" class="off">Not on GitHub yet ${info(out.githubMissing, 'Why')}</span>`;
   return `<details class="hq-menu"><summary class="btn btn-ghost" aria-label="More for this file" title="More">⋯</summary><div class="hq-menu-list" role="menu">
-    <a role="menuitem" href="${esc(out.editor)}">Open in editor</a>${gh}
+    <a role="menuitem" href="${esc(out.editor)}" title="${process.env.HQ_EDITOR ? 'Opens in the editor HQ_EDITOR names' : 'Opens in VS Code; set HQ_EDITOR for another editor'}">Open in editor</a>${gh}
     ${revealButton('repo', rel).replace('class="btn btn-ghost hq-reveal"', 'role="menuitem" class="hq-reveal"')}
-    <a role="menuitem" href="/raw/${urlPath(rel)}" target="_blank" rel="noopener">Raw file</a>
+    <a role="menuitem" href="/raw/${urlPath(rel)}" target="_blank" rel="noopener" title="Opens in a new tab">Raw file</a>
     ${wrap ? '<button type="button" role="menuitem" class="hq-wrap-toggle" aria-pressed="true">Wrap long lines</button>' : ''}
   </div></details>`;
 }

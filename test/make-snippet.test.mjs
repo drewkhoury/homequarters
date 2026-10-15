@@ -58,7 +58,7 @@ function slotMake(t) {
   wf(join(bin, 'hq'), `#!/bin/sh\nexec ${process.execPath} ${HQ_BIN} "$@"\n`); chmodSync(join(bin, 'hq'), 0o755);
   const held = `touch ran && pid=$$(${process.execPath} -e 'console.log(JSON.parse(require("fs").readFileSync(process.env.HQ_SLOT_DIR + "/run.json")).pid)') && test "$$pid" = "$$$$"`;
   // a function replacer: a replacement string would read the shell's $$ as one $
-  wf(join(dir, 'Makefile'), MAKE_SNIPPET.replace('<your test command>', 'true').replace('<your browser test command>', () => held) + 'fail:\n\t@$(call hq-slot,fail,exit 7)\n');
+  wf(join(dir, 'Makefile'), MAKE_SNIPPET.replace('<your test command>', 'true').replace('<your browser test command>', () => held) + 'fail:\n\t@$(call hq-slot,fail,exit 7)\nci-browser:\n\t@$(call hq-slot,ci-browser,touch ci-ran)\n');
   t.after(() => rmSync(dir, { recursive: true, force: true }));
   const make = (target, env = {}, path = `${bin}:/usr/bin:/bin`) => { try { return { status: 0, out: execFileSync('make', ['-s', '-C', dir, target], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'], env: { PATH: path, HOME: process.env.HOME, HQ_SLOT_DIR: lock, HQ_NO_DOCKER: '1', HQ_SLOT_POLL_MS: '20', ...env } }) }; } catch (e) { return { status: e.status, out: `${e.stdout || ''}${e.stderr || ''}` }; } };
   return { dir, lock, make };
@@ -92,4 +92,26 @@ test('with no hq on the PATH, the slot line stops the run and says how to instal
   const r = m.make('browser-test', {}, '/usr/bin:/bin');
   assert.notEqual(r.status, 0); assert.equal(existsSync(join(m.dir, 'ran')), false);
   assert.match(r.out, /hq is not installed, and slot take browser-test guards this run: npm install -g homequarters/);
+});
+
+// On CI there is no shared laptop for the slot to guard, so the slot line stands aside there as hq slot itself does, and a
+// hosted runner needs no hq for the browser tests to run.
+test('on CI with no hq, the slot line runs the command instead of stopping', t => {
+  const m = slotMake(t);
+  const r = m.make('ci-browser', { CI: 'true' }, '/usr/bin:/bin');
+  assert.equal(r.status, 0, r.out); assert.equal(existsSync(join(m.dir, 'ci-ran')), true);
+});
+
+// A check (the free space) is hq's to fail: it runs when hq is there and keeps its exit, and is nothing without it.
+test('a check line keeps hq\'s own exit when hq is there, and is nothing when it is not', t => {
+  const dir = mkdtempSync(join(tmpdir(), 'hq-make-check-')), bin = join(dir, 'bin');
+  mkdirSync(bin);
+  writeFileSync(join(bin, 'hq'), '#!/bin/sh\necho "checked: $*"; exit 3\n'); chmodSync(join(bin, 'hq'), 0o755);
+  writeFileSync(join(dir, 'Makefile'), MAKE_SNIPPET + 'checked:\n\t@$(call hq-check,space host) && echo went-on\n');
+  t.after(() => rmSync(dir, { recursive: true, force: true }));
+  const make = path => { try { return { status: 0, out: execFileSync('make', ['-s', '-C', dir, 'checked'], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'], env: { PATH: path, HOME: process.env.HOME } }) }; } catch (e) { return { status: e.status, out: (e.stdout || '') + (e.stderr || '') }; } };
+  const stopped = make(`${bin}:/usr/bin:/bin`);
+  assert.notEqual(stopped.status, 0); assert.match(stopped.out, /checked: space host/); assert.doesNotMatch(stopped.out, /went-on/);
+  const absent = make('/usr/bin:/bin');
+  assert.equal(absent.status, 0, absent.out); assert.match(absent.out, /went-on/);
 });

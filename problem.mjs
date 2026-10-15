@@ -15,8 +15,8 @@
 //   hq problem reopen <id>
 //   hq problem merge <id> --into <id>
 //   hq problem redact <id> --fields <field,field>
-// The kinds, modes, factors and dispositions are in lib/problems.mjs; the stages come from the repo's pipeline file
-// (docs/standards/pipeline.md) and --help lists them. A refusal writes nothing and exits 1.
+// The kinds, modes, factors and dispositions are fixed (hq problem --help lists the kinds); the stages come from the
+// repo's pipeline file (the manifest's tests.pipeline) and --help lists them. A refusal writes nothing and exits 1.
 import { appendFileSync, mkdirSync, readFileSync } from 'node:fs';
 import { randomBytes } from 'node:crypto';
 import { homedir } from 'node:os';
@@ -130,7 +130,9 @@ export function main(argv = process.argv.slice(2), env = process.env) {
   configureStages(stagesFrom(loadPipeline(m.tests && m.tests.pipeline)));
   const dir = env.HQ_PROBLEMS_DIR || env.QK_PROBLEMS_DIR || m.store('problems') || join(m.cache, 'problems'), file = join(dir, 'events.jsonl');
   if (argv.includes('--help') || argv[0] === 'help') {
-    console.log(readFileSync(new URL(import.meta.url), 'utf8').split('\n').filter(l => l.startsWith('//')).map(l => l.slice(3)).join('\n'));
+    const src = readFileSync(new URL(import.meta.url), 'utf8').split('\n');
+    const usage = src.slice(src.findIndex(l => l.startsWith('// Usage:')), src.findIndex(l => l.startsWith('import '))).filter(l => l.startsWith('//')).map(l => l.slice(3));
+    console.log(['hq problem: write to the problem register. Evidence is a pointer (a run id, a file and line, a commit), never copied text.', ...usage].join('\n'));
     console.log(`\nKinds: ${Object.keys(KIND).join(', ')}\nStages for ${m.name}, earliest first: ${STAGES.map(([k]) => k).join(', ')}`);
     return;
   }

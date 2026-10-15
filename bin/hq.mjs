@@ -17,7 +17,7 @@
 //   hq --version
 // HQ reads the repo's hq.json if there is one, and shows the baseline without it. It never writes to the repo.
 import { execFileSync } from 'node:child_process';
-import { readFileSync } from 'node:fs';
+import { readFileSync , existsSync, statSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -31,12 +31,15 @@ const cmd = args.find(a => !a.startsWith('--') && a !== flag('--port') && a !== 
 // The repo: --repo, else the git checkout the current folder is in, else the current folder.
 function findRepo() {
   const given = flag('--repo');
-  if (given) return resolve(given);
+  if (given) {
+    if (!existsSync(given) || !statSync(given).isDirectory()) { console.error(`hq: --repo ${given} is not a folder.`); process.exit(2); }
+    return resolve(given);
+  }
   try { return execFileSync('git', ['rev-parse', '--show-toplevel'], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] }).trim(); } catch { return process.cwd(); }
 }
 
 if (args.includes('--version') || cmd === 'version') { console.log(PKG.version); process.exit(0); }
-if ((args.includes('--help') && !['problem', 'slot'].includes(cmd)) || cmd === 'help') { console.log(readFileSync(fileURLToPath(import.meta.url), 'utf8').split('\n').filter(l => l.startsWith('//')).map(l => l.slice(3)).join('\n')); process.exit(0); }
+if ((args.includes('--help') && cmd !== 'problem') || cmd === 'help') { console.log(readFileSync(fileURLToPath(import.meta.url), 'utf8').split('\n').filter(l => l.startsWith('//')).map(l => l.slice(3)).join('\n')); process.exit(0); }
 
 if (cmd === 'run-info') {
   const { main } = await import('../lib/run-info.mjs');
@@ -83,7 +86,7 @@ if (cmd === 'run-info') {
   if (!scan.found.length) console.log('  nothing HQ recognises beyond the files themselves; the baseline pages work as they are');
   for (const f of scan.found) console.log(`  ${f.rel.padEnd(28)} ${f.note}`);
   if (scan.remote) console.log(`  GitHub remote: ${scan.remote}`);
-  if (scan.caches.length) console.log(`  cache folder: ${scan.caches[0]}${scan.stores.length ? ` with ${[...new Set(scan.stores.map(s => s.store))].join(', ')}` : ''}`);
+  console.log(`\n## The cache\n  ${scan.caches[0]}${scan.stores.length ? ` with ${[...new Set(scan.stores.map(s => s.store))].join(', ')}` : ' (nothing recorded there yet)'}`);
   console.log(`\n## ${scan.manifest ? 'hq.json is already there; this is what setup would propose from scratch' : 'Proposed hq.json (add it to the repo root yourself)'}\n`);
   console.log(JSON.stringify(proposeManifest(scan), null, 2));
   // a Makefile that names its test sets the way QuestKeep did: propose the file HQ reads them from instead
@@ -92,7 +95,7 @@ if (cmd === 'run-info') {
     const sets = proposeSets(readFileSync(join(repo, 'Makefile'), 'utf8'));
     if (sets) { console.log('\n## Proposed tests/sets.json, from the Makefile\'s GATE and AFTER lines (add it, and tests.sets to hq.json)\n'); console.log(JSON.stringify(sets, null, 2)); }
   }
-  console.log('\n## Make lines to add, if you want runs recorded\n');
+  console.log(`\n## Make lines to add${scan.found.some(f => f.rel === 'Makefile') ? '' : ' (the repo has no Makefile; the same calls work from any task runner)'}\n`);
   console.log(MAKE_SNIPPET);
 } else if (cmd === 'serve') {
   const { start } = await import('../server.mjs');

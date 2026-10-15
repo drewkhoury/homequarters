@@ -43,11 +43,15 @@ if (!args.has('--no-fetch')) {
   }
 }
 const git = (...a) => execFileSync('git', a, { cwd: repo, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'], maxBuffer: 64 * 1024 * 1024 });
-if (!args.has('--no-fetch-git')) { try { git('fetch', '-q', 'origin', 'main'); } catch { say('Could not fetch origin/main; using the copy this checkout has.'); } }
+if (!args.has('--no-fetch') && !args.has('--no-fetch-git')) { try { git('fetch', '-q', 'origin', 'main'); } catch { say('Could not fetch origin/main; using the copy this checkout has.'); } }
 
 const readJson = (f, fallback) => { try { return JSON.parse(readFileSync(f, 'utf8')); } catch { return fallback; } };
 const runs = readJson(join(raw, 'runs.json'), null);
-if (!runs) { console.log(`No runs in ${raw} yet. Run hq dora with gh logged in first.`); process.exit(0); }
+if (!runs) {
+  let remote = false; try { remote = git('remote').trim().length > 0; } catch { /* not a repo */ }
+  console.log(`No runs in ${raw} yet. ${remote ? 'Run hq dora with gh logged in to fetch them.' : 'This repo has no git remote, so there are no GitHub runs to fetch.'}`);
+  process.exit(0);
+}
 
 // Each attempt's jobs, read when first asked for
 const jobCache = new Map();

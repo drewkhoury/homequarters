@@ -10,6 +10,7 @@ import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { compute, summarise, deploysOf, failuresOf, recoveriesOf, changesOf, mergesOf, prRedsOf, gatesOf, fixesOf, rowFromLog, slotOf, stats, dayStart, dayKey, addDays, windowsAt, lateDays, COUNTING_CHANGES, P90_FROM, configureDelivery } from '../lib/dora.mjs';
 import * as dora from '../lib/dora.mjs';
+import { QK_DELIVERY } from './fixtures/delivery.mjs';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const fixture = name => JSON.parse(readFileSync(join(here, 'fixtures', 'dora', `${name}.json`), 'utf8'));
@@ -18,9 +19,7 @@ const logs = new Map(Object.entries(fixture('logs')).map(([id, line]) => [Number
 const jobsOf = (id, attempt) => jobs[`${id}-${attempt}`] || null;
 // what reaches players in the repo these runs came from: its manifest would say delivery.userPaths; without one, every
 // change counts as reaching users (tested below)
-// QuestKeep's own job and step names, which these fixtures carry; until 15 October they were baked into dora.mjs
-export const QK_DELIVERY = { userPaths: ['web'], tz: 'America/New_York', deployWorkflow: '.github/workflows/deploy.yml', testWorkflow: '.github/workflows/test.yml',
-  gateJobs: ['test', 'test (a)', 'test (b)', 'laptop'], deployJob: 'deploy', smokeJob: 'smoke', deploySteps: ['Deploy to production', 'Run make deploy'], reuseSteps: ['Reuse a gate that passed'], testSteps: ['Run the tests'] };
+// QuestKeep's own job and step names, which these fixtures carry (test/fixtures/delivery.mjs)
 configureDelivery(QK_DELIVERY);
 
 // main's pushes in the order they landed, which is how "a contains b" is answered on a straight line

@@ -11,7 +11,9 @@ import { join, dirname } from 'node:path';
 import { tmpdir } from 'node:os';
 import { fileURLToPath } from 'node:url';
 import { readFileSync } from 'node:fs';
-import { compute, summarise } from '../lib/dora.mjs';
+import { compute, summarise, configureDelivery } from '../lib/dora.mjs';
+import { QK_DELIVERY } from './fixtures/delivery.mjs';
+configureDelivery(QK_DELIVERY); // the fixtures are QuestKeep's runs, with its job and step names
 import { deliveryPage, STALE_MIN } from '../pages/delivery.mjs';
 
 const here = dirname(fileURLToPath(import.meta.url)), repo = join(here, '..', '..');

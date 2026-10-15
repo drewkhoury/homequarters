@@ -4,7 +4,7 @@
 // has to be forgiving in exactly these ways and no others.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { resolveManifest, pagesFor, SCHEMA, defaultCache, nameFrom, loadManifest } from '../lib/manifest.mjs';
+import { resolveManifest, pagesFor, SCHEMA, DEFAULTS, defaultCache, nameFrom, loadManifest } from '../lib/manifest.mjs';
 import { mkdtempSync, writeFileSync, rmSync } from 'node:fs';
 import { join, basename } from 'node:path';
 import { tmpdir } from 'node:os';
@@ -93,12 +93,12 @@ test('a key of the wrong type is ignored with a warning, never a crash', () => {
 
 test('the delivery key takes the deploy and test workflows and a time zone, and refuses a zone Intl does not know', () => {
   const { m, warnings } = read({ schemaVersion: 1, name: 'app', delivery: { userPaths: ['web'], deployWorkflow: '.github/workflows/ship.yml', testWorkflow: '.github/workflows/check.yml', tz: 'Australia/Melbourne' } });
-  assert.deepEqual(m.delivery, { userPaths: ['web'], deployWorkflow: '.github/workflows/ship.yml', testWorkflow: '.github/workflows/check.yml', tz: 'Australia/Melbourne' });
+  assert.deepEqual(m.delivery, { userPaths: ['web'], deployWorkflow: '.github/workflows/ship.yml', testWorkflow: '.github/workflows/check.yml', tz: 'Australia/Melbourne', gateJobs: null, deployJob: null, smokeJob: null, deploySteps: null, reuseSteps: null, testSteps: null });
   assert.deepEqual(warnings, []);
   const bad = read({ schemaVersion: 1, name: 'app', delivery: { tz: 'Mars/Olympus' } });
   assert.equal(bad.m.delivery.tz, null);
   assert.ok(bad.warnings.some(w => /delivery\.tz/.test(w)));
-  assert.deepEqual(read({ schemaVersion: 1, name: 'app' }).m.delivery, { userPaths: [], deployWorkflow: null, testWorkflow: null, tz: null }, 'absent means the defaults HQ had before the key');
+  assert.deepEqual(read({ schemaVersion: 1, name: 'app' }).m.delivery, DEFAULTS[SCHEMA].delivery, 'absent means the schema\'s defaults');
 });
 
 // ---- the adversary's survivors, 15 October ----

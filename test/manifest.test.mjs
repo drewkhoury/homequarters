@@ -4,7 +4,10 @@
 // has to be forgiving in exactly these ways and no others.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { resolveManifest, pagesFor, SCHEMA, defaultCache, nameFrom } from '../lib/manifest.mjs';
+import { resolveManifest, pagesFor, SCHEMA, defaultCache, nameFrom, loadManifest } from '../lib/manifest.mjs';
+import { mkdtempSync, writeFileSync, rmSync } from 'node:fs';
+import { join, basename } from 'node:path';
+import { tmpdir } from 'node:os';
 
 const repo = '/r/My Project', home = '/h', env = {};
 const read = raw => resolveManifest(raw, { repo, home, env });
@@ -96,4 +99,34 @@ test('the delivery key takes the deploy and test workflows and a time zone, and 
   assert.equal(bad.m.delivery.tz, null);
   assert.ok(bad.warnings.some(w => /delivery\.tz/.test(w)));
   assert.deepEqual(read({ schemaVersion: 1, name: 'app' }).m.delivery, { userPaths: [], deployWorkflow: null, testWorkflow: null, tz: null }, 'absent means the defaults HQ had before the key');
+});
+
+// ---- the adversary's survivors, 15 October ----
+test('the Testing page follows the tests key alone, and the backlog and pipeline paths are the ones named', () => {
+  const { m } = read({ schemaVersion: 1, name: 'app', tests: { layers: 'tests/layers.json', pipeline: 'ci/pipeline.json' }, backlog: { dir: 'work/items', stages: ['ideas', 'todo'] } });
+  assert.equal(m.features.testing, true, 'layers and a pipeline make a Testing page without any store');
+  assert.equal(m.tests.pipeline, join(repo, 'ci', 'pipeline.json'));
+  assert.equal(m.tests.layers, join(repo, 'tests', 'layers.json'));
+  assert.equal(m.backlog.dir, join(repo, 'work', 'items')); assert.equal(m.backlog.rel, 'work/items');
+  assert.deepEqual(m.backlog.stages, ['ideas', 'todo']);
+  assert.deepEqual(read({ schemaVersion: 1, name: 'app', backlog: { dir: 'docs/backlog' } }).m.backlog.stages, ['inbox', 'next', 'parked'], 'the default stages');
+});
+
+test('the nav takes the plugins after the pages the manifest turns on', () => {
+  const { m } = read({ schemaVersion: 1, name: 'app', decisions: { dir: 'docs/decisions' } });
+  const nav = pagesFor(m, [{ id: 'launch', label: 'Launch', path: 'launch' }]);
+  assert.deepEqual(nav.at(-2), ['launch', 'Launch', '/launch']);
+  assert.deepEqual(nav.at(-1)[0], 'export');
+  assert.ok(nav.some(([id]) => id === 'decisions'));
+});
+
+test('a manifest that is not JSON is an error at the top of the warnings, and the repo gets the defaults', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'hq-manifest-bad-'));
+  writeFileSync(join(dir, 'hq.json'), '{ not json');
+  const { m, warnings, present } = loadManifest(dir, { home, env });
+  assert.equal(present, true);
+  assert.match(warnings[0], /hq\.json is not valid JSON/);
+  assert.equal(m.name, nameFrom(basename(dir)));
+  assert.equal(m.features.backlog, false);
+  rmSync(dir, { recursive: true, force: true });
 });

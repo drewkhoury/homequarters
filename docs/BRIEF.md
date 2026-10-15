@@ -106,7 +106,7 @@ Sized in agent time. Waits are named separately.
 5. Delivery and Problems with stages from the pipeline file. Half a day. Built 14 October: `lib/stages.mjs`, `docs/standards/pipeline.md`.
 6. The plugin seam, Launch as the first plugin, Firebase Hosting as the first provider. Half a day.
 7. The standards documents. Half a day.
-8. QuestKeep's side: the manifest, the Makefile calling `hq`, `hq/` removed, the hunter as a plugin, the stylesheets unlinked. One day, then a pull request that waits for Drew's click.
+8. QuestKeep's side: the manifest, the Makefile calling `hq`, `hq/` removed, the hunter as a plugin, the stylesheets unlinked. One day, then a pull request that waits for Drew's click. Rehearsed 14 October on a clone, two of its three steps: `docs/switch-rehearsal.md` has the numbers, what the package lacked, and what QuestKeep pays.
 9. A second project: a hello-world repo with no manifest, then one of the sibling repos with one. Half a day.
 
 ## Risks a reviewer should weigh

@@ -80,8 +80,6 @@ export const STATIC = join(HERE, 'static');
 export const THEME = join(HERE, 'theme');
 export const REPO = process.cwd();
 export const CACHE = process.env.HQ_CACHE || join(homedir(), '.cache', 'hq', basename(REPO));
-// ports other tools on this laptop already use: the app, the emulators and the rendering experiment
-const TAKEN = new Set([8765, 8381, 8790, 4100, 9399, 9599]);
 
 const TYPES = {
   '.html': 'text/html; charset=utf-8', '.css': 'text/css; charset=utf-8', '.js': 'text/javascript; charset=utf-8',
@@ -424,15 +422,16 @@ async function claudeFollowRoute(req, res, params, { repo, projectsDir, claude, 
   res.on('close', () => { clearInterval(reads); clearInterval(lives); if (watcher) watcher.close(); });
 }
 
-// Listens on the port given, or on 8780 and upwards past any port in use. Port 0 takes any free one, for the tests.
+// Listens on the port given, or on 8780 and upwards past any port in use; `movedFrom` says when it is not the one asked
+// for, so the start line can say so. HQ_PORT is taken as it is, and port 0 takes any free one, for the tests.
 export function start({ port = +(process.env.HQ_PORT || 8780), repo = REPO, m = loadManifest(repo).m, plugins = [], pluginsFailed = [], warnings = [], cache = m.cache, gh, run, platform, fb, claude, projectsDir, demo = loadDemo({ repo, cache, name: m.name, file: m.demo }) } = {}) {
   const server = createServer(handler({ repo, m, plugins, pluginsFailed, warnings, cache, gh, run, platform, fb, claude, projectsDir, demo }));
   const fixed = !!process.env.HQ_PORT || port === 0;
   return new Promise((resolve, reject) => {
     const attempt = p => {
-      if (!fixed && TAKEN.has(p)) return attempt(p + 1);
       server.once('error', e => (e.code === 'EADDRINUSE' && !fixed && p < port + 20 ? attempt(p + 1) : reject(e)));
-      server.listen(p, '127.0.0.1', () => resolve({ server, url: `http://127.0.0.1:${server.address().port}` }));
+      // every listen call leaves its callback behind, so the one that fires may be an earlier attempt's: read the port bound
+      server.listen(p, '127.0.0.1', () => { const bound = server.address().port; resolve({ server, url: `http://127.0.0.1:${bound}`, movedFrom: bound === port || port === 0 ? null : port }); });
     };
     attempt(port);
   });

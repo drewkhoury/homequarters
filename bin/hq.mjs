@@ -104,9 +104,9 @@ if (cmd === 'run-info') {
   warnings.push(...pluginWarnings);
   const port = flag('--port') ? +flag('--port') : undefined;
   try {
-    const { url } = await start({ repo, m, plugins, pluginsFailed: failed, warnings, ...(port ? { port } : {}) });
+    const { url, movedFrom } = await start({ repo, m, plugins, pluginsFailed: failed, warnings, ...(port ? { port } : {}) });
     for (const sig of ['SIGINT', 'SIGTERM', 'SIGHUP']) process.on(sig, () => process.exit(0));
-    console.log(`HQ ${PKG.version} for ${m.name}${present ? '' : ' (no hq.json: the baseline pages; run hq setup for more)'}: ${url}`);
+    console.log(`HQ ${PKG.version} for ${m.name}${present ? '' : ' (no hq.json: the baseline pages; run hq setup for more)'}: ${url}${movedFrom ? ` (port ${movedFrom} was in use)` : ''}`);
     for (const w of warnings) console.log(`  warning: ${w}`);
     for (const f of failed) console.log(`  plugin left out: ${f.file}: ${f.why}`);
     console.log('Only this machine can reach it. Ctrl-C stops it.');

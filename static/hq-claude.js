@@ -26,7 +26,7 @@
   // ---- how the panel sits ----
   // Over lies on the right of the page, wide enough that answers need little scrolling. (Push, which narrowed the page
   // to make room, is gone: too many pages looked wrong squeezed; a saved Push opens as Over.)
-  const view = Object.assign({ mode: 'over', open: true, overWidth: 880, float: { x: null, y: 90, w: 520, h: 620 } }, store.get(VIEW, {}));
+  const view = Object.assign({ mode: 'over', open: false, overWidth: 880, float: { x: null, y: 90, w: 520, h: 620 } }, store.get(VIEW, {}));
   if (!['over', 'float', 'full'].includes(view.mode)) view.mode = 'over';
   const widthKey = () => 'overWidth';
   const saveView = () => store.set(VIEW, view);
@@ -176,7 +176,7 @@
     if (!store.get(HERE, true)) return null;
     const page = location.pathname + location.search + location.hash;
     const holder = document.querySelector('dialog[open]:not(.hqc-panel) [data-path]') || document.querySelector('.hq-codemain [data-path], .hq-md[data-path], .hq-code[data-path]');
-    if (!holder) return { file: '', title: document.title.replace(/ · (QuestKeep )?HQ$/, ''), page };
+    if (!holder) return { file: '', title: document.title.replace(/ · [^·]*HQ$/, ''), page };
     const title = holder.closest('.bl-detail')?.querySelector('.bl-detail-title')?.textContent.trim() || document.title.replace(/ · (QuestKeep )?HQ$/, '');
     return { file: holder.dataset.path, title, page };
   }

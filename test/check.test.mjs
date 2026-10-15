@@ -5,9 +5,10 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { mkdtempSync, mkdirSync, writeFileSync, rmSync } from 'node:fs';
-import { join } from 'node:path';
+import { join, dirname } from 'node:path';
 import { tmpdir } from 'node:os';
-import { execFileSync } from 'node:child_process';
+import { execFileSync, spawnSync } from 'node:child_process';
+import { fileURLToPath } from 'node:url';
 import { checks, report } from '../lib/check.mjs';
 import { loadManifest } from '../lib/manifest.mjs';
 
@@ -70,4 +71,79 @@ test('a convention the manifest does not name is not checked, and a bare manifes
   const m = loadManifest(dir);
   const bare = { ...m, m: { ...m.m, backlog: null, decisions: null, docs: { home: null, groups: null }, tests: null }, warnings: [] };
   assert.deepEqual(checks(dir, bare), []);
+});
+
+// Hollis's second pass: these rules had a green case and no red one, so a change that silenced any of them would pass
+// the suite. One repo breaks each of them once.
+function quietRepo(t) {
+  const dir = mkdtempSync(join(tmpdir(), 'hq-check-quiet-'));
+  t.after(() => rmSync(dir, { recursive: true, force: true }));
+  const put = (p, text) => { mkdirSync(join(dir, p, '..'), { recursive: true }); writeFileSync(join(dir, p), text); };
+  const header = ({ runsIn = 'the gate', takes = 'budget 10 s on CI', when = '// Run it when: the door changes.\n' } = {}) =>
+    `// Proves: the door.\n// Why it exists: doors.\n// Runs in: ${runsIn}.\n// Takes: ${takes}.\n${when}`;
+  put('README.md', '# A repo\n');
+  put('web/app.js', '');
+  put('stray/loose.txt', 'in no group');
+  put('hq/groups.json', JSON.stringify({ schema: 1, groups: [{ id: 'app', title: 'App', paths: ['web/'] }, { id: 'docs', title: 'Docs', paths: ['docs/', '*.md', 'hq/', 'hq.json', 'tests/'] }] }));
+  put('tests/layers.json', JSON.stringify({ schema: 1, layers: [{ id: 'browser', name: 'Browser' }] }));
+  put('tests/sets.json', JSON.stringify({ schema: 1, sets: { gate: ['g-no-when', 'g-wrong-runs', 'g-no-budget', 'g-big', 'g-range'], orphan: ['lonely'] } }));
+  put('tests/g-no-when.js', header({ when: '' }));
+  put('tests/g-wrong-runs.js', header({ runsIn: 'after.yml' }));
+  put('tests/g-no-budget.js', header({ takes: '30 s' }));
+  put('tests/g-big.js', header({ takes: 'budget 90 s on CI' }));
+  put('tests/g-range.js', header({ takes: 'budget 10 s on CI (3 to 20)' }));
+  put('hq/pipeline.json', JSON.stringify({ schema: 1, stages: ['gate', { id: 'merge', merge: true }], paths: [{ id: 'pr', title: 'PR', steps: [
+    { stage: 'gate', sets: ['gate'] },
+    { title: 'Ghost', stage: 'gate', tests: ['ghost'] },
+  ] }] }));
+  put('hq.json', JSON.stringify({ schemaVersion: 1, name: 'quiet', cache: join(dir, 'cache'), docs: { groups: 'hq/groups.json' },
+    tests: { layers: 'tests/layers.json', pipeline: 'hq/pipeline.json', sets: 'tests/sets.json' } }));
+  git(dir, 'init', '-q', '-b', 'main'); git(dir, 'add', '.'); git(dir, 'commit', '-q', '-m', 'm');
+  return dir;
+}
+
+test('the quieter rules are red too: a file in no group, a layer without status, a step without a title, a test in no set, a set on no step, and each header rule', t => {
+  const dir = quietRepo(t);
+  const problems = checks(dir), by = area => problems.filter(p => p.area === area).map(p => p.problem);
+  assert.deepEqual(by('groups'), ['stray/loose.txt: in no group, and no group takes the rest']);
+  assert.deepEqual(by('layers'), ['layer "browser": needs id, name and status']);
+  assert.ok(by('pipeline').some(p => p.startsWith('(a step with no title): ')), by('pipeline').join('\n'));
+  assert.ok(by('pipeline').includes('Ghost: names the test ghost, which is in no set'), by('pipeline').join('\n'));
+  assert.ok(by('pipeline').includes('the orphan set is on no step'), by('pipeline').join('\n'));
+  assert.deepEqual(by('headers').sort(), [
+    'tests/g-big.js: "Takes:" budgets 90 s, over the gate\'s 45 s: split it or move it to the long set',
+    'tests/g-no-budget.js: "Takes:" names no budget ("budget N s on CI")',
+    'tests/g-no-when.js: no "Run it when:"',
+    'tests/g-range.js: "Takes:" records up to 20 s on CI, over its 10 s budget: split it, or give it a budget its times fit',
+    'tests/g-wrong-runs.js: "Runs in:" should say the gate, as the Makefile does',
+  ]);
+});
+
+test('a folder or file the manifest names that is not there, or is not what it should be, is one problem each and no crash', t => {
+  const dir = mkdtempSync(join(tmpdir(), 'hq-check-missing-'));
+  t.after(() => rmSync(dir, { recursive: true, force: true }));
+  writeFileSync(join(dir, 'README.md'), '# r\n');
+  mkdirSync(join(dir, 'tests')); writeFileSync(join(dir, 'tests', 'layers.json'), 'not json');
+  writeFileSync(join(dir, 'hq.json'), JSON.stringify({ schemaVersion: 1, name: 'gone', cache: join(dir, 'cache'),
+    docs: { groups: 'hq/groups.json' }, backlog: { dir: 'docs/backlog' }, decisions: { dir: 'docs/decisions' },
+    tests: { layers: 'tests/layers.json', pipeline: 'hq/pipeline.json', sets: 'tests/sets.json' } }));
+  git(dir, 'init', '-q', '-b', 'main'); git(dir, 'add', '.'); git(dir, 'commit', '-q', '-m', 'm');
+  const problems = checks(dir), by = area => problems.filter(p => p.area === area).map(p => p.problem);
+  assert.deepEqual(by('backlog'), ['docs/backlog: the folder hq.json names is not there']);
+  assert.deepEqual(by('decisions'), ['docs/decisions: the folder hq.json names is not there']);
+  assert.deepEqual(by('groups'), [`${join(dir, 'hq/groups.json')}: cannot be read`]);
+  assert.deepEqual(by('sets'), [`${join(dir, 'tests/sets.json')}: cannot be read`]);
+  assert.deepEqual(by('layers'), [`${join(dir, 'tests/layers.json')}: cannot be read, or has no layers list`]);
+  assert.deepEqual(by('pipeline'), [`${join(dir, 'hq/pipeline.json')}: cannot be read, or has no paths list`]);
+});
+
+test('the command exits 1 and prints the report when anything is wrong, and 0 with the one sentence when nothing is', t => {
+  const hq = join(dirname(fileURLToPath(import.meta.url)), '..', 'bin', 'hq.mjs');
+  const run = dir => spawnSync(process.execPath, [hq, 'check', '--repo', dir], { encoding: 'utf8', env: { PATH: process.env.PATH, HOME: dir } });
+  const red = run(repo(t, { broken: true }));
+  assert.equal(red.status, 1, red.stdout + red.stderr);
+  assert.match(red.stdout, /\n\n\d+ problems\.\n$/);
+  const green = run(repo(t, { broken: false }));
+  assert.equal(green.status, 0, green.stdout + green.stderr);
+  assert.equal(green.stdout, 'hq check: the repo keeps its contract.\n');
 });

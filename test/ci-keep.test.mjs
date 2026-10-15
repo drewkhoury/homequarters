@@ -51,3 +51,12 @@ test("HQ reads the nightly load job's kept results as a CI run of its own kind",
   assert.equal(run.info.kind, 'load', 'never read as a gate run, so the gate figures stay its own');
   assert.deepEqual(run.tasks.map(t => [t.id, t.status]), [['unit', 'fail']]);
 });
+
+// Nell's third review: the names HQ kept were gate, after and load, QuestKeep's sets. A set is the project's own name.
+test('a set with any name is kept, as junit-<run>-<attempt>-<set>', () => {
+  const ci = mkdtempSync(join(tmpdir(), 'hq-ci-keep-any-'));
+  assert.deepEqual(keep(results(), 'junit-7-1-smoke-tests', ci), { kept: join(ci, 'junit-7-1-smoke-tests') });
+  assert.deepEqual(keep(results(), 'junit-7-1-smoke-tests_b', ci), { kept: join(ci, 'junit-7-1-smoke-tests_b') });
+  assert.match(keep(results(), 'junit-7-1-Smoke', ci).skipped, /not a name HQ reads/);
+  rmSync(ci, { recursive: true, force: true });
+});

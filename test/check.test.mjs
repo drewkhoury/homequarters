@@ -38,7 +38,7 @@ function repo(t, { broken }) {
   ] }] }));
   put('hq.json', JSON.stringify({ schemaVersion: 1, name: 'doors', cache: join(dir, 'cache'),
     docs: { home: 'README.md', groups: 'hq/groups.json' }, backlog: { dir: 'docs/backlog' }, decisions: { dir: 'docs/decisions' },
-    tests: { layers: 'tests/layers.json', pipeline: 'hq/pipeline.json', sets: 'tests/sets.json' }, ...(broken ? { futureKey: 1 } : {}) }));
+    tests: { layers: 'tests/layers.json', pipeline: 'hq/pipeline.json', sets: 'tests/sets.json', headers: ['tests/*.js'] }, ...(broken ? { futureKey: 1 } : {}) }));
   git(dir, 'init', '-q', '-b', 'main'); git(dir, 'add', '.'); git(dir, 'commit', '-q', '-m', 'm');
   return dir;
 }
@@ -97,7 +97,7 @@ function quietRepo(t) {
     { title: 'Ghost', stage: 'gate', tests: ['ghost'] },
   ] }] }));
   put('hq.json', JSON.stringify({ schemaVersion: 1, name: 'quiet', cache: join(dir, 'cache'), docs: { groups: 'hq/groups.json' },
-    tests: { layers: 'tests/layers.json', pipeline: 'hq/pipeline.json', sets: 'tests/sets.json' } }));
+    tests: { layers: 'tests/layers.json', pipeline: 'hq/pipeline.json', sets: 'tests/sets.json', headers: ['tests/*.js'] } }));
   git(dir, 'init', '-q', '-b', 'main'); git(dir, 'add', '.'); git(dir, 'commit', '-q', '-m', 'm');
   return dir;
 }
@@ -115,7 +115,7 @@ test('the quieter rules are red too: a file in no group, a layer without status,
     'tests/g-no-budget.js: "Takes:" names no budget ("budget N s on CI")',
     'tests/g-no-when.js: no "Run it when:"',
     'tests/g-range.js: "Takes:" records up to 20 s on CI, over its 10 s budget: split it, or give it a budget its times fit',
-    'tests/g-wrong-runs.js: "Runs in:" should say the gate, as the Makefile does',
+    'tests/g-wrong-runs.js: "Runs in:" should name the gate set, which the sets file puts it in',
   ]);
 });
 
@@ -167,4 +167,27 @@ test('a newer schema is a note, not a problem: exit 0, said once; a repo with no
   assert.equal(none.status, 0, none.stdout + none.stderr);
   assert.match(none.stdout, /no hq\.json.*nothing to check.*hq setup/s);
   assert.doesNotMatch(none.stdout, /keeps its contract/);
+});
+
+// Nell's third review: a stranger's tests/login.test.js with a full header was told to say "make test-rules", because the
+// header rules were QuestKeep's and ran for any repo with a tests folder. They run only when the manifest asks, and a
+// header names its set in the project's own words.
+test('header rules run only when tests.headers is set, only for tests the sets file names, and ask for the set\'s own name', t => {
+  const dir = mkdtempSync(join(tmpdir(), 'hq-check-headers-'));
+  t.after(() => rmSync(dir, { recursive: true, force: true }));
+  const put = (p, text) => { mkdirSync(join(dir, p, '..'), { recursive: true }); writeFileSync(join(dir, p), text); };
+  const header = runsIn => `// Proves: the door.\n// Why it exists: doors.\n// Runs in: ${runsIn}.\n// Takes: 30 s.\n// Run it when: the door changes.\n`;
+  put('README.md', '# r\n');
+  put('tests/sets.json', JSON.stringify({ schema: 1, sets: { smoke: ['open-door'], 'long-walk': ['walk-house'] } }));
+  put('tests/open-door.js', header('the smoke set, before every merge'));
+  put('tests/walk-house.js', header('smoke'));
+  put('tests/login.test.js', header('whenever'));
+  const manifest = headers => ({ schemaVersion: 1, name: 'doors', cache: join(dir, 'cache'), tests: { sets: 'tests/sets.json', ...(headers ? { headers } : {}) } });
+  put('hq.json', JSON.stringify(manifest(null)));
+  git(dir, 'init', '-q', '-b', 'main'); git(dir, 'add', '.'); git(dir, 'commit', '-q', '-m', 'm');
+  const by = (problems, area) => problems.filter(p => p.area === area).map(p => p.problem);
+  assert.deepEqual(by(checks(dir), 'headers'), [], 'no headers key: no header rules');
+  writeFileSync(join(dir, 'hq.json'), JSON.stringify(manifest(['tests/*.js'])));
+  assert.deepEqual(by(checks(dir), 'headers'), ['tests/walk-house.js: "Runs in:" should name the long-walk set, which the sets file puts it in'],
+    'open-door names its set; login.test.js is in no set and is left alone');
 });

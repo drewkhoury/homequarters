@@ -5,7 +5,7 @@
 // read in order.
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { fold, KINDS, MODES, STAGES, STAGE, BEFORE_MERGE, FIELDS } from '../lib/problems.mjs';
+import { fold, KINDS, MODES, STAGES, STAGE, BEFORE_MERGE, FIELDS, FINDERS } from '../lib/problems.mjs';
 import { useQuestKeepStages } from './fixtures/stages.mjs';
 
 useQuestKeepStages();
@@ -173,4 +173,11 @@ test('no refusal and no writer name carries text from a line the writer did not 
 
 test("an entry's runs are run ids, laptop or CI, and nothing else", () => {
   assert.deepEqual(one([opened(1, { runs: ['2026-10-08T06-00-00Z_000123', 'junit-18342-1-gate', 'see the log'] })]).entry.runs, ['2026-10-08T06-00-00Z_000123', 'junit-18342-1-gate']);
+});
+
+// Nell's third review: the finders were seven QuestKeep reviewers' names and nothing else, so a stranger's reviewer could
+// not be a Found-by. A finder is any lower-case slug, or a named test.
+test('a finder is any lower-case slug or a named test, not a fixed list of one project\'s reviewers', () => {
+  for (const ok of ['nell', 'priya', 'someone-else', 'you', 'gate', 'test:smoke-door', 'ci-nightly']) assert.ok(FINDERS.test(ok), ok);
+  for (const bad of ['Priya', 'two words', '', '-x', 'test:']) assert.ok(!FINDERS.test(bad), bad);
 });

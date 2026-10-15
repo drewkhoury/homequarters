@@ -24,3 +24,16 @@ test('with no runs fetched, hq dora names the manifest\'s cache and ends 0, and 
   assert.ok(!existsSync(join(cache, 'dora')), 'nothing was written with nothing to work out');
   rmSync(dir, { recursive: true, force: true });
 });
+
+// The stranger's install: --no-fetch still fetched origin/main and then blamed gh's login for a repo with no remote.
+test('--no-fetch fetches nothing, GitHub or git, and a repo with no remote is told so instead of blamed for gh', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'hq-dora-cli-')), cache = join(dir, 'cache');
+  writeFileSync(join(dir, 'hq.json'), JSON.stringify({ schemaVersion: 1, name: 'doors', cache, stores: ['dora', 'ci'] }));
+  git(dir, 'init', '-q', '-b', 'main'); git(dir, 'add', '.'); git(dir, 'commit', '-q', '-m', 'm');
+  const r = spawnSync(process.execPath, [HQ, 'dora', '--no-fetch', '--repo', dir], { encoding: 'utf8', env: { PATH: process.env.PATH, HOME: process.env.HOME } });
+  assert.equal(r.status, 0, r.stderr);
+  assert.doesNotMatch(r.stdout + r.stderr, /Could not fetch origin\/main/);
+  assert.doesNotMatch(r.stdout, /gh logged in/);
+  assert.match(r.stdout, /No runs in .*ci\/actions yet/);
+  rmSync(dir, { recursive: true, force: true });
+});

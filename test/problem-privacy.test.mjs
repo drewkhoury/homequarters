@@ -4,7 +4,7 @@
 // a whole message holding someone's address or a path into private folders (Theo's review of the plan).
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { textProblems } from '../lib/problem-privacy.mjs';
+import { textProblems, pointsAt } from '../lib/problem-privacy.mjs';
 
 // a laptop as the check sees it: its home, the repo and the cache the manifest names (privacyContext gives them), the
 // email domains HQ's demo setting keeps, and the strings it lists as private (the demo lists the home folder's own name
@@ -109,4 +109,10 @@ test('with no repo and no cache given, only the private folders are refused, sin
   const bare = { ...CTX, repo: null, cache: null };
   assert.deepEqual(textProblems('read /Users/someone/Documents/plan.pdf', bare), []);
   assert.ok(textProblems('see ~/personal/taxes', bare).some(x => /private folder/.test(x)));
+});
+
+// The stranger's install: Makefile:11 was refused as evidence because the pointer wanted a file extension.
+test('a file and line is a pointer whether or not the file has an extension; a time of day is not', () => {
+  for (const ok of ['Makefile:11', 'tests/hello.test.mjs:3', 'lib/a.mjs:12', 'see Dockerfile:4 for it']) assert.ok(pointsAt(ok), ok);
+  for (const bad of ['at 12:30 it broke', 'ratio 3:1', 'nothing here']) assert.ok(!pointsAt(bad), bad);
 });

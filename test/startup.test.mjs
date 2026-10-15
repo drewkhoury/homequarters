@@ -85,3 +85,22 @@ test('a given port on no list is taken when free, and when it is in use the star
   assert.match(b.text(), new RegExp(`port ${want} was in use`));
   assert.doesNotMatch(a.text(), /was in use/);
 });
+
+// The stranger's install: hq setup --repo <a folder that is not there> printed a full proposal and exited 0.
+test('--repo naming a folder that is not there is refused, by setup and by check alike', () => {
+  const gone = join(tmpdir(), 'hq-not-here-' + process.pid);
+  for (const cmd of ['setup', 'check']) {
+    const r = spawnSync(process.execPath, [HQ, cmd, '--repo', gone], { encoding: 'utf8', env });
+    assert.equal(r.status, 2, `${cmd}: ${r.stdout}`);
+    assert.match(r.stderr, /is not a folder/);
+  }
+});
+
+test('hq slot --help and hq problem --help print usage and exit 0, like hq --help', () => {
+  for (const cmd of ['slot', 'problem']) {
+    const r = spawnSync(process.execPath, [HQ, cmd, '--help'], { encoding: 'utf8', env, cwd: tmpdir() });
+    assert.equal(r.status, 0, `${cmd}: ${r.stderr}`);
+    assert.match(r.stdout, /Usage|hq /);
+    assert.doesNotMatch(r.stdout, /ctx: the privacy check|The command line as \{ cmd, opts \}/, 'no source comments in the help');
+  }
+});

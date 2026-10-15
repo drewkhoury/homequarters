@@ -7,7 +7,9 @@ a warning.
 ## 0.1.0 (unreleased)
 
 The first package: HQ as it left QuestKeep on 14 October 2026, with a manifest, one `hq` command for serving, checking
-and recording, a plugin seam, and seven data standards under docs/standards/.
+and recording, a plugin seam, and eight data standards under docs/standards/. The `delivery` key names a project's
+GitHub jobs and steps (`gateJobs`, `deployJob`, `smokeJob`, `deploySteps`, `reuseSteps`, `testSteps`); with none, a
+deploy is any successful run of the deploy workflow.
 
 Kept for this release only, and gone at 0.2.0 (test/release.test.mjs is the clock):
 

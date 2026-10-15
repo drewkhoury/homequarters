@@ -58,7 +58,8 @@ A full one, QuestKeep's:
   "stores": ["runs", "lock", "problems", "dora", "ci"],
   "info": true,
   "deploy": [{ "provider": "firebase-hosting", "site": "https://questkeep.web.app" }],
-  "delivery": { "userPaths": ["web"], "deployWorkflow": ".github/workflows/deploy.yml", "testWorkflow": ".github/workflows/test.yml", "tz": "America/New_York" },
+  "delivery": { "userPaths": ["web"], "deployWorkflow": ".github/workflows/deploy.yml", "testWorkflow": ".github/workflows/test.yml", "tz": "America/New_York",
+                "gateJobs": ["test", "test (a)", "test (b)", "laptop"], "deployJob": "deploy", "smokeJob": "smoke", "deploySteps": ["Deploy to production", "Run make deploy"], "reuseSteps": ["Reuse a gate that passed"], "testSteps": ["Run the tests"] },
   "plugins": ["./hq-plugins/launch.mjs"],
   "demo": "hq/demo.json"
 }
@@ -73,7 +74,7 @@ A full one, QuestKeep's:
 | `stores` | which folders under `cache` HQ reads: runs, lock, problems, dora, ci |
 | `info` | the status line's `.git/project-info.json` |
 | `deploy` | deploy providers; `firebase-hosting` is the first |
-| `delivery` | the Delivery figures: which paths count as reaching users, which workflows deploy and test, and the time zone |
+| `delivery` | the Delivery figures: which paths count as reaching users, which workflows deploy and test, the time zone, and the GitHub job and step names that mark the gate, the deploy and a reused gate (with none, a deploy is any successful deploy run) |
 | `plugins` | pages the project adds (below) |
 | `demo` | the demo setting for filming |
 

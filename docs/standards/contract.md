@@ -14,7 +14,7 @@ marked *read* is applied when HQ reads the file, with a warning on the Machine p
 | a list key (`stores`, `deploy`, `plugins`, `backlog.stages`, `tests.headers`) holds strings or objects | checked |
 | a store is one of runs, lock, problems, dora, ci | checked |
 | a deploy item names a provider; a plugin item names a path | checked |
-| `delivery.tz` is a zone Intl knows | checked |
+| `delivery.tz` is a zone Intl knows; `delivery.gateJobs`, `deploySteps`, `reuseSteps` and `testSteps` are lists of names | checked |
 | a convention file's `schema` is a whole number; a newer one is read for what HQ knows | note, not a problem |
 
 ## The backlog (`backlog.dir`, QuestKeep's house rules carried over)

@@ -135,7 +135,7 @@ test('a manifest that is not JSON is an error at the top of the warnings, and th
 // passed where one at the top level was caught.
 test('a manifest with no name is warned and named after its folder; a typo inside a known key is caught like one at the top', () => {
   const r = read({ schemaVersion: 1, docs: { hoem: 'README.md' }, tests: { layers: 'tests/layers.json', pipelien: 'x' } });
-  assert.ok(r.warnings.some(w => /names no name; using "repo"/.test(w)), r.warnings.join('\n'));
+  assert.ok(r.warnings.some(w => /names no name; using "my-project"/.test(w)), r.warnings.join('\n'));
   assert.ok(r.warnings.some(w => /"docs\.hoem" is not a key this HQ knows; left alone/.test(w)), r.warnings.join('\n'));
   assert.ok(r.warnings.some(w => /"tests\.pipelien" is not a key this HQ knows/.test(w)), r.warnings.join('\n'));
   assert.equal(r.m.tests.layers.endsWith('tests/layers.json'), true, 'the known key beside the typo is still read');

@@ -27,7 +27,8 @@ test('sizes and dates read the way Finder writes them', () => {
   assert.deepEqual([formatSize(812), formatSize(4200), formatSize(1_300_000), formatSize(52_000)], ['812 B', '4.2 KB', '1.3 MB', '52 KB']);
   assert.equal(formatWhen(NOW - 30_000, NOW), 'just now');
   assert.equal(formatWhen(NOW - 3 * 3600_000, NOW), '3 h ago');
-  assert.equal(formatWhen(NOW - 60 * 86400_000, NOW), '31 Jul 2026');
+  // an older moment is a local date, so the expectation is formed the same way: in Kiritimati it is 1 Aug (Hollis)
+  assert.equal(formatWhen(NOW - 60 * 86400_000, NOW), new Date(NOW - 60 * 86400_000).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }));
 });
 
 test('a backlog item\'s thumbnail shows its type and title, and its prose without markdown marks or frontmatter', () => {

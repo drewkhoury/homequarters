@@ -167,13 +167,13 @@ test('a missed night is filled from the last copy before today, and nothing is f
 const all = compute({ runs, jobsOf, logs, pulls, lock, commits, git });
 const file = summarise(all, { asOf: Date.parse('2026-10-06T12:00:00Z'), repo: 'owner/questkeep', sources: { runs: { status: 'read' } } });
 
-test('dora.json has the documented shape, with portable figures apart from QuestKeep\'s own', () => {
-  assert.equal(file.version, 3);
+test('dora.json has the documented shape, with portable figures apart from the project\'s own', () => {
+  assert.equal(file.version, 4);
   assert.deepEqual(Object.keys(file).sort(), ['blindSpots', 'countingChanges', 'generatedAt', 'items', 'level', 'repo', 'series', 'sources', 'start', 'today', 'tz', 'version', 'waiting', 'windows']);
   assert.deepEqual(file.windows.map(w => w.id), ['1d', '7d', '30d']);
   for (const w of file.windows) {
     assert.deepEqual(Object.keys(w.portable).sort(), ['deploys', 'failedDeploys', 'leadTime', 'recovery', 'rework']);
-    assert.deepEqual(Object.keys(w.questkeep).sort(), ['cost', 'hours', 'identicalRedeploys', 'leadSplit', 'rows', 'slowest', 'typical']);
+    assert.deepEqual(Object.keys(w.project).sort(), ['cost', 'hours', 'identicalRedeploys', 'leadSplit', 'rows', 'slowest', 'typical']);
     assert.ok(w.prev.from < w.prev.to && w.prev.to === w.from && w.from < w.to);
   }
 });
@@ -711,4 +711,20 @@ test('every merged pull request with a green gate has its wait from green to mer
   assert.ok(merges.every(m => Number.isFinite(m.greenToMergeSec) && m.greenToMergeSec >= 0 && m.mergedAt && m.pr));
   const pr172 = merges.find(m => m.pr === 172);
   assert.equal(pr172.mergedAt, '2026-10-05T22:08:33Z');
+});
+
+// The delivery key says what is the project's: which workflow deploys, which runs the tests, which paths reach users
+// and which time zone the days are counted in. Until 15 October the first three were QuestKeep's names, baked in.
+test("the delivery key's workflows and time zone are read, and the figures' project block keeps its old name for one release", () => {
+  try {
+    const shipped = runs.map(r => (r.path === '.github/workflows/deploy.yml' ? { ...r, path: '.github/workflows/ship.yml' } : r));
+    assert.equal(deploysOf({ runs: shipped, jobsOf, rows, changed: git.changed }).length, 0, 'a renamed deploy workflow is nobody\'s deploy until the manifest names it');
+    configureDelivery({ userPaths: ['web'], tz: 'UTC', deployWorkflow: '.github/workflows/ship.yml' });
+    assert.equal(deploysOf({ runs: shipped, jobsOf, rows, changed: git.changed }).length, deploys.length);
+    assert.equal(dayKey(Date.parse('2026-10-06T02:00:00Z')), '2026-10-06', 'days are counted in the configured zone (New York would say the 5th)');
+    const f = summarise(all, { asOf: Date.parse('2026-10-06T12:00:00Z'), sources: {} });
+    assert.equal(f.tz, 'UTC');
+    assert.ok(f.windows[0].project && f.windows[0].project.cost, 'the project block');
+    assert.deepEqual(f.windows[0].questkeep, f.windows[0].project, 'and its old name, read by the pages of one release ago');
+  } finally { configureDelivery({ userPaths: ['web'], tz: 'America/New_York', deployWorkflow: '.github/workflows/deploy.yml' }); }
 });

@@ -115,3 +115,14 @@ test('a check line keeps hq\'s own exit when hq is there, and is nothing when it
   const absent = make('/usr/bin:/bin');
   assert.equal(absent.status, 0, absent.out); assert.match(absent.out, /went-on/);
 });
+
+// GitHub sets CI=true on a self-hosted runner too, and that runner shares the laptop with every session on it: there
+// the guard must stop, as hq slot itself does (Nell, third review, finding 1).
+test('on a self-hosted runner with no hq, the slot line stops the run like a laptop would', t => {
+  const m = slotMake(t);
+  const r = m.make('ci-browser', { CI: 'true', RUNNER_ENVIRONMENT: 'self-hosted' }, '/usr/bin:/bin');
+  assert.notEqual(r.status, 0); assert.equal(existsSync(join(m.dir, 'ci-ran')), false);
+  assert.match(r.out, /hq is not installed, and slot take ci-browser guards this run/);
+  const hosted = m.make('ci-browser', { CI: 'true', RUNNER_ENVIRONMENT: 'github-hosted' }, '/usr/bin:/bin');
+  assert.equal(hosted.status, 0, hosted.out);
+});

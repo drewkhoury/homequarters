@@ -35,6 +35,18 @@ function serve(t, args, cwd) {
   });
 }
 
+// the same, with the whole start-up text readable after the URL came
+function serveOut(t, args, cwd) {
+  const p = spawn(process.execPath, [HQ, 'serve', ...args], { cwd, env });
+  t.after(() => p.kill('SIGTERM'));
+  let out = '';
+  return new Promise((res, rej) => {
+    p.stdout.on('data', d => { out += d; const m = /(http:\/\/127\.0\.0\.1:\d+)/.exec(out); if (m) setTimeout(() => res({ url: m[1], text: () => out }), 50); });
+    p.stderr.on('data', d => { out += d; });
+    p.on('close', () => rej(new Error(`hq serve ended: ${out}`)));
+  });
+}
+
 test('hq finds the checkout from a folder inside it, and --repo points it elsewhere', t => {
   const dir = repo(t);
   const inside = spawnSync(process.execPath, [HQ, 'backlog'], { cwd: join(dir, 'deep', 'inside'), encoding: 'utf8', env });
@@ -56,4 +68,20 @@ test('with no port given hq serves on 8780 or the next free one; a given port is
   const free = createServer(); await new Promise(r => free.listen(0, '127.0.0.1', r)); const want = free.address().port; await new Promise(r => free.close(r));
   const url3 = await serve(t, ['--port', String(want)], dir);
   assert.equal(+new URL(url3).port, want);
+});
+
+// The stranger's install (finding 4): --port 8790 served on 8791 because 8790 was on a list of ports QuestKeep's laptop
+// uses. A port list is one machine's; a given port is taken when free, and a move is said out loud.
+test('a given port on no list is taken when free, and when it is in use the start line says so', async t => {
+  const dir = repo(t);
+  const probe = async p => { const s = createServer(); try { await new Promise((r, j) => { s.once('error', j); s.listen(p, '127.0.0.1', r); }); await new Promise(r => s.close(r)); return true; } catch { return false; } };
+  let want = null;
+  for (const p of [8790, 9399, 9599, 4100, 8381, 8765]) if (await probe(p)) { want = p; break; }
+  if (want === null) { t.skip('every port on the old list is in use on this machine'); return; }
+  const a = await serveOut(t, ['--port', String(want)], dir);
+  assert.equal(+new URL(a.url).port, want, a.text());
+  const b = await serveOut(t, ['--port', String(want)], dir);
+  assert.equal(+new URL(b.url).port, want + 1);
+  assert.match(b.text(), new RegExp(`port ${want} was in use`));
+  assert.doesNotMatch(a.text(), /was in use/);
 });

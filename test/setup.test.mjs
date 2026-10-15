@@ -45,3 +45,27 @@ test('an empty lock folder, as hq slot who leaves one, is not a store the repo a
   assert.equal(m.stores, undefined, 'the slot made the folder; the repo did not name it');
   rmSync(home, { recursive: true, force: true });
 });
+
+// The stranger's install (docs/reviews/stranger-install.md, finding 3): with XDG_CACHE_HOME set, setup proposed
+// ~/.cache/hq/hello because another repo of that name had left one, and everything then written went to the real home.
+test('setup honours XDG_CACHE_HOME and never adopts a cache HQ made for another repo of the same name', () => {
+  const home = mkdtempSync(join(tmpdir(), 'hq-setup-home-')), xdg = join(home, 'xdg'), dir = join(home, 'repos', 'hello');
+  put(dir, 'index.js', '');
+  mkdirSync(join(home, '.cache', 'hq', 'hello', 'lock'), { recursive: true }); writeFileSync(join(home, '.cache', 'hq', 'hello', 'lock', 'log.jsonl'), '{}\n');
+  const m = proposeManifest(scanRepo(dir, { home, env: { XDG_CACHE_HOME: xdg } }));
+  assert.equal(m.cache, join(xdg, 'hq', 'hello'));
+  assert.equal(m.stores, undefined, 'the other repo\'s lock is not this repo\'s store');
+  rmSync(home, { recursive: true, force: true });
+});
+
+test('a project\'s own earlier cache, ~/.cache/<name> with runs in it, is still proposed; one holding only a lock is not', () => {
+  const home = mkdtempSync(join(tmpdir(), 'hq-setup-home-')), dir = join(home, 'repos', 'doors');
+  put(dir, 'index.js', '');
+  mkdirSync(join(home, '.cache', 'doors', 'lock'), { recursive: true }); writeFileSync(join(home, '.cache', 'doors', 'lock', 'log.jsonl'), '{}\n');
+  assert.match(proposeManifest(scanRepo(dir, { home, env: {} })).cache, /\/\.cache\/hq\/doors$/, 'a lock alone is what hq slot who leaves on any repo');
+  mkdirSync(join(home, '.cache', 'doors', 'runs'), { recursive: true }); writeFileSync(join(home, '.cache', 'doors', 'runs', 'r1.json'), '{}');
+  const m = proposeManifest(scanRepo(dir, { home, env: {} }));
+  assert.equal(m.cache, join(home, '.cache', 'doors'));
+  assert.deepEqual(m.stores, ['runs', 'lock']);
+  rmSync(home, { recursive: true, force: true });
+});

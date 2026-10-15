@@ -4,7 +4,7 @@
 // convention, with one command.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { mkdtempSync, mkdirSync, writeFileSync, rmSync } from 'node:fs';
+import { mkdtempSync, mkdirSync, writeFileSync, readFileSync, rmSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { tmpdir } from 'node:os';
 import { execFileSync, spawnSync } from 'node:child_process';
@@ -146,4 +146,25 @@ test('the command exits 1 and prints the report when anything is wrong, and 0 wi
   const green = run(repo(t, { broken: false }));
   assert.equal(green.status, 0, green.stdout + green.stderr);
   assert.equal(green.stdout, 'hq check: the repo keeps its contract.\n');
+});
+
+// A newer manifest is read with a warning (README): hq check in a CI step must not go red the day a teammate's HQ writes
+// schema 2 (the stranger's install, finding 11). A repo with no manifest has nothing to check, and the sentence says so
+// instead of "keeps its contract" (Nell, third review).
+test('a newer schema is a note, not a problem: exit 0, said once; a repo with no hq.json is nothing to check', t => {
+  const hq = join(dirname(fileURLToPath(import.meta.url)), '..', 'bin', 'hq.mjs');
+  const run = dir => spawnSync(process.execPath, [hq, 'check', '--repo', dir], { encoding: 'utf8', env: { PATH: process.env.PATH, HOME: dir } });
+  const dir = repo(t, { broken: false });
+  writeFileSync(join(dir, 'hq.json'), JSON.stringify({ ...JSON.parse(readFileSync(join(dir, 'hq.json'), 'utf8')), schemaVersion: 2, later: { x: 1 } }));
+  const newer = run(dir);
+  assert.equal(newer.status, 0, newer.stdout + newer.stderr);
+  assert.match(newer.stdout, /keeps its contract/);
+  assert.match(newer.stdout, /note.*schema 2.*newer than this HQ/s);
+  assert.match(newer.stdout, /note.*"later" is not a key this HQ knows/s);
+  const bare = mkdtempSync(join(tmpdir(), 'hq-check-bare-'));
+  t.after(() => rmSync(bare, { recursive: true, force: true }));
+  const none = run(bare);
+  assert.equal(none.status, 0, none.stdout + none.stderr);
+  assert.match(none.stdout, /no hq\.json.*nothing to check.*hq setup/s);
+  assert.doesNotMatch(none.stdout, /keeps its contract/);
 });

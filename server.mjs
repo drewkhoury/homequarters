@@ -62,7 +62,7 @@ import { renderMarkdown } from './lib/markdown.mjs';
 import { kindIn } from './lib/files.mjs';
 import { loadDemo, demoResponse, hiddenPath } from './lib/demo.mjs';
 import { loadManifest, pagesFor } from './lib/manifest.mjs';
-import { setNav, setBrand } from './lib/page.mjs';
+import { setNav, setBrand, frame } from './lib/page.mjs';
 import { machinePage } from './pages/machine.mjs';
 import { configureBacklog } from './lib/backlog.mjs';
 import { configureDecisions } from './lib/decisions.mjs';
@@ -124,14 +124,15 @@ export function handler({ repo = REPO, m = loadManifest(repo).m, plugins = [], p
   configureStages(stageSpec);
   warnings.push(...stageSpec.warnings);
   // in the demo a plugin that keeps out of it (demo: false) is out of the nav too, and its page below answers not found
-  setNav(pagesFor(m, demo ? plugins.filter(p => p.demo) : plugins)); setBrand(m.name);
+  const nav = pagesFor(m, demo ? plugins.filter(p => p.demo) : plugins), brand = m.name;
+  setNav(nav); setBrand(brand); // the fallback, for anything drawn outside a request
   const ctx = { repo, cache, m, plugins, pluginsFailed, warnings, links, gh, fb, demo, ...(projectsDir ? { projectsDir } : {}) };
   const off = f => !m.features[f];
   const cw = claudeWatcher({ find: claude.find, env: claude.env || process.env, platform, repo });
   cw.get(); // look claude up now, so the first page already knows
   // GitHub's answers kept on disk, so a restart shows the last ones at once
   setStash(makeStash({ dir: join(cache, 'hq') }));
-  return async (req, res) => {
+  return (req, res) => frame({ nav, brand }, async () => {
     try {
       demoResponse(res, demo);
       // only this machine's names for itself: another site in the browser cannot reach HQ by pointing a name of its own
@@ -242,7 +243,7 @@ export function handler({ repo = REPO, m = loadManifest(repo).m, plugins = [], p
       console.error(e);
       send(res, 500, layout({ title: 'Error', active: '', body: `<h1>Something went wrong</h1><pre>${esc(e.stack || e)}</pre>` }));
     }
-  };
+  });
 }
 
 const json = (res, status, body) => send(res, status, JSON.stringify(body), 'application/json; charset=utf-8');

@@ -10,6 +10,9 @@
 //   hq space host | figures | vm         free space on the disks a test run fills; exit 1 stops the run (lib/space.mjs)
 //   hq ci-keep <results> <name>          keep a self-hosted runner job's results in the ci store (lib/ci-keep.mjs)
 //   hq problem-backfill red-gates ...    import a sort of red gate runs into the register (problem-backfill.mjs)
+//   hq backlog [--repo DIR]              the backlog in the terminal: ready, in progress, blocked, inbox (backlog.mjs)
+//   hq dora [--no-fetch] [--quiet] ...   the delivery figures: fetch from GitHub, work them out, write the dora store (dora.mjs)
+//   hq ci-fetch [<folder>]               download the CI results a workflow kept as junit-* artifacts into the ci store
 //   hq --version
 // HQ reads the repo's hq.json if there is one, and shows the baseline without it. It never writes to the repo.
 import { execFileSync } from 'node:child_process';
@@ -52,6 +55,16 @@ if (cmd === 'run-info') {
 } else if (cmd === 'problem') {
   const { main } = await import('../problem.mjs');
   main(args.filter(a => a !== 'problem'), process.env);
+} else if (cmd === 'backlog') {
+  const { main } = await import('../backlog.mjs');
+  await main(args.filter(a => a !== 'backlog'), process.env);
+} else if (cmd === 'ci-fetch') {
+  const { main } = await import('../lib/ci-fetch.mjs');
+  process.exitCode = main(args.filter(a => a !== 'ci-fetch'), process.env);
+} else if (cmd === 'dora') {
+  // dora.mjs reads process.argv itself, as it did as a script
+  process.argv = [process.argv[0], join(HERE, '..', 'dora.mjs'), ...args.filter(a => a !== 'dora')];
+  await import('../dora.mjs');
 } else if (cmd === 'machine') {
   const { hostInfo } = await import('../lib/machine.mjs');
   console.log(JSON.stringify(hostInfo(), null, 2));

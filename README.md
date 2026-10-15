@@ -22,6 +22,9 @@ hq problem note --title "..." --kind <kind> --evidence <pointer>   # write to th
 hq slot take <name> | release <name> <status> | who | status <msg> | claim <why> | unclaim   # one test run at a time
 hq space host | figures | vm      # free space on the disks a test run fills; exit 1 stops the run
 hq ci-keep <results> <name>       # keep a self-hosted runner job's results in the ci store as the job ends
+hq backlog                        # the backlog in the terminal: ready, in progress, blocked, inbox
+hq dora [--no-fetch] [--quiet]    # the delivery figures: fetch from GitHub, work them out, write the dora store
+hq ci-fetch [<folder>]            # download the CI results a workflow kept as junit-* artifacts into the ci store
 ```
 
 With no `hq.json`, HQ shows the baseline: Home (the files and docs, with search), Repo (git state and worktrees), Machine (this computer, the software found, and the manifest HQ would propose), GitHub (when the remote is GitHub and `gh` is logged in), Conversations (Claude Code's transcripts for this folder) and Export.

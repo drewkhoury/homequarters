@@ -4,16 +4,16 @@
 // which never expire, and the pull requests, closed and open. It saves raw responses and never figures. Each pass fetches only what it does not have yet: runs
 // created since a little before the newest finished one it holds, then the jobs and logs of finished runs it has not
 // saved. Read-only on GitHub. Uses the gh CLI and its login; says so and stops cleanly without them.
-// Usage: node hq/dora-fetch.mjs <folder>     (make dora passes ~/.cache/questkeep/ci/actions)
+// Usage: node dora-fetch.mjs <folder> [--repo DIR]     (hq dora passes <cache>/ci/actions and the repo)
 import { execFile } from 'node:child_process';
 import { existsSync, mkdirSync, readFileSync, writeFileSync, renameSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const dir = process.argv[2];
-if (!dir) { console.error('usage: node hq/dora-fetch.mjs <folder>'); process.exit(2); }
-// run from the repo, so gh reads {owner}/{repo} from its remote wherever the script is called from
-const repo = join(dirname(fileURLToPath(import.meta.url)), '..');
+if (!dir) { console.error('usage: node dora-fetch.mjs <folder> [--repo DIR]'); process.exit(2); }
+// gh runs in the repo, so it reads {owner}/{repo} from its remote wherever the script is called from
+const at = process.argv.indexOf('--repo'), repo = at >= 0 && process.argv[at + 1] ? process.argv[at + 1] : process.cwd();
 const gh = args => new Promise((resolve, reject) => execFile('gh', args, { cwd: repo, encoding: 'utf8', maxBuffer: 256 * 1024 * 1024 },
   (err, stdout, stderr) => err ? reject(Object.assign(err, { stderr })) : resolve(stdout)));
 const first = e => String(e.stderr || e.message).trim().split('\n')[0];

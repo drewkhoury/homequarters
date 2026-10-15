@@ -1,32 +1,40 @@
-// make dora: fetches what is new from GitHub (hq/dora-fetch.mjs, and CI's test results with tests/ci-fetch.mjs),
-// works out the figures (hq/lib/dora.mjs), prints them as a table, and writes ~/.cache/questkeep/dora/dora.json with a
-// dated copy in dora/daily/. A day with no copy since the last one gets one written now, marked writtenLate, so a night
-// the laptop slept leaves no hole. HQ's Delivery page reads dora.json and runs this with --no-fetch-git when it is old.
-// Usage: node hq/dora.mjs [--no-fetch] [--no-fetch-git] [--no-daily] [--quiet]
+// hq dora: fetches what is new from GitHub (dora-fetch.mjs, and CI's test results with lib/ci-fetch.mjs), works out the
+// figures (lib/dora.mjs), prints them as a table, and writes dora/dora.json in the manifest's cache with a dated copy in
+// dora/daily/. A day with no copy since the last one gets one written now, marked writtenLate, so a night the laptop
+// slept leaves no hole. The Delivery page reads dora.json and runs this with --no-fetch-git when it is old.
+// Usage: hq dora [--no-fetch] [--no-fetch-git] [--no-daily] [--quiet] [--repo DIR]
 //   --no-fetch      use only what the cache holds (no gh)
 //   --no-fetch-git  skip `git fetch origin main` (HQ never fetches on its own)
 //   --no-daily      write dora.json only, not the dated copies: HQ's refresh, which has not fetched main, may hold
 //                   deploys git cannot judge, and the dated copies are what the meta-analysis study compares
 //   --quiet         write the files, print one line
-// QK_CACHE points at another cache folder (default ~/.cache/questkeep).
+// HQ_CACHE (QK_CACHE for one release) points at another cache folder; the default is the manifest's.
 import { spawnSync, execFileSync } from 'node:child_process';
 import { existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync, renameSync } from 'node:fs';
 import { join, dirname } from 'node:path';
-import { homedir } from 'node:os';
 import { fileURLToPath } from 'node:url';
-import { compute, summarise, sourcesOf, lateDays, PLAYER_PATHS, TZ, dayKey } from './lib/dora.mjs';
-import { nightlyAt } from './lib/nightly.mjs';
+import { compute, summarise, sourcesOf, lateDays, PLAYER_PATHS, TZ, dayKey, dayStart, addDays, configureDelivery } from './lib/dora.mjs';
 import { allRuns } from './lib/runs.mjs';
+import { loadManifest } from './lib/manifest.mjs';
 
-const args = new Set(process.argv.slice(2));
-const repo = join(dirname(fileURLToPath(import.meta.url)), '..');
-const cache = process.env.QK_CACHE || join(homedir(), '.cache', 'questkeep');
+const argv = process.argv.slice(2), args = new Set(argv);
+const HERE = dirname(fileURLToPath(import.meta.url));
+// the repo: --repo, HQ_REPO, else the checkout this runs in; the cache and what reaches users come from its manifest
+const repo = (() => {
+  const i = argv.indexOf('--repo');
+  if (i >= 0 && argv[i + 1]) return argv[i + 1];
+  if (process.env.HQ_REPO) return process.env.HQ_REPO;
+  try { return execFileSync('git', ['rev-parse', '--show-toplevel'], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] }).trim(); } catch { return process.cwd(); }
+})();
+const { m } = loadManifest(repo);
+configureDelivery(m.delivery);
+const cache = process.env.HQ_CACHE || process.env.QK_CACHE || m.cache;
 const raw = join(cache, 'ci', 'actions'), out = join(cache, 'dora');
 const say = (...a) => { if (!args.has('--quiet')) console.log(...a); };
 
 if (!args.has('--no-fetch')) {
-  for (const [script, dir] of [['hq/dora-fetch.mjs', raw], ['tests/ci-fetch.mjs', join(cache, 'ci')]]) {
-    const r = spawnSync(process.execPath, [join(repo, script), dir], { cwd: repo, encoding: 'utf8' });
+  for (const [script, dir] of [[join(HERE, 'dora-fetch.mjs'), raw], [join(HERE, 'lib', 'ci-fetch.mjs'), m.store('ci') || join(cache, 'ci')]]) {
+    const r = spawnSync(process.execPath, [script, dir, '--repo', repo], { cwd: repo, encoding: 'utf8' });
     // printed even with --quiet: the nightly's log is where a fetch that stopped working shows
     console.log((r.stdout || '').trim() || (r.stderr || '').trim());
     if (r.status && process.env.CI) process.exit(r.status);
@@ -37,7 +45,7 @@ if (!args.has('--no-fetch-git')) { try { git('fetch', '-q', 'origin', 'main'); }
 
 const readJson = (f, fallback) => { try { return JSON.parse(readFileSync(f, 'utf8')); } catch { return fallback; } };
 const runs = readJson(join(raw, 'runs.json'), null);
-if (!runs) { console.log(`No runs in ${raw} yet. Run make dora with gh logged in first.`); process.exit(0); }
+if (!runs) { console.log(`No runs in ${raw} yet. Run hq dora with gh logged in first.`); process.exit(0); }
 
 // Each attempt's jobs, read when first asked for
 const jobCache = new Map();
@@ -97,11 +105,11 @@ save(join(out, 'dora.json'), file);
 save(join(out, 'changes.json'), { generatedAt: new Date(Date.now()).toISOString(), changes: d.changes, merges: d.merges });
 const today = dayKey(now, TZ), daily = !args.has('--no-daily');
 if (daily) save(join(out, 'daily', `${today}.json`), file);
-// Fill the days since the last copy, as if made at 08:07 New York time on each, when the laptop's clock fires the
-// nightly (hq/lib/nightly.mjs); at most 30
+// Fill the days since the last copy, each as of its day's end in the figures' zone; at most 30. QuestKeep's copies were
+// made as of 08:07 New York, its nightly's time; a daily time of the project's own waits on the manifest's delivery key.
 const copies = readdirSync(join(out, 'daily')).filter(f => /^\d{4}-\d{2}-\d{2}\.json$/.test(f)).map(f => f.slice(0, 10));
 const late = daily ? lateDays(copies, today) : [];
-for (const k of late) save(join(out, 'daily', `${k}.json`), { ...summarise(d, { asOf: nightlyAt(k, TZ), repo: repoSlug, sources }), writtenLate: true });
+for (const k of late) save(join(out, 'daily', `${k}.json`), { ...summarise(d, { asOf: dayStart(addDays(k, 1), TZ) - 1, repo: repoSlug, sources }), writtenLate: true });
 
 if (args.has('--quiet')) { console.log(`dora: wrote ${join(out, 'dora.json')}${late.length ? ` and ${late.length} late daily copies` : ''}.`); process.exit(0); }
 console.log(table(file) + `\nWrote ${join(out, 'dora.json')} ${daily ? ` and daily/${today}.json` : ''}${late.length ? `, plus ${late.length} late daily copies (${late.join(', ')})` : ''}.`);

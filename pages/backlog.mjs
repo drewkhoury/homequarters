@@ -2,7 +2,7 @@
 // all read from the files and from git. Which column a card sits in comes from where its file is and from the
 // branches: a branch that changes or deletes an item's file is working on it. Opening a card shows its words and
 // every commit that touched it. HQ only reads; the items are changed by editing their files in a branch.
-import { readFileSync, statSync } from 'node:fs';
+import { readFileSync, statSync, existsSync } from 'node:fs';
 import { join } from 'node:path';
 import { esc, urlPath, layout } from '../lib/page.mjs';
 import { info, dataTable } from '../lib/ui.mjs';
@@ -330,8 +330,9 @@ export async function backlogPage(ctx, params) {
   const g = await gather(ctx);
   const tab = TABS.some(([k]) => k === params.get('tab')) ? params.get('tab') : 'board';
   const problems = g.problems.length ? `<div class="bl-problems card"><b>${g.problems.length} item${g.problems.length === 1 ? '' : 's'} break the backlog's rules</b>${info('The same checks tests/unit/backlog.test.mjs makes before a push.', 'Which checks')}<ul>${g.problems.map(p => `<li>${esc(p)}</li>`).join('')}</ul></div>` : '';
-  const body = `<div class="hq-pagehead"><h1>Backlog${info(`One file per item in ${DIR}/, read from this checkout. HQ only shows them: to change an item, edit its file in a branch. See ${DIR}/README.md.`, 'About this page')}</h1>
-      <a class="hint" href="/code/${DIR}/README.md" data-open="${README}">How the backlog works</a></div>
+  const hasReadme = existsSync(join(ctx.repo, DIR, 'README.md'));
+  const body = `<div class="hq-pagehead"><h1>Backlog${info(`One file per item in ${DIR}/, read from this checkout. HQ only shows them: to change an item, edit its file in a branch.${hasReadme ? ` See ${DIR}/README.md.` : ''} The inbox holds at most ${MAX_INBOX} items; past that the backlog's rules fail.`, 'About this page')}</h1>
+      ${hasReadme ? `<a class="hint" href="/code/${DIR}/README.md" data-open="${README}">How the backlog works</a>` : ''}</div>
     ${problems}
     <nav class="hq-tabs" aria-label="Backlog">${TABS.map(([k, label]) => `<a href="?tab=${k}"${k === tab ? ' class="on" aria-current="page"' : ''}>${label}</a>`).join('')}</nav>
     ${tab === 'board' ? board(g) : tab === 'list' ? list(g) : trends(g)}

@@ -70,7 +70,7 @@ test('with no figures yet the page says so and what to run, and starts nothing',
   const s = spy();
   const html = await deliveryPage({ repo, cache: cacheWith(t, null) }, new URLSearchParams(), { now: NOW, run: s.run });
   assert.match(text(html), /No delivery data yet/);
-  assert.match(html, /<code>make dora<\/code>/);
+  assert.match(html, /<code>hq dora<\/code>/);
   assert.equal(s.calls.length, 0);
 });
 
@@ -103,11 +103,11 @@ test('in the demo nothing is refreshed, however old the figures', async t => {
   assert.equal(s.calls.length, 0);
 });
 
-test('figures from an older make dora start a refresh and say so, instead of crashing', async t => {
+test('figures from an older hq dora start a refresh and say so, instead of crashing', async t => {
   const { series, ...v1 } = dora, s = spy();
   const html = await deliveryPage({ repo, cache: cacheWith(t, 1, { ...v1, version: 1 }) }, new URLSearchParams(), { now: NOW, run: s.run });
   assert.doesNotMatch(html, /Something went wrong/);
-  assert.match(text(html), /The saved figures are from an older make dora/);
+  assert.match(text(html), /The saved figures are from an older hq dora/);
   assert.equal(s.calls.length, 1, 'one refresh starts even though the file is only a minute old');
 });
 
@@ -192,7 +192,7 @@ test('Method defines its words once, without Rework, links the decision record a
 // The Player-facing trailer says a fix changes what players get, and most are caught in review before release, so the
 // line names what it counts rather than claiming players saw each bug (Nell, review of #281)
 test('fixes to what players get says none are tagged yet, with the count of fixes', async t => {
-  assert.match(text(section(await open(t), 'dv-live').replace(/<span class="hq-tip"[^]*?<\/span>/g, '')), /Fixes to what players get None tagged yet \(0 of 3 fixes\)/);
+  assert.match(text(section(await open(t), 'dv-live').replace(/<span class="hq-tip"[^]*?<\/span>/g, '')), /Fixes to what users get None tagged yet \(0 of 3 fixes\)/);
 });
 
 test('no number is hedged or given in decimal hours, and times follow New York\'s clock', async t => {

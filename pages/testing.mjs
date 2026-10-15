@@ -16,7 +16,8 @@ export const when = iso => { const d = new Date(iso); return isNaN(d) ? '?' : d.
 export const secs = s => (s < 1 ? 'under 1 s' : s >= 60 ? `${Math.floor(s / 60)} min ${Math.round(s % 60)} s` : `${Math.round(s)} s`);
 const commitOf = i => (i.commit ? `${i.commit}${i.dirty ? '+' : ''}` : '?');
 const WHERE = [['', 'Anywhere'], ['laptop', 'Laptop'], ['container', 'Container'], ['ci', 'CI']];
-const SET_TITLE = { gate: 'Gate', after: 'Long set', unit: 'Unit', rules: 'Rules', helper: 'Helpers' };
+// A set's title is its name, capitalised; the sets are the project's own (tests.sets).
+const SET_TITLE = new Proxy({ helper: 'Helpers' }, { get: (t, k) => (k in t ? t[k] : typeof k === 'string' && k ? k[0].toUpperCase() + k.slice(1) : k) });
 const plainLog = s => s.replace(/\x1b\[[0-9;?]*[A-Za-z]/g, ''); // eslint-disable-line no-control-regex
 
 // The shared filter, read from the page's address: where the runs happened and which branch they tested.
@@ -38,7 +39,7 @@ function filterBar(f, tab, extra, branch) {
   const seg = (key, options) => `<div class="seg" role="group" aria-label="${key === 'where' ? 'Where' : 'Branch'}">${options.map(([v, label]) =>
     `<a class="seg-opt" href="${esc(testingLink({ ...f, [key]: v }, { tab: tab === 'pipeline' ? '' : tab, ...extra }))}"${f[key] === v ? ' aria-current="true"' : ''}>${esc(label)}</a>`).join('')}</div>`;
   const branches = [['', 'All branches'], ...(branch && branch !== 'main' ? [[branch, 'This branch']] : []), ['main', 'main']];
-  return `<div class="hq-filterbar">${seg('where', WHERE)}${seg('branch', branches)}${info('These choices apply on every tab. Laptop is make test on this laptop, Container is make docker-test and the deploy gate, CI is GitHub Actions. "This branch" means ' + (branch || 'the checked-out branch') + '.', 'About the filter')}</div>`;
+  return `<div class="hq-filterbar">${seg('where', WHERE)}${seg('branch', branches)}${info('These choices apply on every tab. Laptop is a run on this machine, Container is a run inside a test container, CI is a run on a CI runner. "This branch" means ' + (branch || 'the checked-out branch') + '.', 'About the filter')}</div>`;
 }
 
 // Screenshots by file name, newest first: ~/.cache/questkeep/shots/<run>/, once the tests save there
@@ -141,7 +142,7 @@ function runsTab({ repo }, runs, f, params) {
   });
   const about = file ? `<p class="hq-scope">Runs of <b>${esc(test)}</b> <a class="hint" href="${esc(testingLink(f, { tab: 'runs' }))}">show all runs</a></p>`
     : task ? `<p class="hq-scope">Runs with the <b>${esc(task)}</b> step <a class="hint" href="${esc(testingLink(f, { tab: 'runs' }))}">show all runs</a></p>` : '';
-  return about + dataTable({ id: 'runs', columns, rows, empty: 'No runs match. With devpipe installed, every make test is saved; make ci-history fetches the CI runs.' });
+  return about + dataTable({ id: 'runs', columns, rows, empty: 'No runs match. With devpipe installed, every test run is recorded; hq ci-fetch brings the CI runs.' });
 }
 
 export function testingPage(ctx, params) {
@@ -152,9 +153,9 @@ export function testingPage(ctx, params) {
   const tabs = [['pipeline', 'Pipeline'], ['tests', 'Tests'], ['runs', 'Runs']].map(([k, label]) =>
     `<a role="tab" href="${esc(testingLink(f, { tab: k === 'pipeline' ? '' : k }))}"${k === tab ? ' aria-selected="true" class="on"' : ' aria-selected="false"'}>${label}</a>`).join('');
   const notes = {
-    pipeline: 'How a change gets to production. Each step shows its tests and how they did last time. Dashed steps are planned and not built yet. hq/pipeline.json describes it.',
+    pipeline: `How a change gets to production. Each step shows its tests and how they did last time. Dashed steps are planned and not built yet. ${ctx.m?.tests?.pipeline ? ctx.m.tests.pipeline.replace(`${ctx.repo}/`, '') : 'The pipeline file'} describes it.`,
     tests: 'Every test file, which set it is in, and its last result in each place. The dots are the last 12 runs, oldest on the left. A test is flaky when it passes and fails on the same commit with no uncommitted changes. Click a test for its runs.',
-    runs: 'Every saved run, newest first. Every make test on this laptop is saved here; make ci-history fetches the CI runs. A + after a commit means it had uncommitted changes. Click a run for its tests.',
+    runs: 'Every recorded run, newest first: the runs devpipe recorded on this machine, and the CI runs hq ci-fetch brought. A + after a commit means it had uncommitted changes. Click a run for its tests.',
   };
   // the kinds of test, when the repo has tests/layers.json (a branch from before it has none)
   const L = loadLayers(ctx.m?.tests?.layers ?? null);

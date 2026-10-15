@@ -1,4 +1,4 @@
-// The Delivery page: how fast and how safely changes reach players, from make dora's ~/.cache/questkeep/dora/dora.json
+// The Delivery page: how fast and how safely changes reach users, from hq dora's ~/.cache/questkeep/dora/dora.json
 // (hq/dora.mjs works it out; hq/lib/dora.mjs says what each figure means). It reads as a product, top to bottom: a
 // header with the repo and the period, four figures (Deploys and Lead time for speed, Failed deploys and Rework for
 // stability), the pull requests waiting on the reader, then one full-width section per figure with its chart, the
@@ -8,7 +8,7 @@
 // day on a chart links to it.
 // When the file is older than STALE_MIN, or on Refresh, the page starts hq/dora.mjs in the background (no git fetch:
 // HQ never fetches on its own), answers at once with the figures it has and says it is updating. It writes dora.json
-// only: the dated copies are the nightly's and make dora's, which fetch main first. With no file at all it waits for
+// only: the dated copies are the nightly's and hq dora's, which fetch main first. With no file at all it waits for
 // Refresh, so a test or the demo never starts a fetch.
 import { execFile } from 'node:child_process';
 import { readFileSync, statSync } from 'node:fs';
@@ -33,7 +33,7 @@ const MARK = '<span class="hq-mark bad" aria-label="Failed">!</span>';
 const SMALL_TIP = 'Fewer than 10: one more could move this a lot';
 // What each figure counts, said once: in its ⓘ and again under Method
 const DEFINE = {
-  deploys: 'Deploys that changed what players get: the app\'s files, rules or indexes. Same-app redeploys aren\'t counted.',
+  deploys: 'Deploys that changed what users get: the app\'s files, rules or indexes. Same-app redeploys aren\'t counted.',
   lead: 'From a pull request\'s last push, or a direct push to main, to live.',
   failed: 'A deploy fails when its live check, or the deploy job after sending, goes red.',
   green: 'From a failed deploy going live to the next deploy whose live check passed.',
@@ -180,7 +180,7 @@ const more = (url, text) => `<a class="dv-more" href="${url}">${esc(text)} →</
 
 function waitingSection(f, now) {
   const list = f.waiting || [];
-  // the age make dora measured, plus the time since it measured it
+  // the age hq dora measured, plus the time since it measured it
   const since = Math.max(0, (now - Date.parse(f.generatedAt)) / 1000);
   const checks = c => (c === 'pass' ? tag('Checks passed', 'good') : c === 'fail' ? `${MARK} ${tag('Checks failed', 'bad')}` : c === 'pending' ? tag('Checks running') : tag('No checks'));
   const row = x => `<li>${link(x.url, `#${x.pr}`)} <span class="dv-title">${esc(x.title)}</span> <span class="dv-age">${esc(dur(x.ageSec + since))}</span> ${checks(x.checks)}${x.stale ? ` ${tag('Probably stale', 'neutral', `#${x.stale.pr} merged with the same title`)}` : ''}</li>`;
@@ -276,7 +276,7 @@ function liveSection(f, w, range, p) {
   const bugs = rw.status === 'none' ? 'No fix commits' : rw.status === 'untagged' ? `None tagged yet (0 of ${plural(rw.fixes, 'fix', 'fixes')})`
     : `${rw.n} · ${rw.tagged < SMALL ? `<span class="dv-n" title="${SMALL_TIP}">${rw.tagged}</span>` : rw.tagged} of ${rw.fixes} fixes tagged`;
   return section('dv-live', 'Live checks', `<div class="dv-split"><div>${liveStrip(f, w, p)}</div><div>${rows || '<p class="dv-empty">No failed deploys</p>'}${apart}</div></div>
-    <div class="dv-line"><span class="dv-line-k">Fixes to what players get</span>${info('fix: commits marked Player-facing: yes. Most are caught in review before release, so this counts fixes to the app, not bugs a player saw.', 'About fixes to what players get')}<span>${bugs}</span></div>`, { about: DEFINE.live });
+    <div class="dv-line"><span class="dv-line-k">Fixes to what users get</span>${info('fix: commits marked Player-facing: yes. Most are caught in review before release, so this counts fixes to the app, not bugs a player saw.', 'About fixes to what users get')}<span>${bugs}</span></div>`, { about: DEFINE.live });
 }
 
 function pipelineSection(f, w, range, p) {
@@ -567,14 +567,14 @@ const STYLE = `<style>
 }
 </style>`;
 const REFRESH = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 11a8 8 0 1 0-2.3 5.7"/><path d="M20 4v7h-7"/></svg>';
-const ABOUT = 'How fast and how safely changes reach players. Figures come from make dora; definitions are under Method.';
+const ABOUT = 'How fast and how safely changes reach users. Figures come from hq dora; definitions are under Method.';
 
 export async function deliveryPage(ctx, params = new URLSearchParams(), { now = Date.now(), run } = {}) {
   const range = RANGES.some(([k]) => k === params.get('range')) ? params.get('range') : '7d';
   const list = Object.hasOwn(LISTS, params.get('list') || '') ? params.get('list') : null;
   const day = /^\d{4}-\d{2}-\d{2}$/.test(params.get('day') || '') ? params.get('day') : null;
   const got = readDora(ctx.cache);
-  // a file from an older make dora lacks what this page draws, so it is out of date however new it is
+  // a file from an older hq dora lacks what this page draws, so it is out of date however new it is
   const older = got.data && (got.data.version || 1) < VERSION;
   const stale = got.data && (older || now - got.at > STALE_MIN * 60000);
   // Refresh and old figures start one refresh in the background; nothing waits for it
@@ -584,7 +584,7 @@ export async function deliveryPage(ctx, params = new URLSearchParams(), { now = 
 
   const page = (inner, title = 'Delivery') => layout({ title, active: 'delivery', wide: true, skip: { href: '#dv-top', label: 'Skip to figures' }, scripts: ['/hq/hq-charts.js'],
     body: `${STYLE}<div class="dv-page">${inner}</div>` });
-  const note = problem ? `<p class="hq-problem hq-stalenote">${MARK} Refresh failed: ${esc(problem)} <span class="hint">Run make dora for details.</span></p>` : '';
+  const note = problem ? `<p class="hq-problem hq-stalenote">${MARK} Refresh failed: ${esc(problem)} <span class="hint">Run hq dora for details.</span></p>` : '';
   const read = got.data ? `Updated ${ago(got.at, now)}${updating ? ' · refreshing…' : ''}` : updating ? 'Refreshing…' : '';
   // while a refresh runs, the page looks again shortly, without asking for another one
   const poll = updating ? `<script>setTimeout(() => location.replace('/delivery?range=${range}'), 10000);</script>` : '';
@@ -593,10 +593,10 @@ export async function deliveryPage(ctx, params = new URLSearchParams(), { now = 
     <div class="dv-fresh"><span>${esc(read)}</span><a class="btn btn-secondary" href="?range=${range}&amp;fresh=1">${REFRESH} Refresh</a></div></div>${poll}`;
 
   if (!got.data) return page(`${head}${note}<section class="dv-sec dv-state"><p><b>No delivery data yet.</b></p>
-    <div class="hq-command"><code>make dora</code></div><p class="hint">Or press Refresh. The first run takes a few minutes.</p></section>`);
+    <div class="hq-command"><code>hq dora</code></div><p class="hint">Or press Refresh. The first run takes a few minutes.</p></section>`);
 
-  if (older) return page(`${head}${note}<section class="dv-sec dv-state"><p><b>Updating figures…</b> The saved figures are from an older make dora.</p>
-    <p class="hint">Reload in a minute, or run make dora.</p></section>`);
+  if (older) return page(`${head}${note}<section class="dv-sec dv-state"><p><b>Updating figures…</b> The saved figures are from an older hq dora.</p>
+    <p class="hint">Reload in a minute, or run hq dora.</p></section>`);
 
   const f = got.data, w = f.windows.find(x => x.id === range) || f.windows.find(x => x.id === '7d') || f.windows[0], p = period(f, w);
   if (list) { const d = drillDown(f, w, range, list, day, p); return page(`${note}${d.body}`, d.title); }

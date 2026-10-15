@@ -151,17 +151,22 @@ export async function githubPart({ repo, gh, cache, fb, demo }, name, { fresh = 
 
 const REFRESH = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 11a8 8 0 1 0-2.3 5.7"/><path d="M20 4v7h-7"/></svg>';
 
-export function githubPage({ repo, demo }, params = new URLSearchParams()) {
-  const gi = gitInfo(repo), tab = TABS.some(([k]) => k === params.get('tab')) ? params.get('tab') : 'dashboard';
+// The tabs a repo gets: Firebase only when a deploy provider is Firebase Hosting.
+export const tabsFor = m => TABS.filter(([k]) => k !== 'firebase' || (m?.deploy || []).some(d => d.provider === 'firebase-hosting'));
+
+export function githubPage({ repo, demo, m }, params = new URLSearchParams()) {
+  const tabs = tabsFor(m), firebase = tabs.some(([k]) => k === 'firebase');
+  const gi = gitInfo(repo), tab = tabs.some(([k]) => k === params.get('tab')) ? params.get('tab') : 'dashboard';
   const chip = `<details class="hq-ghchip"><summary class="hq-chip-status" data-health aria-label="Whether gh works on this machine">gh <span data-health-text>checking…</span></summary>
     <div class="hq-ghchip-body"><div class="kicker">gh on this machine</div><div data-health-body><p class="hq-loading">Loading…</p></div></div></details>`;
-  const body = `<div class="hq-pagehead"><h1>GitHub &amp; Firebase${info('HQ asks GitHub through gh and Firebase through gcloud or the Firebase CLI, logged in as you, and only reads. Answers are kept on disk and shown at once; anything older than 30 seconds is asked again behind the page, every minute while it is on screen. Refresh asks now.', 'About this page')}</h1>
+  const title = firebase ? 'GitHub & Deploys' : 'GitHub';
+  const body = `<div class="hq-pagehead"><h1>${esc(title)}${info(`HQ asks GitHub through gh${firebase ? ', and Firebase through gcloud or the Firebase CLI,' : ''} logged in as you, and only reads. Answers are kept on disk and shown at once; anything older than 30 seconds is asked again behind the page, every minute while it is on screen. Refresh asks now.`, 'About this page')}</h1>
       ${gi ? ext(`https://github.com/${gi.slug}`, esc(gi.slug)) : ''}${chip}
       <span class="hq-gh-bar"><span class="hint" data-updated>Loading…</span><button type="button" class="btn btn-secondary" data-refresh>${REFRESH} Refresh</button></span></div>
-    <nav class="hq-tabs" role="tablist" aria-label="GitHub">${TABS.map(([k, label]) =>
+    <nav class="hq-tabs" role="tablist" aria-label="GitHub">${tabs.map(([k, label]) =>
       `<a role="tab" href="?tab=${k}" data-tab="${k}"${k === tab ? ' aria-selected="true" class="on"' : ' aria-selected="false"'}>${label} <span class="hq-gh-count" data-count="${k}"></span></a>`).join('')}</nav>
     <noscript><p class="hq-warn">This page needs JavaScript to load from GitHub.</p></noscript>
-    ${TABS.map(([k]) => `<section class="hq-gh-part" data-part="${k}"${k === tab ? '' : ' hidden'} role="tabpanel"><div class="hq-gh-body"><p class="hq-loading">Loading…</p></div>${k === 'dashboard'
+    ${tabs.map(([k]) => `<section class="hq-gh-part" data-part="${k}"${k === tab ? '' : ' hidden'} role="tabpanel"><div class="hq-gh-body"><p class="hq-loading">Loading…</p></div>${k === 'dashboard'
       ? '<div class="hq-ci-slot" data-load-part="ci-now"><p class="hq-loading">Looking for CI runs going now…</p></div>' + (demo ? '' : '<div class="hq-actions-slot" data-load-part="actions"><p class="hq-loading">Loading the Actions minutes…</p></div>') : ''}</section>`).join('')}`;
-  return layout({ title: 'GitHub & Firebase', active: 'github', body, wide: true });
+  return layout({ title, active: 'github', body, wide: true });
 }

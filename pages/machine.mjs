@@ -52,7 +52,9 @@ function manifestCard(ctx, scan) {
   const on = Object.entries(m.features).filter(([, v]) => v).map(([k]) => k);
   const head = m.present
     ? `<p>${esc(FILE)} read, schema ${m.schemaVersion}${m.schemaVersion > SCHEMA ? ` (this HQ knows schema ${SCHEMA})` : ''}. On: ${on.length ? on.map(esc).join(', ') : 'nothing beyond the baseline'}. Cache: <code>${esc(m.cache)}</code>.</p>`
-    : `<p>No ${esc(FILE)} in the repo, so these are the baseline pages. Below is what <code>hq setup</code> found and the manifest it would propose; add it to the repo root yourself.</p>`;
+    : warnings.some(w => w.includes('is not valid JSON'))
+      ? `<p>${esc(FILE)} is in the repo but could not be read, so these are the baseline pages until it parses. Below is what <code>hq setup</code> found and the manifest it would propose.</p>`
+      : `<p>No ${esc(FILE)} in the repo, so these are the baseline pages. Below is what <code>hq setup</code> found and the manifest it would propose; add it to the repo root yourself.</p>`;
   const warn = warnings.length ? `<ul class="hq-warnlist">${warnings.map(w => `<li>${esc(w)}</li>`).join('')}</ul>` : '';
   const plug = `${ctx.plugins.length ? `<p>Plugins: ${ctx.plugins.map(p => `<a href="/${esc(p.path)}">${esc(p.label)}</a>`).join(', ')}.</p>` : ''}${failed.length ? `<ul class="hq-warnlist">${failed.map(f => `<li>plugin left out: <code>${esc(f.file)}</code>: ${esc(f.why)}</li>`).join('')}</ul>` : ''}`;
   const found = scan.found.length ? `<ul class="hq-found">${scan.found.map(f => `<li><code>${esc(f.rel)}</code> ${f.key ? `<span class="hint">→ ${esc(f.key)}</span>` : ''} ${esc(f.note)}</li>`).join('')}</ul>` : '<p class="hint">Nothing HQ recognises beyond the files themselves.</p>';

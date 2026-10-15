@@ -1,5 +1,5 @@
 // The Problems page: the problem register as HQ shows it (docs/plans/problem-register.md). Observations are worked out
-// from the run store, the lock log and make dora each time the register is read; entries come from fix commits, notes
+// from the run store, the lock log and hq dora each time the register is read; entries come from fix commits, notes
 // and backfill and own the observations they explain; what no entry owns is unexplained. Overview tells a period's
 // story, Trends the whole register week by week, Tests what each test costs and has caught, Test slot the time agents
 // waited, List every entry and group. Each entry has a page of its own, and every view downloads as JSON.
@@ -84,7 +84,7 @@ function overviewTab(s, w, live) {
     ${tile(share(o.caughtBeforeMerge.caught, o.caughtBeforeMerge.of), 'of product bugs caught before the merge', 'Product bugs found by the agent, a test, a gate, a reviewer or you in review, against all product bugs opened in the period whose finder is known.', was(x => share(x.caughtBeforeMerge.caught, x.caughtBeforeMerge.of)))}
     ${tile(dur(o.machineMinutes), 'machine time on reds', 'Every red in the period priced at its own run\'s minutes, each run once, owned or not. Reds on a dirty tree are left out.', was(x => x.machineMinutes, dur))}
     ${tile(dur(o.slot.minutes), 'agents waited for the slot', `${o.slot.waits} waits behind another session, agent or worktree's run, from the lock log. Waits behind the same agent's own run are the queue working.`, was(x => x.slot.minutes, dur))}
-    ${prRead ? tile(dur(o.waitingOnYou.minutes), `waiting on you, ${plural(o.waitingOnYou.prs, 'pull request')}`, 'Clock time during which at least one pull request had gone green and waited for its merge, from make dora\'s own figures. Several waiting at once count once.', was(x => x.waitingOnYou.minutes, dur)) : tile('not read yet', 'waiting on you', 'Pull request waits come from make dora\'s own figures, dora/changes.json, which its next pass writes.')}
+    ${prRead ? tile(dur(o.waitingOnYou.minutes), `waiting on you, ${plural(o.waitingOnYou.prs, 'pull request')}`, 'Clock time during which at least one pull request had gone green and waited for its merge, from hq dora\'s own figures. Several waiting at once count once.', was(x => x.waitingOnYou.minutes, dur)) : tile('not read yet', 'waiting on you', 'Pull request waits come from hq dora\'s own figures, dora/changes.json, which its next pass writes.')}
   </div>${b ? '' : `<p class="hint">No comparison with the ${w.days} days before: the register starts on 24 September, so that period holds no data.</p>`}`;
   const groups = o.unexplained.list;
   const unexplained = groups.length ? dataTable({ id: 'pr-unexplained', columns: [
@@ -129,7 +129,7 @@ function trendsTab(s) {
   const push = changes.length ? dotPlot(changes.map(c => ({ day: c.mergedAt.slice(0, 10), v: c.split.runnerWaitSec + c.split.slotWaitSec + c.split.gateSec, title: `#${c.pr}: ${duration(c.split.runnerWaitSec + c.split.slotWaitSec + c.split.gateSec)}` })),
     { label: 'Push to gate result for each pull request, by the day it merged', names: { median: 'Daily median' } })
     + numbers({ head: ['Week of', 'pull requests', 'median', '90th percentile'], rows: t.map(x => [week(x), x.pushToResultMin.n, x.pushToResultMin.median == null ? null : dur(x.pushToResultMin.median), x.pushToResultMin.p90 == null ? null : dur(x.pushToResultMin.p90)]) })
-    : '<p class="hint">Not read yet: make dora writes dora/changes.json, each change\'s own figures, from its next pass.</p>';
+    : '<p class="hint">Not read yet: hq dora writes dora/changes.json, each change\'s own figures, from its next pass.</p>';
   const bugs = dayChart(t.map(x => ({ day: x.weekOf, bugs: x.productBugsAfterMerge.per10PRs })), [{ key: 'bugs', cls: 'fail', label: 'product bugs found after the merge, per 10 merged pull requests', bar: true }],
     { label: 'Product bugs found after the merge per 10 merged pull requests, each week', narrow: true })
     + numbers({ head: ['Week of', 'merged pull requests', 'product bugs after the merge', 'per 10', ...Object.values(EFFECTS)], rows: t.map(x => [week(x), x.mergedPRs, x.productBugsAfterMerge.n, x.productBugsAfterMerge.per10PRs, ...Object.keys(EFFECTS).map(e => x.productBugsAfterMerge.byEffect[e])]) });
@@ -142,7 +142,7 @@ function trendsTab(s) {
   return `${story}<div class="bl-charts pr-charts">
     ${panel('Gate reds per 100 gate runs, each week', 'Full, clean gate runs on the laptop and CI, each week from the day named. A red run counts once, by its worst cause: tooling, else a real break, else not known, else flaky. An entry judged from the run gives its cause; otherwise tooling is a red naming no test, a real break failed again when rerun, flaky passed on the same commit or when rerun alone, and not known was never rerun, as almost no red was before 11 October.', reds)}
     ${panel('Who found them, each week', 'Each week\'s entries by who found them, from Found-by or the stage, as a share of those that say who: the counts rise with the work. More found by tests and agents, fewer by you, is the direction to want.', who)}
-    ${panel('Push to gate result', 'For each pull request, from its gate being queued to its result, the wait for the runner and the test slot included, from make dora\'s figures. The line is each day\'s median.', push)}
+    ${panel('Push to gate result', 'For each pull request, from its gate being queued to its result, the wait for the runner and the test slot included, from hq dora\'s figures. The line is each day\'s median.', push)}
     ${panel('Product bugs found after the merge, per 10 merged pull requests', 'Product-bug entries found by the merge\'s deploy, the production smoke test, the nightly long set, you after the merge, or players.', anyBugs ? bugs : '<p class="hint">Not drawn yet: no entry has the kind Product bug, which fix commits give with Kind: product-bug from 11 October.</p>')}
   </div>`;
 }
@@ -213,7 +213,7 @@ function listTab(s, w, live) {
 
 // ---- The page ----
 
-const PAGE_ABOUT = 'The problem register: everything that went wrong in the work, from a red test to a wait for the test slot. Observations are worked out from the run store, the lock log and make dora each time the page is read. Entries add judgement: fix commits make them from their trailers, notes and backfill add the rest. docs/plans/problem-register.md says how it all fits.';
+const PAGE_ABOUT = 'The problem register: everything that went wrong in the work, from a red test to a wait for the test slot. Observations are worked out from the run store, the lock log and hq dora each time the page is read. Entries add judgement: fix commits make them from their trailers, notes and backfill add the rest. docs/plans/problem-register.md says how it all fits.';
 const COPY_SCRIPT = `<script>document.addEventListener('click', async e => {
   const b = e.target.closest('[data-copy-json]'); if (!b) return;
   const was = b.textContent;
@@ -223,7 +223,7 @@ const COPY_SCRIPT = `<script>document.addEventListener('click', async e => {
 const exportButtons = (url, about) => `<span class="pr-export"><a class="btn btn-secondary" href="${esc(url)}${url.includes('?') ? '&amp;' : '?'}download=1">Download JSON</a><button type="button" class="btn btn-ghost" data-copy-json="${esc(url)}">Copy JSON</button>${info(about, 'About the JSON')}</span>`;
 function freshness(s) {
   const src = s.reg.sources;
-  return `<p class="hint pr-fresh">Read ${esc(when(new Date(s.readAt).toISOString()))}: ${plural(src.runs, 'run')}, ${plural(src.lockLines, 'lock log line')}, ${plural(src.events, 'event')} in the register, ${plural(src.gitEntries, 'entry', 'entries')} from git, ${src.prWaits ? plural(src.prWaits, 'pull request wait') : 'no pull request waits yet (make dora writes them)'}${s.reg.notPlaced.length ? `, <b>${plural(s.reg.notPlaced.length, 'event')} not placed</b>` : ''}. <a href="?fresh=1">Read again</a></p>`;
+  return `<p class="hint pr-fresh">Read ${esc(when(new Date(s.readAt).toISOString()))}: ${plural(src.runs, 'run')}, ${plural(src.lockLines, 'lock log line')}, ${plural(src.events, 'event')} in the register, ${plural(src.gitEntries, 'entry', 'entries')} from git, ${src.prWaits ? plural(src.prWaits, 'pull request wait') : 'no pull request waits yet (hq dora writes them)'}${s.reg.notPlaced.length ? `, <b>${plural(s.reg.notPlaced.length, 'event')} not placed</b>` : ''}. <a href="?fresh=1">Read again</a></p>`;
 }
 
 export function problemsPage(ctx, params = new URLSearchParams()) {

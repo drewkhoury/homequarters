@@ -11,7 +11,7 @@ import { allRuns, flakes } from '../lib/runs.mjs';
 import { conversationsIndex, indexDir } from '../lib/conversations.mjs';
 import { demoSession } from '../lib/demo.mjs';
 import { gather, COLUMNS } from './backlog.mjs';
-import { SECTIONS, estimateTokens, pickSections, fileName, assemble, docsSection, trackedDocs, trackedSource, zipEntries, zipName, conversationFile, sourceSection, repoSection, testsSection, githubSection, conversationsSection } from '../lib/export.mjs';
+import { SECTIONS, sectionsFor, estimateTokens, pickSections, fileName, assemble, docsSection, trackedDocs, trackedSource, zipEntries, zipName, conversationFile, sourceSection, repoSection, testsSection, githubSection, conversationsSection } from '../lib/export.mjs';
 import { zip } from '../lib/zip.mjs';
 
 const KEEP_MS = 60000;
@@ -113,19 +113,19 @@ export async function exportPage(ctx, params = new URLSearchParams()) {
   const k = await getSections(ctx);
   const size = text => ({ bytes: Buffer.byteLength(text), tokens: estimateTokens(text) });
   const data = {
-    sections: SECTIONS.map(s => ({ id: s.id, on: s.on, ...size(k.sections[s.id] || '') })),
+    sections: sectionsFor(ctx.m).map(s => ({ id: s.id, on: s.on, ...size(k.sections[s.id] || '') })),
     prompts: (() => { const a = size(k.sections.conversationsWriting), b = size(k.sections.conversations); return { bytes: a.bytes - b.bytes, tokens: a.tokens - b.tokens }; })(),
     header: 700,
   };
   const preview = (await exportFile(ctx, new URLSearchParams('preview=1'), {})).body;
-  const rows = SECTIONS.map(s => {
+  const rows = sectionsFor(ctx.m).map(s => {
     const d = data.sections.find(x => x.id === s.id);
     const extra = s.id === 'conversations' ? `<label class="ex-sub"><input type="checkbox" name="prompts" disabled> Include what people and Claude wrote <span class="hint" data-size-of="prompts">${kb(data.prompts.bytes)} · ${tok(data.prompts.tokens)} tokens</span>${info('The prompts and Claude\'s replies, never tool output. They can hold anything pasted into a session, so read them before sending the file on.', 'About this')}</label>` : '';
     return `<div class="ex-row"><label class="ex-main"><input type="checkbox" name="section" value="${s.id}"${s.on ? ' checked' : ''}>
       <span class="ex-label">${esc(s.label)}</span><span class="hint ex-size" data-size-of="${s.id}">${kb(d.bytes)} · ${tok(d.tokens)} tokens</span></label>
       <p class="hint ex-about">${esc(s.about)}</p>${extra}</div>`;
   }).join('');
-  const body = `<div class="hq-pagehead"><h1>Export${info(`Built from this checkout at ${k.sha.slice(0, 7)} on ${k.branch}, in ${(k.ms / 1000).toFixed(1)} s, and kept for a minute. Docs and source are read only from files git tracks, so nothing ignored (an .env, the emulators' data) gets in. GitHub comes from what HQ last heard; the export never asks GitHub itself.`, 'About this page')}</h1></div>
+  const body = `<div class="hq-pagehead"><h1>Export${info(`Built from this checkout at ${k.sha.slice(0, 7)} on ${k.branch}, in ${(k.ms / 1000).toFixed(1)} s, and kept for a minute. Docs and source are read only from files git tracks, so nothing ignored (an .env, local data) gets in. GitHub comes from what HQ last heard; the export never asks GitHub itself.`, 'About this page')}</h1></div>
     <p class="ex-lede">What HQ shows, to hand to Claude or keep: one Markdown file, or a zip of files Claude can look through and open only what it needs.</p>
     <form class="card ex-form" onsubmit="return false">
       <div class="ex-format"><span class="ex-label">As</span><div class="seg hq-spans" role="group" aria-label="As one file or a zip">

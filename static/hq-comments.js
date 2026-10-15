@@ -347,7 +347,7 @@
 
   function asText(list) {
     const day = new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
-    let out = `Comments from QuestKeep HQ (${list.length}), ${day}. File paths are from the repo root.\n`;
+    let out = `Comments from HQ (${list.length}), ${day}. File paths are from the repo root.\n`;
     for (const [k, cs] of grouped(list)) {
       out += `\n${k}\n`;
       for (const c of cs) out += `- ${on(c)}: ${c.text.replace(/\n+/g, ' ')}\n`;
@@ -372,8 +372,8 @@
 
   // Where the button sits, so it can move off whatever it covers: either bottom corner, or tucked into a thin tab on
   // the right edge (one click still opens the list). Kept in this browser.
-  function place(where = store.get(PLACE, 'right')) {
-    if (!PLACES.some(([k]) => k === where)) where = 'right';
+  function place(where = store.get(PLACE, 'tucked')) {
+    if (!PLACES.some(([k]) => k === where)) where = 'tucked';
     pill.dataset.place = where;
     pill.title = where === 'tucked' ? 'Your comments' : '';
     for (const b of panel.querySelectorAll('[data-place]')) b.setAttribute('aria-pressed', String(b.dataset.place === where));

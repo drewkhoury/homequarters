@@ -599,3 +599,63 @@ test('a run given LOCK_WAIT minutes gives up once they pass, says so, and leaves
   assert.match(r.text, /Giving up \(LOCK_WAIT=0\.005 minutes\)/);
   assert.deepEqual(existsSync(join(dir, 'queue')) ? readdirSync(join(dir, 'queue')) : [], []);
 });
+
+// ---- the adversary's survivors, 15 October: the fallbacks nothing exercised ----
+// A take by a process whose environment names the folder the QuestKeep way, and names its agent and process the same way.
+const rawCli = (t, args, env) => {
+  const p = spawn(process.execPath, [...HQ, ...args], { env: { PATH: process.env.PATH, HOME: process.env.HOME, HQ_SLOT_POLL_MS: '20', ...env } });
+  let text = ''; p.stdout.on('data', d => { text += d; }); p.stderr.on('data', d => { text += d; });
+  return new Promise(done => p.on('close', code => done({ code, text })));
+};
+
+test('the QK_ names QuestKeep set still work for one release: the folder, the agent, the process, who, no docker', async t => {
+  const dir = scratch(t);
+  const r = await rawCli(t, ['take', 'docker-test'], { QK_LOCK_DIR: dir, QK_NO_DOCKER: '1', QK_LOCK_PID: String(process.pid), QK_AGENT: 'gate-runner', CLAUDE_CODE_SESSION_ID: 's1' });
+  assert.equal(r.code, 0, r.text);
+  const run = JSON.parse(readFileSync(join(dir, 'run.json'), 'utf8'));
+  assert.equal(run.pid, process.pid, 'QK_LOCK_PID'); assert.equal(run.agent, 'gate-runner', 'QK_AGENT');
+  // a run outside any Claude session is a person's, named the QuestKeep way
+  const who = await rawCli(t, ['status', 'posting'], { QK_LOCK_DIR: dir, QK_NO_DOCKER: '1', QK_WHO: 'the laptop runner' });
+  assert.equal(who.code, 0, who.text);
+  assert.ok(readdirSync(join(dir, 'board')).some(b => JSON.parse(readFileSync(join(dir, 'board', b), 'utf8')).person === 'the laptop runner'), 'QK_WHO');
+  const hq = await rawCli(t, ['release', 'docker-test', '0'], { QK_LOCK_DIR: dir, HQ_SLOT_DIR: dir, QK_NO_DOCKER: '1', HQ_SLOT_PID: String(process.pid), QK_LOCK_PID: '1', HQ_AGENT: 'gate-runner', QK_AGENT: 'other', CLAUDE_CODE_SESSION_ID: 's1' });
+  assert.equal(hq.code, 0, `the HQ_ name wins over the QK_ one: ${hq.text}`);
+  assert.equal(existsSync(join(dir, 'run.json')), false);
+});
+
+test('with no folder named, the slot is the manifest\'s lock store, under the repo\'s cache', async t => {
+  const repo = scratch(t), cache = join(repo, 'cache');
+  writeFileSync(join(repo, 'hq.json'), JSON.stringify({ schemaVersion: 1, name: 'doors', cache, stores: ['lock'] }));
+  const r = await rawCli(t, ['take', 'docker-test', '--repo', repo], { HQ_NO_DOCKER: '1', HQ_SLOT_PID: String(process.pid) });
+  assert.equal(r.code, 0, r.text);
+  assert.equal(existsSync(join(cache, 'lock', 'run.json')), true, 'run.json under <cache>/lock');
+  const moved = scratch(t);
+  writeFileSync(join(repo, 'hq.json'), JSON.stringify({ schemaVersion: 1, name: 'doors', cache, stores: [{ id: 'lock', path: moved }] }));
+  const r2 = await rawCli(t, ['take', 'docker-test', '--repo', repo], { HQ_NO_DOCKER: '1', HQ_SLOT_PID: String(process.pid), LOCK_WAIT: '0' });
+  assert.equal(r2.code, 0, `a store with its own path is the slot: ${r2.text}`);
+  assert.equal(existsSync(join(moved, 'run.json')), true);
+});
+
+test('unclaim force takes away another session\'s claim; without force it is refused and says so', async t => {
+  const dir = scratch(t);
+  assert.equal((await lockCli(t, dir, ['claim', 'three runs'], { CLAUDE_CODE_SESSION_ID: 'a', CLAUDE_PID: String(process.pid) })).code, 0);
+  const refused = await lockCli(t, dir, ['unclaim'], { CLAUDE_CODE_SESSION_ID: 'b', CLAUDE_PID: String(process.pid) });
+  assert.equal(refused.code, 3, refused.text); assert.match(refused.text, /hq slot unclaim force/);
+  assert.equal(existsSync(join(dir, 'claim.json')), true);
+  const forced = await lockCli(t, dir, ['unclaim', 'force'], { CLAUDE_CODE_SESSION_ID: 'b', CLAUDE_PID: String(process.pid) });
+  assert.equal(forced.code, 0, forced.text);
+  assert.equal(existsSync(join(dir, 'claim.json')), false);
+  const log = readFileSync(join(dir, 'log.jsonl'), 'utf8').trim().split('\n').map(l => JSON.parse(l));
+  assert.equal(log.at(-1).event, 'unclaim'); assert.equal(log.at(-1).of, 'a');
+});
+
+test('the claimer\'s own take renews its claim, so a session running gate after gate never looks idle', async t => {
+  const dir = scratch(t), me = { CLAUDE_CODE_SESSION_ID: 'a', CLAUDE_PID: String(process.pid), HQ_SLOT_PID: String(process.pid) };
+  assert.equal((await lockCli(t, dir, ['claim', 'three runs'], me)).code, 0);
+  const before = JSON.parse(readFileSync(join(dir, 'claim.json'), 'utf8'));
+  await new Promise(r => setTimeout(r, 30)); // cap: so the take's stamp can differ from the claim's
+  assert.equal((await lockCli(t, dir, ['take', 'docker-test'], me)).code, 0);
+  const after = JSON.parse(readFileSync(join(dir, 'claim.json'), 'utf8'));
+  assert.ok(after.renewed && Date.parse(after.renewed) > Date.parse(before.renewed || before.since), 'renewed at the take');
+  assert.equal(after.msg, 'three runs');
+});

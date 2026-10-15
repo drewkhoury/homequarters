@@ -1,7 +1,8 @@
-// The problem register's observations (hq/lib/problem-observations.mjs): what happened, worked out from the stores each
-// time HQ asks, never typed in and never closed. Each red test in a run is sorted by what else the stores saw of it; each
-// wait for the test slot is matched to how it ended and to whose run it waited behind. These tests pin those rules on
-// runs and lock log lines shaped as hq/lib/runs.mjs and scripts/lock.mjs write them.
+// Proves: the register's observations (lib/problem-observations.mjs) are worked out from the stores each time HQ
+// asks, never typed in and never closed: each red test sorted by what else the stores saw of it, each slot wait
+// matched to how it ended and whose run it waited behind, on runs and lock lines shaped as the writers write them.
+// Why: observations are the register's view of what happened without anyone writing it down, so the matching rules
+// are the whole value.
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { observeReds, observeSlot, observePulls, machineMinutes, testKeyer } from '../lib/problem-observations.mjs';

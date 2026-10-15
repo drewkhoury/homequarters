@@ -1,6 +1,7 @@
-// Export (hq/lib/export.mjs): which sections a request gets, how big they are to Claude, which files go in (only ones
-// git tracks, never binary, minified or huge ones), and how the file is laid out. git is a stub answering a fixed list
-// of tracked files; the files live in a temp folder.
+// Proves: Export (lib/export.mjs) gives a request the sections it asks for, sizes them as Claude would see them,
+// takes in only files git tracks that are neither binary, minified nor huge, and lays the file out as documented,
+// with git a stub answering a fixed list and the files in a temp folder.
+// Why: the export is handed to Claude or kept, so what goes in and how big it is decide whether it is usable.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { mkdtempSync, mkdirSync, writeFileSync, rmSync } from 'node:fs';

@@ -1,7 +1,7 @@
-// What the problem register refuses to write (hq/lib/problem-privacy.mjs). The register's events file stays on the laptop
-// but shows on HQ and leaves in every JSON export, and backfill writes entries from transcripts, where one "line" can be a
-// whole message holding a player's address or a path into private folders (Theo's review of the plan). So the writer
-// refuses rather than hopes, the export checks again, and each pattern has a test of its own.
+// Proves: what the problem register refuses to write (lib/problem-privacy.mjs), one test per pattern: the writer
+// refuses, and the export checks again.
+// Why: the events file stays on the laptop but shows on HQ and leaves in every export, and a backfilled "line" can be
+// a whole message holding someone's address or a path into private folders (Theo's review of the plan).
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { textProblems } from '../lib/problem-privacy.mjs';

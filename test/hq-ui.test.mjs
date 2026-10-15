@@ -1,7 +1,7 @@
-// HQ's one table (hq/lib/ui.mjs): what every list in HQ is drawn with. Its filters sit in a bar above the table, never in
-// its header, so a column is as wide as what it holds; each column's width comes from what kind of value it holds, and
-// a cell stays on one line unless its column is one that wraps (27 September: a column of filter chips pushed the
-// table's result and time off the screen, and dates wrapped over three lines).
+// Proves: HQ's one table (lib/ui.mjs), which every list is drawn with, keeps its filters in a bar above, sizes each
+// column by the kind of value it holds, and keeps a cell on one line unless its column wraps.
+// Why: on 27 September a column of filter chips pushed the table's result and time off the screen, and dates wrapped
+// over three lines.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { dataTable } from '../lib/ui.mjs';

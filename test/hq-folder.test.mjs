@@ -1,5 +1,7 @@
-// A folder on HQ's Code page (hq/lib/folder.mjs): what kind each file is, what its thumbnail says, sizes and dates in
-// words, folders before files with their counts, and the three views drawn from a small folder made here.
+// Proves: a folder on the Code page (lib/folder.mjs) says what kind each file is, what its thumbnail shows, its size
+// and date in words, puts folders before files with their counts, and draws its three views from a small folder made
+// here.
+// Why: the Code page is the first thing a person opens; a folder that reads wrong misplaces their files.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { mkdtempSync, mkdirSync, writeFileSync, rmSync, utimesSync } from 'node:fs';

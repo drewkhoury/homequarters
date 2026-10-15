@@ -1,5 +1,6 @@
-// The Docs page's markdown: links between docs keep working inside HQ, other repo files open in the code viewer, and
-// the docs' habit of naming files in inline code becomes a link.
+// Proves: the Docs page's markdown keeps links between docs working inside HQ, opens other repo files in the code
+// viewer, and turns the docs' habit of naming files in inline code into links.
+// Why: a doc that links to a file nobody can open from HQ sends the reader back to the terminal.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { rewriteHref, rewriteSrc, resolveRepoPath, renderMarkdown, slugger, sectionsOf } from '../lib/markdown.mjs';

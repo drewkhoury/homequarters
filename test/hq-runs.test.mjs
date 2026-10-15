@@ -1,5 +1,7 @@
-// HQ's reading of the run history: devpipe's run.json with the run-info line from each task's log, CI's JUnit files
-// (the seam for backlog 30), flakes, and which test file each result belongs to.
+// Proves: the run history is read into one shape whatever recorded it: devpipe's run.json with the run line from each
+// task's log, CI's JUnit folders, flakes, and which test file each result belongs to.
+// Why: every page that says "the last run passed" reads through this, from stores written by devpipe, the Makefile
+// and CI.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { mkdtempSync, mkdirSync, writeFileSync, rmSync, readdirSync } from 'node:fs';

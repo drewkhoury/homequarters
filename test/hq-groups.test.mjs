@@ -1,6 +1,7 @@
-// The groups a project's groups file sorts the Code page's files into (lib/groups.mjs): the three kinds of pattern, a
-// pattern that takes a folder back out of a wider group, and what a repo with no groups file gets. Whether QuestKeep's
-// own hq/groups.json places every tracked file is QuestKeep's check (test/questkeep-conformance/hq-groups.test.mjs).
+// Proves: a project's groups file (lib/groups.mjs) sorts the Code page's files by three kinds of pattern, a pattern
+// can take a folder back out of a wider group, and a repo with no groups file gets one group. Whether a project's own
+// file places every tracked file is hq check's.
+// Why: the file tree's filter is only useful if every file lands in one place.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { mkdtempSync, writeFileSync, rmSync } from 'node:fs';

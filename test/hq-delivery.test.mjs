@@ -1,9 +1,9 @@
-// HQ's Delivery page (hq/pages/delivery.mjs) drawn from a dora.json made from the real runs in fixtures/dora. It must
-// lead with four figures as labels and values, never sentences, mark a small sample, compare with the days before only
-// when that is fair, list the pull requests waiting on the reader, keep QuestKeep's own words out of its headlines and
-// every list under 6 rows outside the drill-down, and never block on a refresh or start make dora's fetch on its own
-// when there are no figures: a test or the demo opening the page must not reach GitHub. The refresh is handed a
-// stand-in for execFile, so nothing runs.
+// Proves: the Delivery page (pages/delivery.mjs), from figures made of the real runs in fixtures/dora, leads with
+// four figures as labels and values, marks a small sample, compares with the days before only when that is fair,
+// lists the pull requests waiting on the reader, keeps the project's own words out of its headlines, keeps every list
+// under six rows outside the drill-down, and never blocks on a refresh or starts a fetch of its own.
+// Why: Drew rejected a Delivery page that was a data dump; and a test or the demo opening the page must not reach
+// GitHub, so the refresh takes a stand-in for execFile.
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { mkdtempSync, mkdirSync, rmSync, writeFileSync, utimesSync } from 'node:fs';

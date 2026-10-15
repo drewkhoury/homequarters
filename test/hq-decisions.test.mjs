@@ -1,9 +1,9 @@
-// HQ's Decisions page (hq/lib/decisions.mjs, hq/pages/decisions.mjs): the frozen lines of docs/DECISIONS.md and the
-// files in docs/decisions/ read into rows, the rules a file keeps to, and the page drawn from them. The data is
-// tests/unit/fixtures/decisions/, a small repo of its own: a DECISIONS.md of three lines (one whose title names a date,
-// one that is partly superseded in a sentence, one dated in October) and four files, two on the same day and one
-// wholly superseded by a later one whose own text is partly superseded. The page is drawn from a copy of it in a
-// temporary folder, never from the real files.
+// Proves: the Decisions page (lib/decisions.mjs, pages/decisions.mjs) reads the frozen one-line file and the dated
+// files into rows, checks the rules a file keeps to, and draws the page, from a small repo of its own in
+// fixtures/decisions copied to a temp folder: three frozen lines (one naming a date, one partly superseded, one in
+// October) and four files, two on one day, one wholly superseded by a later one whose text is partly superseded.
+// Why: a decision read wrong is a reason lost; the real files are never read, so the test says the same thing on any
+// laptop.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { mkdtempSync, rmSync, cpSync, readdirSync, readFileSync, writeFileSync } from 'node:fs';

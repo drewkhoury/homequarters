@@ -1,6 +1,8 @@
-// HQ's Firebase tab reads Hosting two ways, gcloud's token and the REST API first, then the Firebase CLI's own login,
-// and never logs in. These put stand-ins in place of both: each way working, the first failing, both failing. Also the
-// project id, a release as the API gives it, and which commit is live, from the version.json each deploy stamps.
+// Proves: the Firebase tab reads Hosting two ways, gcloud's token and the REST API first, then the Firebase CLI's own
+// login, never logs in, and reads the project id, a release as the API gives it and which commit is live from the
+// version.json each deploy stamps, with stand-ins for each way working, the first failing and both failing.
+// Why: the tab runs with the person's own logins, and a wrong reading of what is live is a wrong answer to "did it
+// ship".
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { mkdtempSync, writeFileSync, mkdirSync, rmSync } from 'node:fs';

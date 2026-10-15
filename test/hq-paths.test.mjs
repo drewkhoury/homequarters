@@ -1,5 +1,6 @@
-// HQ serves files from two places only, the repo and ~/.cache/questkeep. safePath is the one gate: these build a small
-// repo, a cache and a folder beside them that holds a secret, then try every way out.
+// Proves: HQ serves files from two places only, the repo and its cache; safePath is the one gate, tried every way out
+// from a small repo, a cache and a folder beside them that holds a secret.
+// Why: HQ runs with the person's own files; one path that escapes is every file on the laptop.
 import { test, before, after } from 'node:test';
 import assert from 'node:assert/strict';
 import { mkdtempSync, mkdirSync, writeFileSync, symlinkSync, rmSync, realpathSync } from 'node:fs';

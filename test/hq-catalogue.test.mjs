@@ -1,5 +1,6 @@
-// HQ's test catalogue: the description a test file opens with, the header backlog 29 will give every file, the sets
-// the Makefile puts tests in, and the node test titles results are matched to.
+// Proves: the test catalogue reads the description a test file opens with, the five-field header, the sets a
+// project's Makefile puts tests in, and the node test titles results are matched to.
+// Why: the Testing page's cards and docs/TESTING.md come from these headers, so a misread header is a wrong page.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { parseHeader, openingComment, makeSets, testTitles, shotNames } from '../lib/catalogue.mjs';

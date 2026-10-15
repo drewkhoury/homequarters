@@ -1,6 +1,7 @@
-// The backlog's history, rebuilt from git (hq/lib/backlog.mjs): an item's file read into fields, the rules checked,
-// an entry of the old BACKLOG.md followed through its versions, the item files' own commits, and what a branch does to
-// the items. Each test feeds text, as git would print it, and reads the answer; no repo is needed.
+// Proves: the backlog's history is rebuilt from git (lib/backlog.mjs): an item's file read into fields, the rules
+// checked, an entry of the old one-file backlog followed through its versions, the item files' own commits, and what
+// a branch does to the items, from text as git would print it.
+// Why: the Backlog page's board, list and trends are only as true as this reading, and no repo is needed to pin it.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import {

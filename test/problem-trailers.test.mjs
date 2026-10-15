@@ -1,7 +1,7 @@
-// What a fix commit tells the problem register (hq/lib/problem-trailers.mjs; the plan's "Where entries come from").
-// Agents put Player-facing and Found-by on every fix: commit unasked (154 of 154 since 7 October), so the register's
-// judgement rides there too, in Kind, Found-at and an optional Signature trailer. Found-by was free text, written 77 ways
-// on main by 11 October; it moves to fixed values, and an alias table reads the old spellings.
+// Proves: what a fix commit tells the register (lib/problem-trailers.mjs): Player-facing, Found-by, Kind, Found-at
+// and an optional Signature trailer, with Found-by's fixed values and an alias table for the old free-text spellings.
+// Why: agents put the trailers on every fix commit unasked (154 of 154 since 7 October), and Found-by had been
+// written 77 ways by 11 October.
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';

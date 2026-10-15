@@ -1,7 +1,7 @@
-// The problem register's entries from git (hq/lib/problem-git.mjs): each fix: commit is a closed entry fixed by itself,
-// with the files of its failing-test commit for its signature, and a bug file in docs/backlog/ that a commit deleted
-// says what the problem was and who asked (the plan's Backfill, step 1: "inferring nothing beyond what they say").
-// These tests read git's output as the loader asks for it, so they need no repository.
+// Proves: the register's entries from git (lib/problem-git.mjs): each fix commit is a closed entry fixed by itself,
+// with the files of its failing-test commit as its signature, and a bug file in the backlog that a commit deleted
+// says what the problem was and who asked, from git's output as the loader asks for it.
+// Why: the backfill infers nothing beyond what a commit says, and needs no repository to be pinned.
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { parseLog, LOG_FORMAT, gitEntries, backlogBug, lineContains } from '../lib/problem-git.mjs';

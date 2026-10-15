@@ -1,6 +1,8 @@
-// The conversations index (hq/lib/conversations.mjs): which transcript folders are this repo's, what the list shows
-// for each session, reading only what was added since, and the transcript read a page of turns at a time. Every test
-// builds its own small ~/.claude/projects in a temp folder, and git is answered by a stub, so nothing real is read.
+// Proves: the conversations index (lib/conversations.mjs) knows which transcript folders are this repo's, what the
+// list shows for each session, reads only what was added since, and pages a transcript a turn at a time, each test on
+// its own small ~/.claude/projects in a temp folder with git answered by a stub.
+// Why: the Conversations page reads a person's own transcripts, so which ones it shows and how little it reads must
+// be exact.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { mkdtempSync, mkdirSync, writeFileSync, appendFileSync, rmSync, statSync, truncateSync } from 'node:fs';

@@ -1,7 +1,8 @@
-// The problem register's ledger (hq/lib/problems.mjs, docs/plans/problem-register.md). Each line of the events file is
-// one event about one entry, appended whole and never rewritten, so an entry's state is its events read in order. These
-// tests pin how events become entries: the order they are read in, which events are refused and shown as not placed
-// rather than allowed to rewrite history, which fields are kept, and how a redaction hides a field everywhere.
+// Proves: the register's ledger (lib/problems.mjs): how events become entries in the order read, which events are
+// refused and shown as not placed rather than allowed to rewrite history, which fields are kept, and how a redaction
+// hides a field everywhere.
+// Why: each line of the events file is appended whole and never rewritten, so an entry's state is exactly its events
+// read in order.
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { fold, KINDS, MODES, STAGES, STAGE, BEFORE_MERGE, FIELDS } from '../lib/problems.mjs';

@@ -1,6 +1,7 @@
-// The kinds of test, from tests/layers.json. The file arrives with backlog 30's branch, so these read a copy of its
-// content (fixtures/hq-layers.json, from ci/reliability at 6eb957c) and check which files each kind takes, that a file
-// named outright beats a pattern, and that HQ leaves the kinds out when the file is missing.
+// Proves: the kinds of test (lib/layers.mjs) read from a layers file: which files each kind takes, a file named
+// outright beating a pattern, and the kinds left out when the file is missing, on a copy of a real layers file in
+// fixtures/hq-layers.json.
+// Why: the Testing page's cards are one per kind; a file in the wrong kind is counted against the wrong promise.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { join, dirname } from 'node:path';

@@ -1,5 +1,8 @@
-// HQ's GitHub page runs gh with the developer's own login. These put a stand-in for gh in its place: gh missing, gh
-// logged out, one part failing while the rest still load, the health panel's four checks, and the minute's cache.
+// Proves: the GitHub page, which runs gh with the developer's own login, copes with a stand-in gh that is missing,
+// logged out, or failing on one part while the rest load, and reads the health panel's four checks and the minute's
+// cache.
+// Why: gh is the one tool HQ asks on the person's behalf, and the page must say plainly what it could not see rather
+// than fail whole.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { ghProblem, ghPart, ghHealth, checksOf } from '../lib/github.mjs';

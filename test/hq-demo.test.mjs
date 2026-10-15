@@ -1,6 +1,7 @@
-// HQ's demo setting (hq/lib/demo.mjs): the swap that makes a page safe to film, on made-up people, paths and remotes.
-// Without a config every function hands back what it was given, which is what keeps HQ unchanged when HQ_DEMO is not
-// set. tests/unit/hq-demo-pages.test.mjs runs the same swap over every page of this repo.
+// Proves: the demo setting (lib/demo.mjs) swaps people, paths, remotes and the project's name on a page so it is safe
+// to film, and with no config every function hands back what it was given.
+// Why: HQ is filmed in public; a missed swap is a private name on a video, and a swap when the demo is off would
+// change what the person sees of their own repo.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { mkdtempSync, mkdirSync, writeFileSync, rmSync } from 'node:fs';

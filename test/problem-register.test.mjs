@@ -1,6 +1,7 @@
-// The problem register as HQ reads it (hq/lib/problem-register.mjs): the events file's entries and git's, joined to the
-// observations from the run store and the lock log. Each source is passed in here, so the test needs no stores; HQ's
-// Problems page and its JSON export read through the same function with the real ones.
+// Proves: the register as HQ reads it (lib/problem-register.mjs): the events file's entries and git's, joined to the
+// observations from the run store and the lock log, each source passed in so no store is needed.
+// Why: the Problems page and its JSON export read through this one function with the real stores, so what it joins is
+// what they show.
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readRegister } from '../lib/problem-register.mjs';

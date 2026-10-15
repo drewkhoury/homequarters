@@ -1,7 +1,9 @@
-// Backfill step 1's import of another session's sort of red gates (hq/problem-backfill.mjs). Each line of
-// ~/.cache/questkeep/problems/backfill/red-gates.jsonl judges one red gate run; the import groups them into entries by
-// kind, mode, test and fix, written through the register's own writer as record backfill, so they meet the same checks
-// as any note. Lines that are not problems (dirty trees, red-first commits, planted reds) open nothing.
+// Proves: the import of another session's sort of red gates (problem-backfill.mjs) groups the judged lines into
+// entries by kind, mode, test and fix, writes them through the register's own writer as record backfill so they meet
+// the same checks as a note, and opens nothing for lines that are not problems (dirty trees, red-first commits,
+// planted reds).
+// Why: a backfilled entry is read beside hand-written ones, so it must keep to the same vocabulary and own only the
+// reds that were problems.
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { entriesFromRedGates, reconcile } from '../problem-backfill.mjs';

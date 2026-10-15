@@ -1,6 +1,8 @@
-// Show in Finder and Fetch are the two things HQ does rather than reads. These check who may ask for them and what
-// they run, with a stand-in for the program so no Finder window opens and nothing is fetched. Also the GitHub link
-// built from the checkout's remote.
+// Proves: Show in Finder and Fetch, two of the few things HQ does rather than reads, check who may ask and what they
+// run, with a stand-in for the program so no Finder window opens and nothing is fetched; and the GitHub link is built
+// from the checkout's remote.
+// Why: these are the only actions a page can take on the machine, and a stranger's page must not be able to take
+// them.
 import { test, before, after } from 'node:test';
 import assert from 'node:assert/strict';
 import { mkdtempSync, mkdirSync, writeFileSync, rmSync, realpathSync } from 'node:fs';

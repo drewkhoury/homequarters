@@ -1,5 +1,7 @@
-// Finding a comment's words on the page again (hq/static/hqanchor.js): the page's text as pieces, one per text node,
-// and a comment's quote with a little text either side. Each test is text in, the covered part of each piece out.
+// Proves: a comment's quoted words are found on the page again (static/hqanchor.js): the page's text as pieces, one
+// per text node, and a quote with a little text either side, each test text in and the covered part of each piece
+// out.
+// Why: a comment that cannot find its words again is lost to the reader who left it.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import '../static/hqanchor.js';

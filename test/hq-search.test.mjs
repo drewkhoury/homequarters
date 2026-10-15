@@ -1,5 +1,7 @@
-// HQ's search, done in node so it needs no grep: plain text in any case, long lines cut around the match, and a cap on
-// how much comes back. Also the open-in-editor link the code viewer puts on every line.
+// Proves: search, done in node with no grep: plain text in any case, long lines cut around the match, a cap on how
+// much comes back, and the open-in-editor link the code viewer puts on every line.
+// Why: search is the way into a large repo; an uncapped answer or a missed case is a page that never loads or never
+// finds.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { mkdtempSync, mkdirSync, writeFileSync, rmSync } from 'node:fs';

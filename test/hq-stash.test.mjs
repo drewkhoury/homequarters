@@ -1,6 +1,8 @@
-// HQ keeps GitHub's and Firebase's answers in memory and on disk, shows the last one at once, and asks again in the
-// background when it is old: after 30 s, or 10 minutes for billing. These check those rules, the disk surviving a
-// restart, and that a failed answer never replaces a good one.
+// Proves: GitHub's and Firebase's answers are kept in memory and on disk, the last one shown at once and asked again
+// in the background after 30 s (10 minutes for billing); the disk copy survives a restart and a failed answer never
+// replaces a good one.
+// Why: a page that waits on GitHub is a slow page, and a page that shows an error over a good answer loses the
+// answer.
 import { test, before, after } from 'node:test';
 import assert from 'node:assert/strict';
 import { mkdtempSync, rmSync, readdirSync } from 'node:fs';

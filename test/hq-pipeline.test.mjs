@@ -1,6 +1,8 @@
-// The pipeline (lib/pipeline.mjs, pages/pipeline.mjs): which run stands for a step's last result, and the full drawing
-// of a pipeline file. The pipeline here is a small one written in the test. Whether QuestKeep's own hq/pipeline.json
-// names real sets and tests is QuestKeep's check (test/questkeep-conformance/hq-pipeline.test.mjs).
+// Proves: the pipeline (lib/pipeline.mjs, pages/pipeline.mjs): which run stands for a step's last result, and the
+// full drawing of a small pipeline file written in the test. Whether a project's own pipeline file names real sets
+// and tests is hq check's.
+// Why: the Testing page's picture of how a change reaches production is read at a glance; a step with the wrong
+// result misleads at a glance.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { lastResult, allSteps } from '../lib/pipeline.mjs';

@@ -1,7 +1,7 @@
-// What hq/problem.mjs writes to the problem register's events file, and what it refuses (the plan's "Where entries
-// come from" and "The events file"). The writer is the only way in: it stamps the time itself, takes only defined
-// fields with values from the register's vocabulary, puts every free-text field through the privacy check, and refuses
-// any event the reader would refuse, so nothing it writes ever shows as not placed.
+// Proves: what hq problem writes to the events file and what it refuses: it stamps the time itself, takes only
+// defined fields with values from the register's vocabulary, puts every free-text field through the privacy check,
+// and refuses any event the reader would refuse.
+// Why: the writer is the only way in, so nothing it writes may ever show as not placed.
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { eventFor, parseArgs } from '../problem.mjs';

@@ -1,8 +1,8 @@
-// What HQ's Problems page shows, as data (hq/lib/problem-view.mjs): the page draws it and its JSON export carries it.
-// These pin the rules the reviews set for the figures: costs are summed over every observation at once and filtered by
-// when they happened (Juno), the period before is offered only once it holds data, time waiting on the person is clock
-// hours rather than waits added side by side, every share carries its count (Noor), and the export checks its text for
-// privacy again, since entries from git never pass the writer (Theo).
+// Proves: what the Problems page shows, as data (lib/problem-view.mjs): costs summed over every observation at once
+// and filtered by when they happened, the period before offered only once it holds data, time waiting on the person
+// as clock hours, every share with its count, and the export's text checked for privacy again.
+// Why: the reviews set these rules (Juno on the counts, Noor on the shares, Theo on privacy, since entries from git
+// never pass the writer), and the page and its export carry them.
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { windowOf, overview, trends, slot, exportJSON, clockMinutes, testsView } from '../lib/problem-view.mjs';

@@ -1,6 +1,8 @@
-// CI as it happens (hq/lib/ci-live.mjs, hq/pages/ci.mjs): a job's steps drawn from GitHub's answer, the estimate of
-// which test the test step is on, and the part and page built from a gh that answers from fixtures. No GitHub, no
-// cache of the developer's: temp folders only.
+// Proves: CI as it happens (lib/ci-live.mjs, pages/ci.mjs): a job's steps drawn from GitHub's answer, the estimate of
+// which test the test step is on, and the part and page built from a gh that answers from fixtures, in temp folders
+// only.
+// Why: the live CI view is what a person watches instead of GitHub, and it must say the same thing GitHub does
+// without reaching GitHub in a test.
 import { test, beforeEach } from 'node:test';
 import assert from 'node:assert/strict';
 import { mkdtempSync, mkdirSync, writeFileSync, rmSync } from 'node:fs';

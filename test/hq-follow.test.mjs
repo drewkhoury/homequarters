@@ -1,5 +1,6 @@
-// Following a conversation that carries on in a terminal (hq/lib/follow.mjs): which lines of a transcript the panel
-// shows, and where the transcript is. The route and the stream are tested in hq-server.test.mjs.
+// Proves: following a conversation that carries on in a terminal (lib/follow.mjs): which lines of a transcript the
+// panel shows and where the transcript is. The route and the stream are in hq-server.test.mjs.
+// Why: the panel shows a live transcript; the wrong lines, or the wrong file, show someone else's conversation.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { mkdtempSync, mkdirSync, writeFileSync, rmSync } from 'node:fs';

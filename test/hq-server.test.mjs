@@ -1,7 +1,8 @@
-// HQ's server, started on a free port against a small repo and cache made here: every page answers, and nothing
-// outside the repo and the cache can be read through it. No browser; the pages are read as text. The repo is git
-// initialised and follows the conventions its hq.json names (a backlog, test headers, a layers file, a pipeline file),
-// so the pages the manifest turns on have something to show; QuestKeep's own files are never read.
+// Proves: the server, started on a free port against a small git repo and cache made here that follow the conventions
+// their hq.json names, answers every page as text, gates the pages the manifest leaves off, and lets nothing outside
+// the repo and the cache be read through it.
+// Why: this is the one test that runs the whole site as a stranger's install would, without a browser and without
+// reading QuestKeep's files.
 import { test, before, after } from 'node:test';
 import assert from 'node:assert/strict';
 import { mkdtempSync, mkdirSync, writeFileSync, readFileSync, cpSync, realpathSync, rmSync } from 'node:fs';

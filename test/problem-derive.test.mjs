@@ -1,7 +1,8 @@
-// What the problem register works out by joining entries to observations (hq/lib/problem-derive.mjs; the plan's "What
-// the reader works out", and Juno's review of the counts). Which entry owns which observation decides every cost on HQ,
-// so each rule here has a test: ownership by signature, kind and window; after the fix by the fix commit; fix held by the
-// rule of three; came back; merged duplicates; kinds no store sees; and the observation groups no entry explains.
+// Proves: what the problem register works out by joining entries to observations (lib/problem-derive.mjs): ownership
+// by signature, kind and window, after the fix by the fix commit, a fix held by the rule of three, came back, merged
+// duplicates, kinds no store sees, and the observation groups no entry explains.
+// Why: which entry owns which observation decides every cost on the Problems page (the plan's "What the reader works
+// out", and Juno's review of the counts).
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { derive, testResults } from '../lib/problem-derive.mjs';

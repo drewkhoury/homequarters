@@ -1,6 +1,8 @@
-// HQ's git health on a small repo made here: a bare "origin", a checkout one commit ahead of it and one behind, a
-// worktree on a branch with a commit of its own and an edit, a changed and an untracked file, a stash, and a branch
-// already merged into main. Real git, in a temp folder; nothing touches this repo.
+// Proves: the Repo page's git health reads a small repo made here with real git: a bare origin, a checkout one commit
+// ahead and one behind, a worktree on a branch with a commit and an edit, a changed and an untracked file, a stash,
+// and a branch already merged into main.
+// Why: the Repo page is where a person checks their bearings before a push; it must read every one of those states
+// right, and never from this repo.
 import { test, before, after } from 'node:test';
 import assert from 'node:assert/strict';
 import { execFileSync } from 'node:child_process';

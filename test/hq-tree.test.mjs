@@ -1,5 +1,6 @@
-// The file tree on HQ's Code and Docs pages: an icon for each kind of file, folders before files, and the way to the
-// open file unfolded with the file marked.
+// Proves: the file tree on the Code and Docs pages gives each kind of file an icon, puts folders before files, and
+// unfolds the way to the open file with the file marked.
+// Why: the tree is how a person finds their place in the repo from any page.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { iconFor, fileTree } from '../lib/tree.mjs';

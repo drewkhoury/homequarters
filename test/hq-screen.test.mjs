@@ -1,5 +1,6 @@
-// The screen sums hq.js does (hq/static/hqmath.js): where an info popover goes so the page edge never cuts it off,
-// how many filter chips fit on one row, and the pipeline canvas's zoom, fit and mini map.
+// Proves: the screen sums hq.js does (static/hqmath.js): where an info popover goes so the page edge never cuts it
+// off, how many filter chips fit on one row, and the pipeline canvas's zoom, fit and mini map.
+// Why: these are pure maths a browser test would be slow to pin, and a popover cut off by the edge is unreadable.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import '../static/hqmath.js';

@@ -1,6 +1,7 @@
-// The Actions minutes maths on HQ's GitHub page: multipliers, days with nothing, a month boundary inside the last 30
-// days, the gauge's levels, and the forecast running out mid-month or not. Items are shaped as GitHub's billing usage
-// API returns them.
+// Proves: the Actions minutes maths on the GitHub page: multipliers, days with nothing, a month boundary inside the
+// last 30 days, the gauge's levels, and a forecast that runs out mid-month or not, on items shaped as GitHub's
+// billing API returns them.
+// Why: the gauge is read before a run is started, so a wrong forecast spends minutes the plan does not have.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { ALLOWANCE, multiplier, minutesOf, lastDays, daySeries, totalOf, monthGauge, forecast, byRepo, orgOf } from '../lib/actions.mjs';

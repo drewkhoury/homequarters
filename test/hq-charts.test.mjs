@@ -1,12 +1,8 @@
-// HQ's small SVG charts (hq/lib/charts.mjs): the day columns and bars across that Launch draws, and the pieces the
-// Delivery page adds: a sparkline, a dot plot on a log scale with a 90th-percentile band, a bar of parts, bars of parts
-// on one shared axis, and a strip of deploys with their failures. Every chart is an image with the takeaway its caller
-// wrote as its label. Every mark keeps a native tooltip, and carries data-tip for the HTML tooltip hq/static/hq-charts.js
-// shows on hover, focus and tap. A chart a person can follow to a list links whole days from outside the SVG, since links
-// inside an image are hidden from a screen reader; dots are never links. The wide render and a narrow one at 360 units
-// both ship, so labels stay readable on a phone. 6 October: the second Delivery page drew 0, 16 and 31 on its axes,
-// legends under its charts and the slowest changes each scaled to its own total, so 13 h and 4 h looked the same. On
-// a phone the third drew its text at 9.7 px, day links 23 px wide and event labels over the bars (Noor, 6 October).
+// Proves: HQ's small SVG charts (lib/charts.mjs) each carry their caller's takeaway as the label, a native tooltip
+// and data-tip on every mark, links to whole days outside the SVG and never on dots, and a narrow render at 360 units
+// with legible text; axes are never 0, 16 and 31 and parts share one scale.
+// Why: on 6 October the Delivery page drew axes a person could not read, legends under its charts and the slowest
+// changes each on its own scale, so 13 h and 4 h looked the same; on a phone its text was 9.7 px (Noor).
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';

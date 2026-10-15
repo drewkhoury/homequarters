@@ -1,8 +1,8 @@
-// make dora's figures (hq/lib/dora.mjs), worked out from real runs of this repo (fixtures/dora, whose README says why
-// each run is there). What matters most is that a deploy counts only when it changed what players get, and that a
-// failed deploy, a pipeline red and a reused gate are each told apart, so a reader is never shown a number that means
-// something else. Git's two answers (did the served files change, does one commit contain another) are given here as
-// plain lists, since they are the CLI's to ask.
+// Proves: a deploy counts only when it changed what reaches users, and a failed deploy, a pipeline red and a reused
+// gate are each told apart, over real runs (fixtures/dora, whose README says why each is there), with git's two
+// answers given as plain lists.
+// Why: a reader shown a number that means something else trusts the wrong thing; these figures are what the Delivery
+// page leads with.
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';

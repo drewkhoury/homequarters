@@ -1,6 +1,8 @@
-// A run as it happens (hq/lib/live.mjs, hq/pages/live.mjs): what a log says about each test while it runs and once it
-// has finished, which run folder belongs to the run holding the slot, and the stream of what the log gains. Everything
-// is read from temp folders made here; nothing touches ~/.cache/questkeep, the slot or a real run.
+// Proves: a run as it happens (lib/live.mjs, pages/live.mjs): what a log says about each test while it runs and once
+// it has finished, which run folder belongs to the run holding the slot, and the stream of what the log gains, all
+// from temp folders made here.
+// Why: the live view is watched instead of the terminal, and it must never touch the real cache, the slot or a real
+// run to be tested.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { mkdtempSync, mkdirSync, writeFileSync, appendFileSync, rmSync } from 'node:fs';

@@ -1,5 +1,6 @@
-// Claude from HQ (hq/lib/claude.mjs): who pays, what the read-only claude may do, what the panel makes of claude's
-// stream, and the script Open in Claude hands to Terminal. No claude runs here.
+// Proves: Claude from HQ (lib/claude.mjs): who pays, what the read-only claude may do, what the panel makes of
+// claude's stream, and the script Open in Claude hands to Terminal, with no claude run here.
+// Why: the Chat panel runs with the person's own login, so what it may do and who it bills must be pinned, not hoped.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { mkdtempSync, readFileSync, statSync, writeFileSync, utimesSync, existsSync, rmSync } from 'node:fs';

@@ -14,7 +14,7 @@ A project declares itself to HQ in one file at the repo root, `hq.json`. HQ read
   "stores": ["runs", "lock", "problems", "dora", "ci"],
   "info": true,
   "deploy": [{ "env": "prod", "provider": "firebase-hosting", "url": "https://questkeep.web.app", "with": { "project": "questkeep" } }],
-  "delivery": { "userPaths": ["web", "firestore.rules"] },
+  "delivery": { "userPaths": ["web", "firestore.rules"], "deployWorkflow": ".github/workflows/deploy.yml", "testWorkflow": ".github/workflows/test.yml", "tz": "America/New_York" },
   "plugins": [{ "path": "./hq-plugins/launch.mjs", "with": {} }],
   "demo": "hq/demo.json"
 }
@@ -34,7 +34,7 @@ A project declares itself to HQ in one file at the repo root, `hq.json`. HQ read
 | `stores` | no | which folders under the cache HQ reads: `runs`, `lock`, `problems`, `dora`, `ci`; each a string or `{ id, path }` |
 | `info` | no | the status line's `.git/project-info.json`; `true` or an object |
 | `deploy` | no | deploy providers, each `{ env, provider, url, with }`; HQ never reads inside `with` |
-| `delivery` | no | `userPaths`: the paths a change must touch to count as reaching users |
+| `delivery` | no | `userPaths`: the paths a change must touch to count as reaching users; `deployWorkflow` and `testWorkflow`: the workflow files whose runs are deploys and test runs; `tz`: the zone the days are counted in. Each defaults to what HQ did before the key: every path, `deploy.yml`, `test.yml`, New York |
 | `plugins` | no | pages the project adds, each a string path or `{ path, with }`; a module exports `hqApi` and a default factory taking `{ ui, m }` |
 | `demo` | no | the demo setting's file for filming |
 | `$schema` | no | for editors; never warned about |

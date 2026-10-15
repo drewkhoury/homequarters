@@ -17,6 +17,8 @@ import { compute, summarise, sourcesOf, lateDays, PLAYER_PATHS, TZ, dayKey, dayS
 import { allRuns } from './lib/runs.mjs';
 import { loadManifest } from './lib/manifest.mjs';
 
+// the project's figures block: project since version 4, questkeep in files written before
+const proj = w => w.project || w.questkeep;
 const argv = process.argv.slice(2), args = new Set(argv);
 const HERE = dirname(fileURLToPath(import.meta.url));
 // the repo: --repo, HQ_REPO, else the checkout this runs in; the cache and what reaches users come from its manifest
@@ -119,30 +121,30 @@ function table(f) {
   const st = (s, fmt = dur) => !s || !s.n ? '–' : `${fmt(s.median)}${s.p90 != null ? ` (p90 ${fmt(s.p90)})` : ''} n=${s.n}`;
   const cell = (w, get) => { const now = get(w), was = get(w.prev); return was == null || was === now ? String(now) : `${now} ← ${was}`; };
   // a machine figure over both runners is given per runner, since a median across them measures neither
-  const mixed = (w, all, per) => w.questkeep.leadSplit.mixed && per ? Object.entries(w.questkeep.leadSplit.byRunner).map(([k, v]) => `${k} ${dur(v[per]?.median)}`).join(', ') : all;
+  const mixed = (w, all, per) => proj(w).leadSplit.mixed && per ? Object.entries(proj(w).leadSplit.byRunner).map(([k, v]) => `${k} ${dur(v[per]?.median)}`).join(', ') : all;
   const rows = [
     ['Player-facing deploys', w => `${w.portable.deploys.n}`],
     ['  per day', w => w.portable.deploys.perDay],
     ['  unknown (git could not read)', w => w.portable.deploys.unknown],
-    ['  identical redeploys', w => w.questkeep.identicalRedeploys],
-    ['  decide rows 5/6/7', w => `${w.questkeep.rows[5]}/${w.questkeep.rows[6]}/${w.questkeep.rows[7]}`],
+    ['  identical redeploys', w => proj(w).identicalRedeploys],
+    ['  decide rows 5/6/7', w => `${proj(w).rows[5]}/${proj(w).rows[6]}/${proj(w).rows[7]}`],
     ['Lead time, median', w => st(w.portable.leadTime)],
-    ['  runner wait', w => w.questkeep.leadSplit.reason || mixed(w, dur(w.questkeep.leadSplit.runnerWaitSec?.median), 'runnerWaitSec')],
-    ['  slot wait', w => w.questkeep.leadSplit.reason || mixed(w, dur(w.questkeep.leadSplit.slotWaitSec?.median), 'slotWaitSec')],
-    ['  gate', w => w.questkeep.leadSplit.reason || mixed(w, dur(w.questkeep.leadSplit.gateSec?.median), 'gateSec')],
-    ['  green to merged', w => w.questkeep.leadSplit.reason || dur(w.questkeep.leadSplit.greenToMergeSec?.median)],
-    ['  merged to live', w => w.questkeep.leadSplit.reason || dur(w.questkeep.leadSplit.mergeToLiveSec?.median)],
-    ['  other (reds, re-runs)', w => w.questkeep.leadSplit.reason || dur(w.questkeep.leadSplit.otherSec?.median)],
-    ['Typical change', w => { const t = w.questkeep.typical; return t ? `${t.pr ? `#${t.pr}` : t.sha.slice(0, 7)} ${dur(t.totalSec)}` : '–'; }],
+    ['  runner wait', w => proj(w).leadSplit.reason || mixed(w, dur(proj(w).leadSplit.runnerWaitSec?.median), 'runnerWaitSec')],
+    ['  slot wait', w => proj(w).leadSplit.reason || mixed(w, dur(proj(w).leadSplit.slotWaitSec?.median), 'slotWaitSec')],
+    ['  gate', w => proj(w).leadSplit.reason || mixed(w, dur(proj(w).leadSplit.gateSec?.median), 'gateSec')],
+    ['  green to merged', w => proj(w).leadSplit.reason || dur(proj(w).leadSplit.greenToMergeSec?.median)],
+    ['  merged to live', w => proj(w).leadSplit.reason || dur(proj(w).leadSplit.mergeToLiveSec?.median)],
+    ['  other (reds, re-runs)', w => proj(w).leadSplit.reason || dur(proj(w).leadSplit.otherSec?.median)],
+    ['Typical change', w => { const t = proj(w).typical; return t ? `${t.pr ? `#${t.pr}` : t.sha.slice(0, 7)} ${dur(t.totalSec)}` : '–'; }],
     ['Failed deploys (of player-facing)', w => `${w.portable.failedDeploys.n} of ${w.portable.failedDeploys.of}`],
     ['Recovery', w => w.portable.recovery.n ? w.portable.recovery.items.map(r => dur(r.sec)).join(', ') : '–'],
     ['Rework (deploys that shipped a fix)', w => `${w.portable.rework.fixDeploys} of ${w.portable.rework.of}, ${w.portable.rework.playerFixes} fixes${w.portable.rework.proxy ? ' (proxy)' : ''}`],
     ['fix: commits', w => `${w.portable.rework.fixes}: ${w.portable.rework.tagged} tagged, ${w.portable.rework.n} player-facing`],
-    ['Gate seconds, median', w => w.questkeep.cost.reason || (w.questkeep.cost.gateSecByRunner ? Object.entries(w.questkeep.cost.gateSecByRunner).map(([k, v]) => `${k} ${st(v, s => `${s}s`)}`).join('; ') : st(w.questkeep.cost.gateSec, s => `${s}s`))],
-    ['  gates reused', w => w.questkeep.cost.reason || w.questkeep.cost.gateReused],
-    ['PR gate reds', w => w.questkeep.cost.reason || `${w.questkeep.cost.prReds.n} of ${w.questkeep.cost.prReds.of}` + (w.questkeep.cost.prReds.n ? ` (${Object.entries(w.questkeep.cost.prReds.cause).map(([k, v]) => `${k} ${v}`).join(', ')})` : '')],
-    ['Flakes per 100 runs', w => w.questkeep.cost.reason || (w.questkeep.cost.flakesPer100 == null ? '–' : `${w.questkeep.cost.flakesPer100}${w.questkeep.cost.flakesByRerun ? ` (${w.questkeep.cost.flakesByRerun} by the rerun)` : ''}`)],
-    ['Laptop gates that waited for the slot', w => w.questkeep.cost.reason || `${w.questkeep.cost.slotWait.waited} of ${w.questkeep.cost.slotWait.gates}` + (w.questkeep.cost.slotWait.sec ? ` (median ${dur(w.questkeep.cost.slotWait.sec.median)})` : '')],
+    ['Gate seconds, median', w => proj(w).cost.reason || (proj(w).cost.gateSecByRunner ? Object.entries(proj(w).cost.gateSecByRunner).map(([k, v]) => `${k} ${st(v, s => `${s}s`)}`).join('; ') : st(proj(w).cost.gateSec, s => `${s}s`))],
+    ['  gates reused', w => proj(w).cost.reason || proj(w).cost.gateReused],
+    ['PR gate reds', w => proj(w).cost.reason || `${proj(w).cost.prReds.n} of ${proj(w).cost.prReds.of}` + (proj(w).cost.prReds.n ? ` (${Object.entries(proj(w).cost.prReds.cause).map(([k, v]) => `${k} ${v}`).join(', ')})` : '')],
+    ['Flakes per 100 runs', w => proj(w).cost.reason || (proj(w).cost.flakesPer100 == null ? '–' : `${proj(w).cost.flakesPer100}${proj(w).cost.flakesByRerun ? ` (${proj(w).cost.flakesByRerun} by the rerun)` : ''}`)],
+    ['Laptop gates that waited for the slot', w => proj(w).cost.reason || `${proj(w).cost.slotWait.waited} of ${proj(w).cost.slotWait.gates}` + (proj(w).cost.slotWait.sec ? ` (median ${dur(proj(w).cost.slotWait.sec.median)})` : '')],
   ];
   const ws = f.windows, head = ['', ...ws.map(w => `${w.id} (now ← before)`)];
   const body = rows.map(([label, get]) => [label, ...ws.map(w => cell(w, get))]);
@@ -150,7 +152,7 @@ function table(f) {
   const fmt = r => '| ' + r.map((c, i) => String(c).padEnd(widths[i])).join(' | ') + ' |';
   const week = ws.find(w => w.id === '7d');
   const parts = s => !s ? '' : ` (${[['runner', s.runnerWaitSec], ['slot', s.slotWaitSec], ['gate', s.gateSec], ['to merge', s.greenToMergeSec], ['to live', s.mergeToLiveSec], ['other', s.otherSec]].filter(([, v]) => v).map(([k, v]) => `${k} ${dur(v)}`).join(', ')})`;
-  const slowest = week.questkeep.slowest.map(c => `  ${dur(c.totalSec).padStart(5)}  ${c.pr ? `#${c.pr}` : 'push'} ${c.title || ''}${parts(c.split)}`);
+  const slowest = proj(week).slowest.map(c => `  ${dur(c.totalSec).padStart(5)}  ${c.pr ? `#${c.pr}` : 'push'} ${c.title || ''}${parts(c.split)}`);
   const failed = f.items.failures.filter(x => x.released && Date.parse(x.at) >= Date.parse(ws.at(-1).prev.from))
     .map(x => `  ${x.at.slice(0, 16)} ${x.sha.slice(0, 7)} run ${x.run}: ${x.explainedBy ? `explained by ${x.explainedBy.sha.slice(0, 7)}: ${x.explainedBy.subject}` : 'no commit names this run yet'}`);
   const shifts = f.countingChanges.filter(c => c.date >= ws.at(-1).prev.from.slice(0, 10)).map(c => `  ${c.date}: ${c.what}`);

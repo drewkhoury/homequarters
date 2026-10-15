@@ -19,6 +19,8 @@ import { info, dataTable } from '../lib/ui.mjs';
 import { dayKey, dayStart, addDays, VERSION } from '../lib/dora.mjs';
 import { dayChart, hbars, spark, dotPlot, partsBar, stackBars, strip, duration as dur } from '../lib/charts.mjs';
 
+// the project's figures block: project since version 4, questkeep in files written before
+const proj = w => w.project || w.questkeep;
 export const STALE_MIN = 30;
 // With about 4 deploys a day, one day is noise, so the shortest period is a week
 const RANGES = [['7d', '7 days'], ['30d', '30 days']];
@@ -209,7 +211,7 @@ const partsOf = x => [
 ];
 
 function leadSection(f, w, range, p) {
-  const l = w.portable.leadTime, q = w.questkeep;
+  const l = w.portable.leadTime, q = proj(w);
   const points = f.items.changes.filter(c => inWindow(c.liveAt, w) && c.totalSec != null)
     .map(c => ({ day: dayKey(Date.parse(c.liveAt), f.tz), v: c.totalSec, title: `${c.pr ? `#${c.pr}` : short(c.sha)} ${c.title || ''}: ${dur(c.totalSec)}` }));
   const weekly = (w.leadBand || []).some(b => b.days > 1);
@@ -278,7 +280,7 @@ function liveSection(f, w, range, p) {
 }
 
 function pipelineSection(f, w, range, p) {
-  const c = w.questkeep.cost, pc = w.prev.questkeep.cost, tz = f.tz;
+  const c = proj(w).cost, pc = proj(w.prev).cost, tz = f.tz;
   const figure = (label, value, unit, sub, title = '') => `<div class="dv-stat"><span class="dv-stat-k"${title ? ` title="${esc(title)}"` : ''}>${esc(label)}</span><div class="dv-figure"><span class="dv-value">${esc(value)}</span>${unit ? ` <span class="dv-unit">${esc(unit)}</span>` : ''}</div>${sub ? `<div class="dv-sub">${sub}</div>` : ''}</div>`;
   // gate time is a machine figure: given for the runner the period ended on, never compared across a change of runner
   let time;
@@ -326,7 +328,7 @@ function sourcesTable(sources, tz) {
 }
 
 function method(f, w, range) {
-  const q = w.questkeep, c = q.cost, ls = q.leadSplit, tz = f.tz;
+  const q = proj(w), c = q.cost, ls = q.leadSplit, tz = f.tz;
   const terms = [['Deploy', DEFINE.deploys], ['Lead time', DEFINE.lead], ['Failed deploy', DEFINE.failed], ['Time to green', DEFINE.green],
     ['Live check', DEFINE.live], ['Gate', DEFINE.gate], ['Red attempts', DEFINE.reds], ['Flake', DEFINE.flake]];
   const shifts = f.countingChanges.filter(x => x.date >= w.prev.from.slice(0, 10) && x.date < w.to.slice(0, 10));

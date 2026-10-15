@@ -46,7 +46,7 @@ With no `hq.json`, HQ shows the baseline: Home (the files and docs, with search)
   "stores": ["runs", "lock", "problems", "dora", "ci"],
   "info": true,
   "deploy": [{ "provider": "firebase-hosting", "site": "https://questkeep.web.app" }],
-  "delivery": { "userPaths": ["web"] },
+  "delivery": { "userPaths": ["web"], "deployWorkflow": ".github/workflows/deploy.yml", "testWorkflow": ".github/workflows/test.yml", "tz": "America/New_York" },
   "plugins": ["./hq-plugins/launch.mjs"],
   "demo": "hq/demo.json"
 }
@@ -61,7 +61,7 @@ With no `hq.json`, HQ shows the baseline: Home (the files and docs, with search)
 | `stores` | which folders under `cache` HQ reads: runs, lock, problems, dora, ci |
 | `info` | the status line's `.git/project-info.json` |
 | `deploy` | deploy providers; `firebase-hosting` is the first |
-| `delivery` | which paths count as reaching users, for the Delivery figures |
+| `delivery` | the Delivery figures: which paths count as reaching users, which workflows deploy and test, and the time zone |
 | `plugins` | pages the project adds (below) |
 | `demo` | the demo setting for filming |
 

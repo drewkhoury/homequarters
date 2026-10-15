@@ -358,6 +358,6 @@ test('the page loads the chart tooltips', async t => {
 // many of its flakes the rerun found, so the rise does not read as the tests getting worse.
 test("the Flake rate says how many of its flakes the rerun found", async t => {
   const data = JSON.parse(JSON.stringify(dora));
-  for (const w of data.windows) Object.assign(w.questkeep.cost, { flakes: 3, flakesByRerun: 2, testRuns: 40, flakesPer100: 7.5 });
+  for (const w of data.windows) Object.assign((w.project || w.questkeep).cost, { flakes: 3, flakesByRerun: 2, testRuns: 40, flakesPer100: 7.5 });
   assert.match(text(section(await open(t, '', data), 'dv-pipeline')), /2 by the rerun/);
 });

@@ -4,6 +4,11 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { runInfo, runLine } from '../lib/run-info.mjs';
 import { runInfoLine } from '../lib/run-line.mjs';
+import { mkdtempSync, rmSync } from 'node:fs';
+import { join, dirname } from 'node:path';
+import { tmpdir } from 'node:os';
+import { execFileSync } from 'node:child_process';
+import { fileURLToPath } from 'node:url';
 
 const git = cmd => ({ 'git rev-parse --abbrev-ref HEAD': 'feat/thing', 'git rev-parse --short HEAD': 'abc1234', 'git status --porcelain': '' })[cmd] ?? '';
 const machine = () => ({ load1: 1, cores: 8 });
@@ -55,4 +60,13 @@ test("--extra adds a project's own facts to the line, never over HQ's, and a mal
   assert.match(bad.warnings[0], /--extra/);
   const list = runInfo({ env: {}, args: ['gate', '--extra', '[1]'], git, machine });
   assert.match(list.warnings[0], /JSON object/);
+});
+
+// The command itself, not only the pure function: `hq run-info gate` with no --repo records kind gate.
+test('hq run-info <kind> with no --repo keeps the kind', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'hq-run-info-'));
+  execFileSync('git', ['-C', dir, 'init', '-q', '-b', 'main'], { env: { ...process.env, GIT_CONFIG_NOSYSTEM: '1' } });
+  const out = execFileSync(process.execPath, [join(dirname(fileURLToPath(import.meta.url)), '..', 'bin', 'hq.mjs'), 'run-info', 'gate'], { cwd: dir, encoding: 'utf8', env: { PATH: process.env.PATH, HOME: process.env.HOME } });
+  assert.equal(runInfoLine(out).kind, 'gate');
+  rmSync(dir, { recursive: true, force: true });
 });

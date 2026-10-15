@@ -189,3 +189,19 @@ test('the laptop\'s own settings add names, people and kept conversations to the
   assert.equal(s.brand, 'HQ');
   assert.deepEqual(demoSettings(join(dir, 'nowhere'), file).names, { A: 'B' }, 'no laptop file is fine');
 });
+
+// The manifest's demo key names the project's own demo settings, read over the package's defaults and under the
+// laptop's. Until now the key was resolved and never read.
+test("the project's demo file, named in hq.json, is read over the package's defaults and under the laptop's", () => {
+  const dir = mkdtempSync(join(tmpdir(), 'hq-demo-project-'));
+  mkdirSync(join(dir, 'cache', 'hq'), { recursive: true });
+  writeFileSync(join(dir, 'demo.json'), JSON.stringify({ names: { Rose: 'Robin' }, keep: ['a-keeper'] }));
+  writeFileSync(join(dir, 'cache', 'hq', 'demo.json'), JSON.stringify({ names: { Pip: 'Pat' } }));
+  const s = demoSettings(join(dir, 'cache'), undefined, join(dir, 'demo.json'));
+  assert.equal(s.brand, 'HQ', "the package's defaults stand");
+  assert.deepEqual(s.names, { Rose: 'Robin', Pip: 'Pat' });
+  assert.ok(s.keep.includes('a-keeper'));
+  const d = loadDemo({ repo: '.', cache: join(dir, 'cache'), file: join(dir, 'demo.json'), env: { HQ_DEMO: '1' } });
+  assert.ok(d && d.rules, 'a demo config with the file read');
+  rmSync(dir, { recursive: true, force: true });
+});

@@ -108,6 +108,11 @@ test('a page the manifest has not turned on is not there, and says what would tu
     const home = await (await fetch(`${bare.url}/`)).text();
     assert.doesNotMatch(home, /href="\/testing"|href="\/backlog"/, 'the nav shows only the baseline');
     assert.match(home, /href="\/machine"/);
+    // and Home shows only the cards the manifest turns on: no Backlog or Tests card, and none of the GitHub cards without a remote (e76b5b8 had no test)
+    assert.doesNotMatch(home, /class="kicker" href="\/(testing|backlog|decisions|delivery|problems)"/, 'no card for a page that is off');
+    assert.doesNotMatch(home, /data-load-part="firebase"/, 'no Live site card without a deploy provider');
+    assert.match(home, /data-load-part="ci-now"/, 'the GitHub cards follow the remote, which this scratch repo has');
+    assert.match(home, /class="kicker" href="\/repo"/, 'the Repo card stays');
   } finally { bare.server.close(); }
 });
 

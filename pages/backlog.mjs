@@ -316,15 +316,6 @@ function lineChart(points, key, { label }) {
 
 const TABS = [['board', 'Board'], ['list', 'List'], ['trends', 'Trends']];
 
-// A deck card's item as HQ shows it everywhere: its badge, title, facts and words, from the same gather as the board.
-// Null for a card that is not an item on the list (a decision about the process, or an item gone since the deck).
-function deckItem(g, slug) {
-  const r = g.records.find(x => x.slug === slug && x.open);
-  if (!r) return null;
-  return { title: r.title, type: typeBadge(r.type), href: `/backlog/${urlPath(r.slug)}`, slug: r.slug,
-    facts: factsHtml(factRows(r, g).filter(([k]) => k !== 'Type')),
-    body: r.item ? renderMarkdown(r.item.body, r.item.path, kindIn(g.repo)).html : '' };
-}
 
 export async function backlogPage(ctx, params) {
   const g = await gather(ctx);

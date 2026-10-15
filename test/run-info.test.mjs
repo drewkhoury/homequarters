@@ -70,3 +70,11 @@ test('hq run-info <kind> with no --repo keeps the kind', () => {
   assert.equal(runInfoLine(out).kind, 'gate');
   rmSync(dir, { recursive: true, force: true });
 });
+
+test('a dirty tree, the run folder, a given branch and a partial flag each reach the line', () => {
+  const dirtyGit = cmd => (cmd === 'git status --porcelain' ? ' M web/app.js' : git(cmd));
+  const { info } = runInfo({ env: { HQ_OUT: '/tmp/out/run-1', HQ_BRANCH: 'detached-copy', HQ_PARTIAL: '1' }, args: ['gate'], git: dirtyGit, machine });
+  assert.equal(info.dirty, true); assert.equal(info.out, '/tmp/out/run-1'); assert.equal(info.branch, 'detached-copy'); assert.equal(info.partial, true);
+  const clean = runInfo({ env: {}, args: ['gate'], git, machine }).info;
+  assert.equal(clean.out, undefined); assert.equal(clean.partial, undefined);
+});

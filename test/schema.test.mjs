@@ -32,3 +32,12 @@ test('the warnings for a manifest are read once from its files; a missing or unp
   assert.deepEqual(conventionWarnings({}), []);
   rmSync(dir, { recursive: true, force: true });
 });
+
+test('every convention key is checked, and a file holding null is nobody\'s crash', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'hq-schema-all-'));
+  const f = (name, text) => { const p = join(dir, name); writeFileSync(p, text); return p; };
+  const m = { tests: { layers: f('l.json', '{"schema":2}'), pipeline: f('p.json', '{"schema":2}'), sets: f('s.json', '{"schema":2}') }, docs: { groups: f('g.json', '{"schema":2}') }, demo: f('d.json', 'null') };
+  const w = conventionWarnings(m);
+  assert.deepEqual(w.map(x => x.split(':')[0]).sort(), ['docs.groups', 'tests.layers', 'tests.pipeline', 'tests.sets'], w.join('\n'));
+  rmSync(dir, { recursive: true, force: true });
+});

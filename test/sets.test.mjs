@@ -52,3 +52,11 @@ test('hq setup proposes the sets file from a Makefile\'s lines, and nothing from
   assert.deepEqual(proposeSets(MAKEFILE), { schema: SETS_V, sets: { gate: ['load-check', 'smoke-stamps'], after: ['walk-universe', 'walk-world'] } });
   assert.equal(proposeSets('test:\n\tnode x\n'), null);
 });
+
+test('a set with a name that is not a test name is left out and said, and a file holding null is a warning, not a crash', () => {
+  const r = parseSets(JSON.stringify({ schema: 1, sets: { gate: ['smoke-sync', 'not a name'], after: ['walk-world'] } }));
+  assert.deepEqual(r.sets, { after: ['walk-world'] });
+  assert.ok(r.warnings.some(w => /set "gate" should be a list of test names/.test(w)));
+  assert.deepEqual(parseSets('null').sets, {});
+  assert.match(parseSets('null').warnings[0], /should be an object/);
+});

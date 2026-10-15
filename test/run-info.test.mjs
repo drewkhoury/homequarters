@@ -43,3 +43,16 @@ test('the line HQ reads back is the line written', () => {
   const { info } = runInfo({ env: {}, args: ['after'], git, machine });
   assert.deepEqual(runInfoLine(`some output\n${runLine(info)}\nmore`), info);
 });
+
+test("--extra adds a project's own facts to the line, never over HQ's, and a malformed one is left out with a warning", () => {
+  const r = runInfo({ env: {}, args: ['gate', '--extra', '{"sdk":"local","kind":"nope"}'], git, machine });
+  assert.equal(r.info.sdk, 'local', 'the project\'s fact is on the line');
+  assert.equal(r.info.kind, 'gate', 'a project fact never replaces one of HQ\'s');
+  assert.deepEqual(r.warnings, []);
+  const bad = runInfo({ env: {}, args: ['gate', '--extra', '{not json'], git, machine });
+  assert.equal(bad.info.kind, 'gate');
+  assert.equal(bad.warnings.length, 1);
+  assert.match(bad.warnings[0], /--extra/);
+  const list = runInfo({ env: {}, args: ['gate', '--extra', '[1]'], git, machine });
+  assert.match(list.warnings[0], /JSON object/);
+});

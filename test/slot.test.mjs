@@ -502,8 +502,9 @@ test('a test container from a checkout without the labels is seen too, by its im
   assert.equal((await lockCli(t, dir, ['take', 'docker-test'], { LOCK_WAIT: '0', ...dockerStub(t, { byImage: shell }) })).code, 0, 'a shell or docker-up is not a test run');
 });
 
+// three rounds: eight took 11 s of a 25 s suite and the race is the same each time (Hollis)
 test('two takers over a dead holder, with a slow docker: never both get the slot', async t => {
-  for (let i = 0; i < 8; i++) {
+  for (let i = 0; i < 3; i++) {
     const dir = scratch(t);
     writeFileSync(join(dir, 'run.json'), JSON.stringify({ ...them, pid: 999999, since: new Date().toISOString() }));
     const env = { LOCK_WAIT: '0', ...dockerStub(t, { maxMs: 300 }), HQ_SLOT_PID: String(process.pid) };

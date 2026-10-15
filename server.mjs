@@ -425,7 +425,7 @@ async function claudeFollowRoute(req, res, params, { repo, projectsDir, claude, 
 }
 
 // Listens on the port given, or on 8780 and upwards past any port in use. Port 0 takes any free one, for the tests.
-export function start({ port = +(process.env.HQ_PORT || 8780), repo = REPO, m = loadManifest(repo).m, plugins = [], pluginsFailed = [], warnings = [], cache = m.cache, gh, run, platform, fb, claude, projectsDir, demo = loadDemo({ repo, cache, name: m.name }) } = {}) {
+export function start({ port = +(process.env.HQ_PORT || 8780), repo = REPO, m = loadManifest(repo).m, plugins = [], pluginsFailed = [], warnings = [], cache = m.cache, gh, run, platform, fb, claude, projectsDir, demo = loadDemo({ repo, cache, name: m.name, file: m.demo }) } = {}) {
   const server = createServer(handler({ repo, m, plugins, pluginsFailed, warnings, cache, gh, run, platform, fb, claude, projectsDir, demo }));
   const fixed = !!process.env.HQ_PORT || port === 0;
   return new Promise((resolve, reject) => {

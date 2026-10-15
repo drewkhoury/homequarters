@@ -18,7 +18,10 @@ const logs = new Map(Object.entries(fixture('logs')).map(([id, line]) => [Number
 const jobsOf = (id, attempt) => jobs[`${id}-${attempt}`] || null;
 // what reaches players in the repo these runs came from: its manifest would say delivery.userPaths; without one, every
 // change counts as reaching users (tested below)
-configureDelivery({ userPaths: ['web'] });
+// QuestKeep's own job and step names, which these fixtures carry; until 15 October they were baked into dora.mjs
+export const QK_DELIVERY = { userPaths: ['web'], tz: 'America/New_York', deployWorkflow: '.github/workflows/deploy.yml', testWorkflow: '.github/workflows/test.yml',
+  gateJobs: ['test', 'test (a)', 'test (b)', 'laptop'], deployJob: 'deploy', smokeJob: 'smoke', deploySteps: ['Deploy to production', 'Run make deploy'], reuseSteps: ['Reuse a gate that passed'], testSteps: ['Run the tests'] };
+configureDelivery(QK_DELIVERY);
 
 // main's pushes in the order they landed, which is how "a contains b" is answered on a straight line
 const MAIN = runs.filter(r => r.path.endsWith('deploy.yml') && r.event === 'push').map(r => r.head_sha);
@@ -502,7 +505,7 @@ test('with no user paths declared, every fix: commit with known paths counts as 
     const w = summarise(compute({ runs, jobsOf, logs, pulls, lock, commits, git }), { asOf: Date.parse('2026-10-06T12:00:00Z'), sources: {} }).windows[1];
     assert.equal(w.portable.rework.fixes, 3);
     assert.equal(w.portable.rework.playerFixes, 3, '7ad0722 changed only hq/, which reaches users when no paths are named');
-  } finally { configureDelivery({ userPaths: ['web'] }); }
+  } finally { configureDelivery(QK_DELIVERY); }
 });
 
 test('a fix: commit whose changed paths are unknown is not counted as changing what players get', () => {
@@ -719,12 +722,44 @@ test("the delivery key's workflows and time zone are read, and the figures' proj
   try {
     const shipped = runs.map(r => (r.path === '.github/workflows/deploy.yml' ? { ...r, path: '.github/workflows/ship.yml' } : r));
     assert.equal(deploysOf({ runs: shipped, jobsOf, rows, changed: git.changed }).length, 0, 'a renamed deploy workflow is nobody\'s deploy until the manifest names it');
-    configureDelivery({ userPaths: ['web'], tz: 'UTC', deployWorkflow: '.github/workflows/ship.yml' });
+    configureDelivery({ ...QK_DELIVERY, tz: 'UTC', deployWorkflow: '.github/workflows/ship.yml' });
     assert.equal(deploysOf({ runs: shipped, jobsOf, rows, changed: git.changed }).length, deploys.length);
     assert.equal(dayKey(Date.parse('2026-10-06T02:00:00Z')), '2026-10-06', 'days are counted in the configured zone (New York would say the 5th)');
     const f = summarise(all, { asOf: Date.parse('2026-10-06T12:00:00Z'), sources: {} });
     assert.equal(f.tz, 'UTC');
     assert.ok(f.windows[0].project && f.windows[0].project.cost, 'the project block');
     assert.deepEqual(f.windows[0].questkeep, f.windows[0].project, 'and its old name, read by the pages of one release ago');
-  } finally { configureDelivery({ userPaths: ['web'], tz: 'America/New_York', deployWorkflow: '.github/workflows/deploy.yml' }); }
+  } finally { configureDelivery(QK_DELIVERY); }
+});
+
+// Nell's third review, finding 8: the gate job, the deploy step and the reuse step were QuestKeep's GitHub names, so a
+// stranger's deploys counted zero with no reason given. The delivery key names them; with none named, a deploy is any
+// successful run of the deploy workflow, live when its last job ended, every job of a test run is the gate, and no
+// gate is reused.
+test('with no job or step names in the manifest, a deploy is a successful deploy run and every job is the gate; the names, when given, pick the step', () => {
+  const T = m => `2026-10-10T00:${String(m).padStart(2, '0')}:00Z`;
+  const runs2 = [
+    { id: 1, path: '.github/workflows/deploy.yml', event: 'push', head_branch: 'main', status: 'completed', conclusion: 'success', run_attempt: 1, head_sha: 'aaa', html_url: 'u1', created_at: T(0) },
+    { id: 2, path: '.github/workflows/deploy.yml', event: 'push', head_branch: 'main', status: 'completed', conclusion: 'failure', run_attempt: 1, head_sha: 'bbb', html_url: 'u2', created_at: T(10) },
+    { id: 3, path: '.github/workflows/test.yml', event: 'pull_request', status: 'completed', conclusion: 'success', run_attempt: 1, head_sha: 'ccc', html_url: 'u3', created_at: T(20) },
+  ];
+  const jobs2 = {
+    '1-1': [{ name: 'build', conclusion: 'success', started_at: T(1), completed_at: T(2), steps: [] },
+      { name: 'ship', conclusion: 'success', started_at: T(2), completed_at: T(5), steps: [{ name: 'Push it to the host', conclusion: 'success', completed_at: T(4) }] }],
+    '2-1': [{ name: 'ship', conclusion: 'failure', started_at: T(11), completed_at: T(12), steps: [{ name: 'Push it to the host', conclusion: 'failure', completed_at: T(12) }] }],
+    '3-1': [{ name: 'checks', conclusion: 'success', created_at: T(20), started_at: T(21), completed_at: T(25), steps: [] },
+      { name: 'lint', conclusion: 'success', created_at: T(20), started_at: T(21), completed_at: T(22), steps: [] }],
+  };
+  const jobsOf2 = (id, a) => jobs2[`${id}-${a}`] || null;
+  try {
+    configureDelivery({ userPaths: [], gateJobs: null, deployJob: null, smokeJob: null, deploySteps: null, reuseSteps: null, testSteps: null });
+    const ds = deploysOf({ runs: runs2, jobsOf: jobsOf2, changed: () => true });
+    assert.deepEqual(ds.map(d => [d.run, d.liveAt, d.runner]), [[1, T(5), 'hosted']], 'the successful run, live when its last job ended; the failed run is no deploy');
+    assert.deepEqual(failuresOf({ runs: runs2, jobsOf: jobsOf2 }).map(f => [f.run, f.kind, f.released]), [[2, 'deploy-job', false]]);
+    const gs = gatesOf({ runs: runs2, jobsOf: jobsOf2 });
+    assert.deepEqual(gs.map(g => [g.run, g.sec, g.reused]), [[3, 240, false]], 'both jobs are the gate, from the first start to the last end, and nothing is reused');
+    configureDelivery({ deploySteps: ['Push it'], gateJobs: ['checks'] });
+    assert.deepEqual(deploysOf({ runs: runs2, jobsOf: jobsOf2, changed: () => true }).map(d => d.liveAt), [T(4)], 'a named step, matched by its first words, times the deploy');
+    assert.deepEqual(gatesOf({ runs: runs2, jobsOf: jobsOf2 }).map(g => g.sec), [240], 'the named gate job alone');
+  } finally { configureDelivery(QK_DELIVERY); }
 });

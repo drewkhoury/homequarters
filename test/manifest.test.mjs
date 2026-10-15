@@ -140,3 +140,13 @@ test('a manifest with no name is warned and named after its folder; a typo insid
   assert.ok(r.warnings.some(w => /"tests\.pipelien" is not a key this HQ knows/.test(w)), r.warnings.join('\n'));
   assert.equal(r.m.tests.layers.endsWith('tests/layers.json'), true, 'the known key beside the typo is still read');
 });
+
+// The delivery key's job and step names (Nell's third review, finding 8): string lists and strings, each null when absent.
+test('the delivery key names the gate jobs, the deploy and smoke jobs, and the deploy, reuse and test steps; a wrong shape is warned and left null', () => {
+  const r = read({ schemaVersion: 1, name: 'app', delivery: { gateJobs: ['checks'], deployJob: 'ship', smokeJob: 'smoke', deploySteps: ['Push it'], reuseSteps: 7, testSteps: ['Run the tests'] } });
+  assert.deepEqual([r.m.delivery.gateJobs, r.m.delivery.deployJob, r.m.delivery.smokeJob, r.m.delivery.deploySteps, r.m.delivery.reuseSteps, r.m.delivery.testSteps],
+    [['checks'], 'ship', 'smoke', ['Push it'], null, ['Run the tests']]);
+  assert.ok(r.warnings.some(w => /delivery\.reuseSteps.*should be a list of names/.test(w)), r.warnings.join('\n'));
+  const none = read({ schemaVersion: 1, name: 'app' }).m.delivery;
+  assert.deepEqual([none.gateJobs, none.deployJob, none.smokeJob, none.deploySteps, none.reuseSteps, none.testSteps], [null, null, null, null, null, null]);
+});

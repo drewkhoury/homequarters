@@ -33,5 +33,8 @@ jobs:
           if ! grep -Eq "^## ${version//./\\.}([^0-9.-]|$)" CHANGELOG.md; then
             echo "::error::CHANGELOG.md has no '## $version' heading"; exit 1
           fi
+          if grep -Eiq "^## ${version//./\\.}[^0-9.-].*unreleased" CHANGELOG.md; then
+            echo "::error::CHANGELOG.md still marks $version unreleased"; exit 1
+          fi
       - run: HQ_RACE_ROUNDS=5 npm test
       - run: npm publish --provenance --access public

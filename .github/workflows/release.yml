@@ -1,0 +1,37 @@
+name: release
+
+on:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: read
+  id-token: write # npm's trusted publishing and provenance sign with the workflow's OIDC token
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    env:
+      GIT_AUTHOR_NAME: homequarters-ci
+      GIT_AUTHOR_EMAIL: homequarters-ci@users.noreply.github.com
+      GIT_COMMITTER_NAME: homequarters-ci
+      GIT_COMMITTER_EMAIL: homequarters-ci@users.noreply.github.com
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          registry-url: https://registry.npmjs.org
+      - run: npm ci
+      - name: The tag, package.json and CHANGELOG.md name the same version
+        run: |
+          version="${GITHUB_REF_NAME#v}"
+          pkg="$(node -p "require('./package.json').version")"
+          if [ "$pkg" != "$version" ]; then
+            echo "::error::tag $GITHUB_REF_NAME but package.json says $pkg"; exit 1
+          fi
+          if ! grep -Eq "^## ${version//./\\.}([^0-9.-]|$)" CHANGELOG.md; then
+            echo "::error::CHANGELOG.md has no '## $version' heading"; exit 1
+          fi
+      - run: HQ_RACE_ROUNDS=5 npm test
+      - run: npm publish --provenance --access public

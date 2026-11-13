@@ -1,0 +1,36 @@
+name: test
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    name: test (node ${{ matrix.node }}, ${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        node: [22, 24]
+        os: [ubuntu-latest, macos-latest]
+    env:
+      # Some tests make git commits in scratch repos; a runner has no git identity of its own.
+      GIT_AUTHOR_NAME: homequarters-ci
+      GIT_AUTHOR_EMAIL: homequarters-ci@users.noreply.github.com
+      GIT_COMMITTER_NAME: homequarters-ci
+      GIT_COMMITTER_EMAIL: homequarters-ci@users.noreply.github.com
+      # On a pull request, skip the pack test, the one that reaches the npm registry.
+      HQ_OFFLINE: ${{ github.event_name == 'pull_request' && '1' || '' }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+          cache: npm
+      - run: npm ci
+      - run: npm test
+      - name: hq check on the package's own hq.json
+        run: node bin/hq.mjs check --repo .

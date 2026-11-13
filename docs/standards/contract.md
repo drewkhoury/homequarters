@@ -4,6 +4,20 @@ What HQ asks of a project, in one list, and whether `hq check` checks it. HQ rea
 else; a rule applies only when its key is in `hq.json`. A rule marked *checked* makes `hq check` exit 1 when broken; one
 marked *read* is applied when HQ reads the file, with a warning on the Machine page, and never fails a check.
 
+## The five surfaces
+
+Everything a project may build on. Each has one doc that says it and tests that hold the code to the doc. A change to a surface is a change to its doc in the same commit, and a breaking one waits for a major version.
+
+| # | Surface | Doc | Tests |
+|---|---|---|---|
+| 1 | The manifest, `hq.json` schema 1, and its JSON Schema [`schema/hq.schema.json`](../../schema/hq.schema.json) | [manifest.md](manifest.md) | [manifest](../../test/manifest.test.mjs), [manifest-schema](../../test/manifest-schema.test.mjs), [check](../../test/check.test.mjs) |
+| 2 | The convention files the manifest names, which HQ only reads, and the link file, the one file HQ writes in the repo | this page, [pipeline.md](pipeline.md), [sets.md](sets.md) | [check](../../test/check.test.mjs), [schema](../../test/schema.test.mjs), [link](../../test/link.test.mjs), [check-demo](../../test/check-demo.test.mjs) |
+| 3 | The stores under the cache: each record carries a `v`, readers tolerate one version behind, and projects add fields through the pass-throughs | [runs.md](runs.md), [slot.md](slot.md), [problems.md](problems.md), [machine.md](machine.md) | [run-info](../../test/run-info.test.mjs), [slot](../../test/slot.test.mjs), [problem-writer](../../test/problem-writer.test.mjs), [ci-keep](../../test/ci-keep.test.mjs), [dora](../../test/dora.test.mjs) |
+| 4 | The command line: every command, flag and exit code, and the `HQ_` environment names with their `QK_` aliases for one release | [cli.md](cli.md) | [startup](../../test/startup.test.mjs), [pack](../../test/pack.test.mjs), [check-version](../../test/check-version.test.mjs), [contract-docs](../../test/contract-docs.test.mjs) |
+| 5 | The plugin API: a module exporting `hqApi: 1` whose default export receives the `ui` object | [plugins.md](plugins.md) | [plugins](../../test/plugins.test.mjs), [contract-docs](../../test/contract-docs.test.mjs) |
+
+The rest of this page lists the rules for the first two surfaces, and whether `hq check` checks each.
+
 ## The manifest (`hq.json`, [manifest.md](manifest.md))
 
 | Rule | hq check |
@@ -16,6 +30,8 @@ marked *read* is applied when HQ reads the file, with a warning on the Machine p
 | a deploy item names a provider; a plugin item names a path | checked |
 | `delivery.tz` is a zone Intl knows; `delivery.gateJobs`, `deploySteps`, `reuseSteps` and `testSteps` are lists of names | checked |
 | a convention file's `schema` is a whole number; a newer one is read for what HQ knows | note, not a problem |
+| `link` is a path; HQ writes `{"url","pid"}` there as it serves and removes it as it stops | checked (a path); the write is `hq serve`'s |
+| a `homequarters` pin in the repo's `package.json` is in this HQ's major version | note, not a problem |
 
 ## The backlog (`backlog.dir`, QuestKeep's house rules carried over)
 
@@ -53,6 +69,14 @@ marked *read* is applied when HQ reads the file, with a warning on the Machine p
 | a step's `planned` names an open backlog item | checked, when `backlog` is set too |
 | the stages list has one marked `merge`, and `was` names alias none of HQ's fixed stages | checked |
 | **with `tests.headers` set:** a test the sets file names opens with Proves, Why it exists, Runs in, Takes and Run it when; Runs in names its set; a test in a set named `gate` gives a budget in `Takes` of at most 45 s on CI, no lower than its recorded range | checked |
+
+## The demo setting (`demo`, with `hq check --demo`)
+
+| Rule | hq check --demo |
+|---|---|
+| no page in the nav, backlog item, or page or raw view of a tracked file holds a name the demo setting should hide: a git author's, their email, the home folder, the GitHub owner and repo, the project's name beside HQ, the laptop's `private` list, `HQ_DEMO_PRIVATE` | checked |
+| a path the setting hides answers not found, as its page and as a raw file | checked |
+| a plugin with `demo: false` answers not found | checked |
 
 ## The stores ([runs.md](runs.md), [problems.md](problems.md), [slot.md](slot.md), [machine.md](machine.md))
 

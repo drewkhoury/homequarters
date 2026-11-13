@@ -1,0 +1,111 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://unpkg.com/homequarters/schema/hq.schema.json",
+  "title": "hq.json, schema 1",
+  "description": "The manifest a project declares itself to HomeQuarters with (docs/standards/manifest.md). Paths are from the repo root unless they start with / or ~/.",
+  "type": "object",
+  "required": ["schemaVersion", "name"],
+  "additionalProperties": false,
+  "properties": {
+    "$schema": { "type": "string", "description": "For editors; never warned about." },
+    "schemaVersion": { "type": "integer", "minimum": 1, "description": "The defaults epoch, a whole number from 1." },
+    "name": { "type": "string", "pattern": "^[a-z0-9][a-z0-9-]*$", "description": "The project's name, used in the cache path, titles and export file names." },
+    "cache": { "$ref": "#/$defs/path", "description": "The cache folder; default $XDG_CACHE_HOME/hq/<name>, else ~/.cache/hq/<name>." },
+    "docs": {
+      "type": "object", "additionalProperties": false,
+      "properties": {
+        "home": { "$ref": "#/$defs/path", "description": "The file Home opens on; default README.md." },
+        "groups": { "$ref": "#/$defs/path", "description": "The groups file the file tree narrows to." }
+      }
+    },
+    "backlog": {
+      "type": "object", "additionalProperties": false, "required": ["dir"],
+      "description": "Turns on the Backlog page.",
+      "properties": {
+        "dir": { "$ref": "#/$defs/path", "description": "The folder of stage folders." },
+        "stages": { "type": "array", "items": { "$ref": "#/$defs/idItem" }, "description": "The stages in order; default inbox, next, parked." },
+        "map": { "$ref": "#/$defs/path", "description": "The map of renamed items." },
+        "earlier": { "$ref": "#/$defs/path", "description": "The one-line file of earlier items." }
+      }
+    },
+    "decisions": {
+      "type": "object", "additionalProperties": false, "required": ["dir"],
+      "description": "Turns on the Decisions page.",
+      "properties": {
+        "dir": { "$ref": "#/$defs/path", "description": "The folder of dated decision files." },
+        "earlier": { "$ref": "#/$defs/path", "description": "The one-line file of earlier decisions." }
+      }
+    },
+    "tests": {
+      "type": "object", "additionalProperties": false,
+      "description": "Turns on the Testing page (docs/standards/pipeline.md, sets.md).",
+      "properties": {
+        "layers": { "$ref": "#/$defs/path" },
+        "pipeline": { "$ref": "#/$defs/path" },
+        "sets": { "$ref": "#/$defs/path" },
+        "headers": { "type": "array", "items": { "anyOf": [{ "type": "string" }, { "type": "object", "required": ["glob"], "properties": { "glob": { "type": "string" } } }] }, "description": "Globs of the tests whose headers hq check reads." }
+      }
+    },
+    "stores": {
+      "type": "array",
+      "description": "Which folders under the cache HQ reads.",
+      "items": {
+        "anyOf": [
+          { "$ref": "#/$defs/store" },
+          { "type": "object", "required": ["id"], "properties": { "id": { "$ref": "#/$defs/store" }, "path": { "$ref": "#/$defs/path" } } }
+        ]
+      }
+    },
+    "info": {
+      "description": "The status line's project-info file: true for .git/project-info.json, or an object naming the file.",
+      "anyOf": [
+        { "type": "boolean" },
+        { "type": "object", "additionalProperties": false, "properties": { "file": { "$ref": "#/$defs/path" } } }
+      ]
+    },
+    "deploy": {
+      "type": "array",
+      "description": "Deploy providers; HQ never reads inside with.",
+      "items": {
+        "anyOf": [
+          { "type": "string", "minLength": 1 },
+          { "type": "object", "required": ["provider"], "properties": { "env": { "type": "string" }, "provider": { "type": "string", "minLength": 1 }, "url": { "type": "string" }, "with": { "type": "object" } } }
+        ]
+      }
+    },
+    "delivery": {
+      "type": "object", "additionalProperties": false,
+      "description": "What the Delivery page counts and where it reads GitHub's runs.",
+      "properties": {
+        "userPaths": { "$ref": "#/$defs/names" },
+        "deployWorkflow": { "$ref": "#/$defs/path" },
+        "testWorkflow": { "$ref": "#/$defs/path" },
+        "tz": { "type": "string", "description": "An IANA time zone, such as America/New_York." },
+        "gateJobs": { "$ref": "#/$defs/names" },
+        "deployJob": { "type": "string" },
+        "smokeJob": { "type": "string" },
+        "deploySteps": { "$ref": "#/$defs/names" },
+        "reuseSteps": { "$ref": "#/$defs/names" },
+        "testSteps": { "$ref": "#/$defs/names" }
+      }
+    },
+    "plugins": {
+      "type": "array",
+      "description": "Pages the project adds (docs/standards/plugins.md).",
+      "items": {
+        "anyOf": [
+          { "type": "string", "minLength": 1 },
+          { "type": "object", "required": ["path"], "properties": { "path": { "type": "string", "minLength": 1 }, "with": { "type": "object" } } }
+        ]
+      }
+    },
+    "demo": { "$ref": "#/$defs/path", "description": "The demo setting's file for filming." },
+    "link": { "$ref": "#/$defs/path", "description": "The file hq serve writes {\"url\",\"pid\"} to as it starts, so the project's app can link to HQ; removed when it stops." }
+  },
+  "$defs": {
+    "path": { "type": "string", "minLength": 1 },
+    "names": { "type": "array", "items": { "type": "string" } },
+    "idItem": { "anyOf": [{ "type": "string" }, { "type": "object", "required": ["id"], "properties": { "id": { "type": "string" } } }] },
+    "store": { "enum": ["runs", "lock", "problems", "dora", "ci"] }
+  }
+}

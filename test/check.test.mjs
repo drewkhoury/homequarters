@@ -145,7 +145,7 @@ test('the command exits 1 and prints the report when anything is wrong, and 0 wi
   assert.match(red.stdout, /\n\n\d+ problems\.\n$/);
   const green = run(repo(t, { broken: false }));
   assert.equal(green.status, 0, green.stdout + green.stderr);
-  assert.equal(green.stdout, 'hq check: the repo keeps its contract.\n');
+  assert.equal(green.stdout.split('\n').slice(1).join('\n'), 'hq check: the repo keeps its contract.\n', 'after the version line, the one sentence');
 });
 
 // A newer manifest is read with a warning (README): hq check in a CI step must not go red the day a teammate's HQ writes

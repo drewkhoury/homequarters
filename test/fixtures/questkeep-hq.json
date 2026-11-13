@@ -1,0 +1,89 @@
+{
+  "schemaVersion": 1,
+  "name": "questkeep",
+  "cache": "~/.cache/questkeep",
+  "docs": {
+    "home": "README.md",
+    "groups": "hq/groups.json"
+  },
+  "backlog": {
+    "dir": "docs/backlog",
+    "stages": [
+      "inbox",
+      "next",
+      "parked"
+    ],
+    "map": "hq/backlog-map.json",
+    "earlier": "docs/BACKLOG.md"
+  },
+  "decisions": {
+    "dir": "docs/decisions",
+    "earlier": "docs/DECISIONS.md"
+  },
+  "tests": {
+    "layers": "tests/layers.json",
+    "pipeline": "hq/pipeline.json",
+    "headers": [
+      "tests/*.js"
+    ]
+  },
+  "stores": [
+    "runs",
+    "lock",
+    "problems",
+    "dora",
+    "ci"
+  ],
+  "info": true,
+  "deploy": [
+    {
+      "env": "prod",
+      "provider": "firebase-hosting",
+      "url": "https://questkeep.web.app",
+      "with": {
+        "project": "questkeep"
+      }
+    }
+  ],
+  "delivery": {
+    "userPaths": [
+      "web",
+      "firestore.rules",
+      "storage.rules",
+      "firestore.indexes.json",
+      "firebase.json"
+    ],
+    "deployWorkflow": ".github/workflows/deploy.yml",
+    "testWorkflow": ".github/workflows/test.yml",
+    "tz": "America/New_York",
+    "gateJobs": [
+      "test",
+      "test (a)",
+      "test (b)",
+      "laptop"
+    ],
+    "deployJob": "deploy",
+    "smokeJob": "smoke",
+    "deploySteps": [
+      "Deploy to production",
+      "Run make deploy"
+    ],
+    "reuseSteps": [
+      "Reuse a gate that passed"
+    ],
+    "testSteps": [
+      "Run the tests"
+    ]
+  },
+  "plugins": [
+    {
+      "path": "./hq-plugins/launch.mjs",
+      "with": {}
+    },
+    {
+      "path": "./hq-plugins/hunter.mjs",
+      "with": {}
+    }
+  ],
+  "demo": "hq/demo.json"
+}

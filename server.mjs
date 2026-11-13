@@ -14,7 +14,8 @@
 //     channels, and for the Launch page the launch page's visits, sign-ups and feedback in Firestore. That login passes
 //     no security rules, so HQ reads what nobody else can. HQ never logs in to anything itself.
 //   - the live site's /version.json, which is public, for the commit it serves
-// It writes only its own caches in ~/.cache/questkeep, and web/.hq.json, so a local run of the app can link to HQ.
+// It writes only its own caches under the manifest's cache folder, and the link file the manifest's link key names
+// (QuestKeep's is web/.hq.json), so a local run of the project's app can link to HQ.
 // It runs no shell: file walking and search are done here in node.
 //
 // What it does rather than reads, each a POST taken only from HQ's own pages (everything else is GET and HEAD):
@@ -436,9 +437,26 @@ export function start({ port = +(process.env.HQ_PORT || 8780), repo = REPO, m = 
     const attempt = p => {
       server.once('error', e => (e.code === 'EADDRINUSE' && !fixed && p < port + 20 ? attempt(p + 1) : reject(e)));
       // every listen call leaves its callback behind, so the one that fires may be an earlier attempt's: read the port bound
-      server.listen(p, '127.0.0.1', () => { const bound = server.address().port; resolve({ server, url: `http://127.0.0.1:${bound}`, movedFrom: bound === port || port === 0 ? null : port }); });
+      server.listen(p, '127.0.0.1', () => {
+        const bound = server.address().port, url = `http://127.0.0.1:${bound}`;
+        // the link file, before the start line, so a page the app opens next can find HQ; gone again when HQ stops
+        if (m.link) { const unlink = advertise(m.link, url); process.once('exit', unlink); server.once('close', unlink); }
+        resolve({ server, url, movedFrom: bound === port || port === 0 ? null : port });
+      });
     };
     attempt(port);
   });
 }
 
+
+// Writes HQ's address to the link file, {"url","pid"} on one line as QuestKeep's own server wrote web/.hq.json, where
+// the project's app finds it and links to HQ. The returned function removes the file again, unless a newer HQ has
+// written its own since (its pid is not this one). A file that cannot be written is let go: the link is a convenience.
+export function advertise(file, url, pid = process.pid) {
+  try { writeFileSync(file, JSON.stringify({ url, pid }) + '\n'); } catch { return () => {}; }
+  let done = false;
+  return () => {
+    if (done) return; done = true;
+    try { if (JSON.parse(readFileSync(file, 'utf8')).pid === pid) unlinkSync(file); } catch { /* gone already */ }
+  };
+}

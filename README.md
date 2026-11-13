@@ -2,7 +2,7 @@
 
 HQ is a local website for keeping up with your own repo: what changed and why, what guards it, and what is next. It runs on your laptop at http://127.0.0.1:8780 and only your laptop can reach it. It reads what your project writes and runs no code from it.
 
-HQ was built inside QuestKeep and left it as this package on 14 October 2026. The product brief with the decisions behind it is `docs/BRIEF.md` in the repo, with the data standards under `docs/standards/` and the reviews under `docs/reviews/`; the npm package ships the code, not those docs.
+HQ was built inside QuestKeep and left it as this package on 14 October 2026. The product brief with the decisions behind it is `docs/BRIEF.md` in the repo, with the data standards under `docs/standards/`; the npm package ships the code, not those docs.
 
 ## Install
 

@@ -46,7 +46,7 @@ test('an empty lock folder, as hq slot who leaves one, is not a store the repo a
   rmSync(home, { recursive: true, force: true });
 });
 
-// The stranger's install (docs/reviews/stranger-install.md, finding 3): with XDG_CACHE_HOME set, setup proposed
+// A first install on a clean machine found this: with XDG_CACHE_HOME set, setup proposed
 // ~/.cache/hq/hello because another repo of that name had left one, and everything then written went to the real home.
 test('setup honours XDG_CACHE_HOME and never adopts a cache HQ made for another repo of the same name', () => {
   const home = mkdtempSync(join(tmpdir(), 'hq-setup-home-')), xdg = join(home, 'xdg'), dir = join(home, 'repos', 'hello');

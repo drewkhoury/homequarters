@@ -17,7 +17,8 @@ A project declares itself to HQ in one file at the repo root, `hq.json`. HQ read
   "delivery": { "userPaths": ["web", "firestore.rules"], "deployWorkflow": ".github/workflows/deploy.yml", "testWorkflow": ".github/workflows/test.yml", "tz": "America/New_York",
     "gateJobs": ["test", "laptop"], "deployJob": "deploy", "smokeJob": "smoke", "deploySteps": ["Deploy to production"], "reuseSteps": ["Reuse a gate that passed"], "testSteps": ["Run the tests"] },
   "plugins": [{ "path": "./hq-plugins/launch.mjs", "with": {} }],
-  "demo": "hq/demo.json"
+  "demo": "hq/demo.json",
+  "link": "web/.hq.json"
 }
 ```
 
@@ -38,6 +39,7 @@ A project declares itself to HQ in one file at the repo root, `hq.json`. HQ read
 | `delivery` | no | `userPaths`: the paths a change must touch to count as reaching users; `deployWorkflow` and `testWorkflow`: the workflow files whose runs are deploys and test runs; `tz`: the zone the days are counted in. Each defaults to what HQ did before the key: every path, `deploy.yml`, `test.yml`, New York `gateJobs`: the jobs of a test run that are the gate; `deployJob` and `smokeJob`: the deploy run's job that deploys and the one that smoke-tests the release; `deploySteps`, `reuseSteps`, `testSteps`: the steps, matched by their first words, that deploy, that reuse an earlier gate, and that run the tests. With none named, every job of a test run is the gate, a deploy is any successful run of the deploy workflow, live when its last job ended, and no gate is reused. |
 | `plugins` | no | pages the project adds, each a string path or `{ path, with }`; a module exports `hqApi` and a default factory taking `{ ui, m }` |
 | `demo` | no | the demo setting's file for filming |
+| `link` | no | the link file: `hq serve` writes `{"url": "http://127.0.0.1:<port>", "pid": <pid>}` on one line there as it starts, so the project's app can link to HQ, and removes it when it stops unless a newer HQ has written its own since. With no `link`, HQ writes nothing in the repo |
 | `$schema` | no | for editors; never warned about |
 
 Paths are from the repo root unless they start with `/` or `~/`. The separator is `/` on every platform. Nothing is interpolated from the environment.
@@ -52,4 +54,4 @@ Paths are from the repo root unless they start with `/` or `~/`. The separator i
 
 ## What HQ does with it
 
-The manifest is read once, when `hq` or a writer starts (`lib/manifest.mjs`). Every writer (`hq slot`, `hq run-info`, `hq space`, `hq ci-keep`, `hq problem`, `hq dora`, `hq backlog`) finds the repo from `--repo`, `HQ_REPO`, or the git checkout it runs in, and takes the cache and the stores from the manifest. The Machine page shows the manifest HQ read, its warnings, and what `hq setup` would propose instead.
+The manifest is read once, when `hq` or a writer starts (`lib/manifest.mjs`). The one file HQ writes in the repo is the link file, and only when `link` names it; the project keeps it out of git (QuestKeep's `.gitignore` lists `web/.hq.json`). Every writer (`hq slot`, `hq run-info`, `hq space`, `hq ci-keep`, `hq problem`, `hq dora`, `hq backlog`) finds the repo from `--repo`, `HQ_REPO`, or the git checkout it runs in, and takes the cache and the stores from the manifest. The Machine page shows the manifest HQ read, its warnings, and what `hq setup` would propose instead.

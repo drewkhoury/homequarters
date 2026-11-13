@@ -17,6 +17,9 @@ a warning.
   and two workflows: `test.yml` (Node 22 and 24, Linux and macOS) and `release.yml` (publishes a `v*` tag with
   provenance once CHANGELOG.md has its heading).
 - Tests and docs no longer name the author's home folder.
+- `delivery.dailyAt` (`"07:07"`, in `delivery.tz`) says when the project's daily run takes its copy of the figures.
+  `hq dora` writes a missed day's late copy as of that time on that day, as QuestKeep's nightly did; without the key
+  the copy is as of the day's end, as before.
 
 ## 0.1.0 (unreleased)
 

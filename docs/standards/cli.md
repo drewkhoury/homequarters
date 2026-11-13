@@ -85,6 +85,8 @@ The slot stands aside, exiting 0 for `take`, `release`, `claim` and `unclaim`, o
 
 `hq dora [--no-fetch] [--no-fetch-git] [--no-daily] [--quiet] [--repo DIR]` fetches what is new from GitHub, works out the delivery figures, prints them, and writes `dora/dora.json` in the cache with a dated copy in `dora/daily/`.
 
+A day with no copy since the last one, such as a night the laptop slept, gets one written late and marked `writtenLate`. That copy counts the day's activity up to the manifest's `delivery.dailyAt` on that day, when the project's daily run would have taken it, and nothing after. With no `dailyAt` it counts the whole day.
+
 - `--no-fetch` uses only what the cache holds, with no `gh`.
 - `--no-fetch-git` skips `git fetch origin main`.
 - `--no-daily` writes `dora.json` alone.

@@ -93,7 +93,7 @@ test('a key of the wrong type is ignored with a warning, never a crash', () => {
 
 test('the delivery key takes the deploy and test workflows and a time zone, and refuses a zone Intl does not know', () => {
   const { m, warnings } = read({ schemaVersion: 1, name: 'app', delivery: { userPaths: ['web'], deployWorkflow: '.github/workflows/ship.yml', testWorkflow: '.github/workflows/check.yml', tz: 'Australia/Melbourne' } });
-  assert.deepEqual(m.delivery, { userPaths: ['web'], deployWorkflow: '.github/workflows/ship.yml', testWorkflow: '.github/workflows/check.yml', tz: 'Australia/Melbourne', gateJobs: null, deployJob: null, smokeJob: null, deploySteps: null, reuseSteps: null, testSteps: null });
+  assert.deepEqual(m.delivery, { userPaths: ['web'], deployWorkflow: '.github/workflows/ship.yml', testWorkflow: '.github/workflows/check.yml', tz: 'Australia/Melbourne', gateJobs: null, deployJob: null, smokeJob: null, deploySteps: null, reuseSteps: null, testSteps: null, dailyAt: null });
   assert.deepEqual(warnings, []);
   const bad = read({ schemaVersion: 1, name: 'app', delivery: { tz: 'Mars/Olympus' } });
   assert.equal(bad.m.delivery.tz, null);
@@ -149,4 +149,15 @@ test('the delivery key names the gate jobs, the deploy and smoke jobs, and the d
   assert.ok(r.warnings.some(w => /delivery\.reuseSteps.*should be a list of names/.test(w)), r.warnings.join('\n'));
   const none = read({ schemaVersion: 1, name: 'app' }).m.delivery;
   assert.deepEqual([none.gateJobs, none.deployJob, none.smokeJob, none.deploySteps, none.reuseSteps, none.testSteps], [null, null, null, null, null, null]);
+});
+
+// When the daily copy is taken (hq dora's late copies): a 24-hour clock time, in delivery.tz. Absent, the day's end.
+test('the delivery key takes dailyAt as hh:mm on a 24-hour clock, and warns and leaves it null for anything else', () => {
+  assert.equal(read({ schemaVersion: 1, name: 'app', delivery: { dailyAt: '07:07' } }).m.delivery.dailyAt, '07:07');
+  assert.equal(read({ schemaVersion: 1, name: 'app' }).m.delivery.dailyAt, null);
+  for (const bad of ['7:07', '24:00', '07:60', 707, { time: '07:07' }]) {
+    const r = read({ schemaVersion: 1, name: 'app', delivery: { dailyAt: bad } });
+    assert.equal(r.m.delivery.dailyAt, null, JSON.stringify(bad));
+    assert.ok(r.warnings.some(w => /delivery\.dailyAt/.test(w)), JSON.stringify(bad));
+  }
 });

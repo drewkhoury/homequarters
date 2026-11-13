@@ -27,11 +27,15 @@ Since the package was first cut, before its first release:
 - `delivery.dailyAt` (`"07:07"`, in `delivery.tz`) says when the project's daily run takes its copy of the figures.
   `hq dora` writes a missed day's late copy as of that time on that day, as QuestKeep's nightly did; without the key
   the copy is as of the day's end, as before.
+- `hq dora` keeps a counting change that predates the project's decisions folder, and so names no decision file, when
+  the repo has the manifest's `decisions.earlier` file; QuestKeep's 27 September note is back on make dora and the
+  Delivery page. Without that file such a change is still left out.
 - `hq slot` records the run's `tests`, `junit`, `kind` and `place` (from `HQ_RUN_TESTS`, `HQ_JUNIT`, `HQ_KIND`,
   `HQ_PLACE`, with QuestKeep's names as aliases), and `--extra '<json>'` or `HQ_SLOT_EXTRA` adds a project's own fields;
   the slot's own fields always win over them.
 - `hq run-info --extra` wins over HQ's own values for every field but `v`, so a project can pass its `runner`,
-  `target`, `half`, `hash` and `lanes`.
+  `target`, `half`, `hash`, `lanes` and `sdk`. HQ writes `lanes` only when `HQ_LANES`, `QK_LANES` or `LANES=` names
+  it, and never writes `sdk`, so a project whose readers expect them on every run line passes them.
 - `hq serve` writes `{url, pid}` to the file hq.json's `link` key names, and removes it on exit.
 - `hq check` prints its version first, notes a pin at another major version, and `hq check --demo` renders the demo
   pages against the repo and fails on any name the demo setting should hide.

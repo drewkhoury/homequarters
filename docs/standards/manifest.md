@@ -34,13 +34,15 @@ A project declares itself to HQ in one file at the repo root, `hq.json`. HQ read
 | `decisions` | no | the Decisions page: `dir` of dated files, `earlier` one-line file |
 | `tests` | no | the Testing page: `layers`, `pipeline`, `sets` and `headers` globs (`docs/standards/pipeline.md`, `sets.md`) |
 | `stores` | no | which folders under the cache HQ reads: `runs`, `lock`, `problems`, `dora`, `ci`; each a string or `{ id, path }` |
-| `info` | no | the status line's `.git/project-info.json`; `true` or an object |
+| `info` | no | the status line's project-info file: `true` reads `.git/project-info.json`, or an object whose `file` names another |
 | `deploy` | no | deploy providers, each `{ env, provider, url, with }`; HQ never reads inside `with` |
 | `delivery` | no | `userPaths`: the paths a change must touch to count as reaching users; `deployWorkflow` and `testWorkflow`: the workflow files whose runs are deploys and test runs; `tz`: the zone the days are counted in. Each defaults to what HQ did before the key: every path, `deploy.yml`, `test.yml`, New York `gateJobs`: the jobs of a test run that are the gate; `deployJob` and `smokeJob`: the deploy run's job that deploys and the one that smoke-tests the release; `deploySteps`, `reuseSteps`, `testSteps`: the steps, matched by their first words, that deploy, that reuse an earlier gate, and that run the tests. With none named, every job of a test run is the gate, a deploy is any successful run of the deploy workflow, live when its last job ended, and no gate is reused. |
 | `plugins` | no | pages the project adds, each a string path or `{ path, with }`; a module exports `hqApi` and a default factory taking `{ ui, m }` |
 | `demo` | no | the demo setting's file for filming |
 | `link` | no | the link file: `hq serve` writes `{"url": "http://127.0.0.1:<port>", "pid": <pid>}` on one line there as it starts, so the project's app can link to HQ, and removes it when it stops unless a newer HQ has written its own since. With no `link`, HQ writes nothing in the repo |
 | `$schema` | no | for editors; never warned about |
+
+`schema/hq.schema.json` in the package is the JSON Schema for these keys; point an editor at it with `"$schema": "./node_modules/homequarters/schema/hq.schema.json"`. A test holds it, this table and `lib/manifest.mjs` to the same keys (`test/manifest-schema.test.mjs`).
 
 Paths are from the repo root unless they start with `/` or `~/`. The separator is `/` on every platform. Nothing is interpolated from the environment.
 

@@ -53,13 +53,13 @@ One test run at a time on this machine ([slot.md](slot.md)).
 
 The slot stands aside, exiting 0 for `take`, `release`, `claim` and `unclaim`, on GitHub-hosted CI, with `HQ_SLOT=0`, and inside a test container (`HQ_IN_CONTAINER=1`).
 
-Coming in 0.1.0: `hq slot --extra '<json>'`, and `HQ_SLOT_EXTRA`, add a project's own fields to the slot record, as QuestKeep's `tests`, `junit`, `place` and `kind`. The writers agent is adding them.
+`hq slot <command> --extra '<json object>'`, and `HQ_SLOT_EXTRA`, add a project's own fields to run.json and to each log line the command writes. The flag wins a key over the variable, and the slot's own fields (pid, since, target, event, v and the rest) always win over the project's, because a release finds its run by them. A value that is not a JSON object is left out with a warning, and the command goes ahead.
 
 ## `hq run-info`
 
 `hq run-info <kind> [--json FILE] [--extra '<json>'] [--repo DIR]` prints the `=== run {json}` line a recorded run starts with ([runs.md](runs.md)), or with `--json` writes the record to FILE, making its folder. Warnings go to stderr. It exits 0.
 
-`--extra` adds a project's own facts to the record. Today they never replace HQ's own fields. Coming in 0.1.0: `--extra` wins over HQ's defaults (decision 11), so a project can pass `runner`, `target`, `half`, `hash`, `lanes` and its own facts through it. The writers agent is making that change.
+`--extra` adds a project's own facts to the record and wins over HQ's own values for every field but `v`, so a project can pass `runner`, `target`, `half`, `hash`, `lanes` and its own facts through it. Without `--extra` HQ writes `lanes` only when `HQ_LANES` or a `LANES=` make argument names it.
 
 ## `hq ci-keep`
 
@@ -124,7 +124,10 @@ Every `HQ_` name the package reads. The `QK_` names in the second column are Que
 | `HQ_SLOT_WAIT` | `slot take` | `LOCK_WAIT` | minutes to wait for the slot; 0 fails at once with exit 3 |
 | `HQ_SLOT_PID` | `slot` | `QK_LOCK_PID` | the process that holds the slot, when it is not hq's parent |
 | `HQ_SLOT_POLL_MS` | `slot take` | `QK_LOCK_POLL_MS` | how often a waiter looks again; default 2000 |
-| `HQ_SLOT_EXTRA` | `slot` | | coming in 0.1.0: a project's own fields for the slot record, as JSON |
+| `HQ_SLOT_EXTRA` | `slot` | `QK_SLOT_EXTRA` | a project's own fields for the slot record, as a JSON object |
+| `HQ_RUN_TESTS` | `slot take` | `QK_RUN_TESTS` | the run's tests, space-separated, recorded as `tests` |
+| `HQ_JUNIT` | `slot take` | `JUNIT` | set, the run's results feed a check or a deploy, recorded as `junit: true` |
+| `HQ_PLACE` | `slot take` | `QK_PLACE` | where the run was placed, recorded as `place` |
 | `HQ_AGENT` | `slot`, `run-info`, `problem` | `QK_AGENT` | an agent started by another agent names itself |
 | `HQ_WHO` | `slot` | `QK_WHO` | the name a run without a Claude session goes by; default `$USER` |
 | `HQ_NO_DOCKER` | `slot` | `QK_NO_DOCKER` | set, the slot does not look for test containers |
@@ -133,7 +136,7 @@ Every `HQ_` name the package reads. The `QK_` names in the second column are Que
 | `HQ_SPACE_WARN_GB` | `space` | `QK_SPACE_WARN_GB` | the free space under which a run warns; default 20 |
 | `HQ_SPACE_FAIL_GB` | `space` | `QK_SPACE_FAIL_GB` | the free space under which a run is not started; default 5 |
 | `HQ_SPACE_HOST` | `space vm` | `QK_SPACE_HOST` | the host's figures, from `hq space figures` |
-| `HQ_KIND` | `run-info` | `QK_KIND` | the kind, over the argument |
+| `HQ_KIND` | `run-info`, `slot take` | `QK_KIND` | the kind, over the argument; on the slot, recorded as `kind` |
 | `HQ_WHERE` | `run-info` | `QK_WHERE` | laptop, container or ci, when the kind alone cannot say |
 | `HQ_BRANCH` | `run-info` | `QK_BRANCH` | the branch, for a detached checkout |
 | `HQ_COMMIT` | `run-info` | `QK_COMMIT` | the commit on CI, where a pull request's checkout is a merge commit |

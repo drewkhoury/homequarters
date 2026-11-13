@@ -15,7 +15,7 @@
 //   hq dora [--no-fetch] [--quiet] ...   the delivery figures: fetch from GitHub, work them out, write the dora store (dora.mjs)
 //   hq ci-fetch [<folder>]               download the CI results a workflow kept as junit-* artifacts into the ci store
 //   hq --version
-// HQ reads the repo's hq.json if there is one, and shows the baseline without it. It never writes to the repo.
+// HQ reads the repo's hq.json if there is one, and shows the baseline without it. It writes to the repo only the link file hq.json's `link` key names, while `hq serve` runs.
 import { execFileSync } from 'node:child_process';
 import { readFileSync , existsSync, statSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';

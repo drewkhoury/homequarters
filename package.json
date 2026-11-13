@@ -27,6 +27,7 @@
     "pages",
     "static",
     "theme",
+    "schema",
     "server.mjs",
     "problem.mjs",
     "problem-backfill.mjs",

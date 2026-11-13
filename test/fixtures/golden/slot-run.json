@@ -1,0 +1,28 @@
+{
+  "session": null,
+  "agent": null,
+  "claudePid": null,
+  "pid": 65277,
+  "pidStart": "Fri Nov 13 00:29:37 2026",
+  "worktree": "questkeep",
+  "path": "/path/to/questkeep",
+  "branch": "main",
+  "target": "test-gate",
+  "person": "golden-runner",
+  "ciRun": 19000000001,
+  "ciAttempt": 2,
+  "tests": [
+    "sync-offline",
+    "island-stamps"
+  ],
+  "junit": true,
+  "kind": "deploy",
+  "place": "home",
+  "since": "2026-11-13T06:29:37.436Z",
+  "paged": {
+    "swapIn": 7812960,
+    "swapOut": 8309346,
+    "compressed": 546865094,
+    "decompressed": 515439076
+  }
+}

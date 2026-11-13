@@ -4,7 +4,7 @@ What each version of HomeQuarters changes for a project that installs it. The ma
 rule (docs/standards/manifest.md): a key, once published, is never renamed or removed, and a newer manifest is read with
 a warning.
 
-## 0.1.0 (unreleased)
+## 0.1.0
 
 The first package: HQ as it left QuestKeep on 14 October 2026, with a manifest, one `hq` command for serving, checking
 and recording, a plugin seam, and eight data standards under docs/standards/. The `delivery` key names a project's

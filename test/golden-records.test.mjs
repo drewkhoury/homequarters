@@ -24,21 +24,33 @@ const VOLATILE = new Set(['pid', 'pidStart', 'path', 'since', 'at', 'secs', 'pag
 // Fields the package writes that QuestKeep's writers do not, and QuestKeep's readers ignore:
 //   v     the record's shape (a reader takes a line without v as v 0), on the slot's log lines and the run line
 //   tree  git's tree of the commit tested, on a CI run line
-const SLOT_ADDS = new Set(['v']), RUN_ADDS = new Set(['v', 'tree']);
+const SLOT_ADDS = new Set(['v']), RUN_ADDS = new Set(['v', 'tree']), LAPTOP_ADDS = new Set(['v']);
+
+// paged and machine are blocks whose values change from run to run but whose keys do not (lib/machine.mjs writes every
+// key, null where a reading failed), so their keys are compared one level down. The golden records were taken on a Mac,
+// which always reads paged; elsewhere (Linux CI) the package writes paged as null, and only there is null allowed.
+const BLOCKS = new Set(['paged', 'machine']);
+const keysOf = o => Object.keys(o).sort();
 
 function sameRecord(got, want, adds, what) {
   assert.deepEqual(Object.keys(got).filter(k => !adds.has(k)).sort(), Object.keys(want).sort(), `${what}: the same keys`);
   for (const k of Object.keys(want)) {
     if (VOLATILE.has(k)) assert.equal(typeof got[k], typeof want[k], `${what}: ${k} is there, as a ${typeof want[k]}`);
     else assert.deepEqual(got[k], want[k], `${what}: ${k}`);
+    if (BLOCKS.has(k) && want[k] !== null && !(got[k] === null && k === 'paged' && process.platform !== 'darwin')) {
+      assert.ok(got[k] !== null, `${what}: ${k} is a block, not null`);
+      assert.deepEqual(keysOf(got[k]), keysOf(want[k]), `${what}: ${k} has the same keys`);
+    }
   }
 }
 
 // A checkout named and branched as the golden one was (QuestKeep's main), with one commit so git can name its branch.
+// The commit is made as regenerate.sh makes its own, with fixed names and dates and no git config, so both have the same
+// hash and a laptop run line's commit can be compared exactly.
 function checkout(t, branch) {
   const dir = join(scratch(t), 'questkeep');
   mkdirSync(dir);
-  const env = { ...process.env, GIT_CONFIG_NOSYSTEM: '1', GIT_AUTHOR_NAME: 'golden', GIT_AUTHOR_EMAIL: 'golden@example.invalid', GIT_COMMITTER_NAME: 'golden', GIT_COMMITTER_EMAIL: 'golden@example.invalid' };
+  const env = { ...process.env, GIT_CONFIG_NOSYSTEM: '1', GIT_CONFIG_GLOBAL: '/dev/null', GIT_AUTHOR_NAME: 'golden', GIT_AUTHOR_EMAIL: 'golden@example.invalid', GIT_COMMITTER_NAME: 'golden', GIT_COMMITTER_EMAIL: 'golden@example.invalid', GIT_AUTHOR_DATE: '2026-11-13T00:00:00Z', GIT_COMMITTER_DATE: '2026-11-13T00:00:00Z' };
   execFileSync('git', ['-C', dir, 'init', '-q', '-b', branch], { env });
   execFileSync('git', ['-C', dir, 'commit', '-q', '--allow-empty', '-m', 'golden'], { env });
   return dir;
@@ -56,6 +68,9 @@ test('hq slot writes the run.json, take line and release line QuestKeep\'s scrip
   const [take, release] = logOf(dir);
   sameRecord(take, wantTake, SLOT_ADDS, 'the take line');
   sameRecord(release, wantRelease, SLOT_ADDS, 'the release line');
+  // the release line's machine block says how hard the machine paged during the run; the Delivery page and lib/dora.mjs read it
+  assert.ok('pagingMBps' in wantRelease.machine, 'the golden release line has pagingMBps');
+  assert.ok('pagingMBps' in release.machine, 'the release line: machine has pagingMBps');
 });
 
 test('hq run-info, with QuestKeep\'s CI fields in --extra, writes the run line QuestKeep\'s tests/run-info.mjs wrote', t => {
@@ -67,4 +82,25 @@ test('hq run-info, with QuestKeep\'s CI fields in --extra, writes the run line Q
   const extra = { runner: 'laptop', target: 'test-gate', half: '1', hash: want.hash, lanes: want.lanes, sdk: want.sdk };
   execFileSync(process.execPath, [join(root, 'bin/hq.mjs'), 'run-info', 'gate', '--json', out, '--extra', JSON.stringify(extra), '--repo', repo], { env });
   sameRecord(JSON.parse(readFileSync(out, 'utf8')), want, RUN_ADDS, 'the run line');
+});
+
+// The laptop's run lines. QuestKeep's writer always wrote lanes (2, or 3 for a gate in its test image) and sdk (where its
+// browsers got the Firebase SDK); the package writes neither unless the project passes them in --extra. Both are the
+// project's to pass: HQ cannot know a project's lanes default or its SDK copy, and QuestKeep passes the two it works
+// out itself, as it will once it calls hq run-info. Here they come from the golden line, as QuestKeep's writer worked them out.
+function laptopLine(t, kind, file) {
+  const want = golden(file), repo = checkout(t, 'main'), out = join(scratch(t), 'run.json');
+  // the environment regenerate.sh gave tests/run-info.mjs: nothing but PATH and a HOME, so no CI, no agent, no LANES
+  const env = { PATH: process.env.PATH, HOME: process.env.HOME };
+  const extra = { lanes: want.lanes, sdk: want.sdk };
+  execFileSync(process.execPath, [join(root, 'bin/hq.mjs'), 'run-info', kind, '--json', out, '--extra', JSON.stringify(extra), '--repo', repo], { env });
+  sameRecord(JSON.parse(readFileSync(out, 'utf8')), want, LAPTOP_ADDS, `the ${kind} line`);
+}
+
+test('hq run-info, with the project\'s lanes and sdk in --extra, writes the laptop test line QuestKeep\'s writer wrote', t => {
+  laptopLine(t, 'test', 'run-info-test.json');
+});
+
+test('hq run-info, with the project\'s lanes and sdk in --extra, writes the docker-gate line QuestKeep\'s writer wrote', t => {
+  laptopLine(t, 'docker-gate', 'run-info-docker-gate.json');
 });

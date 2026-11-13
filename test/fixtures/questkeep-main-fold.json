@@ -1,0 +1,14 @@
+{
+  "about": "Three opened lines with stage words, and what QuestKeep main's reader made of them: fold() in QuestKeep's hq/lib/problems.mjs at main 904a9df35 (file last changed in 8a0606560), run once by hand on 13 November 2026. Main's stages are self, test-fast, pre-push, smoke, pr-gate, reviewer, person, merge, prod-smoke, nightly, person-after and players; a word outside them is dropped, so foundAt null below means main's Problems page shows no stage.",
+  "mainStages": ["self", "test-fast", "pre-push", "smoke", "pr-gate", "reviewer", "person", "merge", "prod-smoke", "nightly", "person-after", "players"],
+  "lines": [
+    { "v": 1, "at": "2026-11-13T06:00:00.000Z", "ev": "opened", "id": "P-2026-11-13-agent-mistake-aaaa01", "by": "builder", "fields": { "title": "A stage word as given", "kind": "agent-mistake", "evidence": "feedback/r3port1", "record": "live", "foundAt": "person" } },
+    { "v": 1, "at": "2026-11-13T06:00:00.000Z", "ev": "opened", "id": "P-2026-11-13-agent-mistake-aaaa02", "by": "builder", "fields": { "title": "A stage word as given", "kind": "agent-mistake", "evidence": "feedback/r3port1", "record": "live", "foundAt": "players", "shouldHaveCaughtAt": "person-after" } },
+    { "v": 1, "at": "2026-11-13T06:00:00.000Z", "ev": "opened", "id": "P-2026-11-13-agent-mistake-aaaa03", "by": "builder", "fields": { "title": "A stage word as given", "kind": "agent-mistake", "evidence": "feedback/r3port1", "record": "live", "foundAt": "you", "shouldHaveCaughtAt": "you-after" } }
+  ],
+  "mainFolded": [
+    { "id": "P-2026-11-13-agent-mistake-aaaa01", "foundAt": "person", "shouldHaveCaughtAt": null },
+    { "id": "P-2026-11-13-agent-mistake-aaaa02", "foundAt": "players", "shouldHaveCaughtAt": "person-after" },
+    { "id": "P-2026-11-13-agent-mistake-aaaa03", "foundAt": null, "shouldHaveCaughtAt": null }
+  ]
+}

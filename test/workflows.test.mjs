@@ -52,3 +52,9 @@ test('the release workflow tests with more race rounds, checks the changelog, th
   assert.ok(tests < publish && changelog < publish, 'both checks come before the publish');
   assert.match(w, /GITHUB_REF_NAME#v/, 'the version is the tag without its v');
 });
+
+test('the release workflow refuses a changelog heading still marked unreleased', () => {
+  // `## 0.1.0 (unreleased)` passed the heading check, so a tag would publish a changelog saying the version is not out
+  const w = read('release.yml');
+  assert.match(w, /grep[^\n]*unreleased[^\n]*CHANGELOG\.md/i, 'a grep for "(unreleased)" on the version heading');
+});

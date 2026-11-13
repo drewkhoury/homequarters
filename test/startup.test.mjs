@@ -63,8 +63,11 @@ test('with no port given hq serves on 8780 or the next free one; a given port is
   // a port in use: the next one is taken
   const blocker = createServer(); await new Promise(r => blocker.listen(0, '127.0.0.1', r)); t.after(() => blocker.close());
   const busy = blocker.address().port;
-  const url2 = await serve(t, ['--port', String(busy)], dir);
-  assert.equal(+new URL(url2).port, busy + 1, 'the next port after the one in use');
+  // a later one is taken, and the start line says it moved; not exactly busy + 1, which another suite running beside
+  // this one may hold by then
+  const moved = await serveOut(t, ['--port', String(busy)], dir);
+  assert.ok(+new URL(moved.url).port > busy, `a port after the one in use: ${moved.url}`);
+  assert.match(moved.text(), new RegExp(`port ${busy} was in use`));
   const free = createServer(); await new Promise(r => free.listen(0, '127.0.0.1', r)); const want = free.address().port; await new Promise(r => free.close(r));
   const url3 = await serve(t, ['--port', String(want)], dir);
   assert.equal(+new URL(url3).port, want);
@@ -81,7 +84,7 @@ test('a given port on no list is taken when free, and when it is in use the star
   const a = await serveOut(t, ['--port', String(want)], dir);
   assert.equal(+new URL(a.url).port, want, a.text());
   const b = await serveOut(t, ['--port', String(want)], dir);
-  assert.equal(+new URL(b.url).port, want + 1);
+  assert.ok(+new URL(b.url).port > want, b.url); // not exactly want + 1, which another suite may hold
   assert.match(b.text(), new RegExp(`port ${want} was in use`));
   assert.doesNotMatch(a.text(), /was in use/);
 });

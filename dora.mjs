@@ -29,7 +29,7 @@ const repo = (() => {
   try { return execFileSync('git', ['rev-parse', '--show-toplevel'], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] }).trim(); } catch { return process.cwd(); }
 })();
 const { m } = loadManifest(repo);
-configureDelivery({ ...m.delivery, decisionsDir: (m.decisions && m.decisions.dir) || join(repo, 'docs', 'decisions') });
+configureDelivery({ ...m.delivery, decisionsDir: (m.decisions && m.decisions.dir) || join(repo, 'docs', 'decisions'), decisionsEarlier: (m.decisions && m.decisions.earlier) || null });
 const cache = process.env.HQ_CACHE || process.env.QK_CACHE || m.cache;
 const raw = join(cache, 'ci', 'actions'), out = join(cache, 'dora');
 const say = (...a) => { if (!args.has('--quiet')) console.log(...a); };

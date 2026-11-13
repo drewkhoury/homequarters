@@ -6,7 +6,7 @@
 //   hq machine                           what the machine is doing now, as JSON (the block recorded with each run)
 //   hq run-info <kind> [--json FILE]     the `=== run {json}` line a recorded run starts with (lib/run-info.mjs)
 //   hq problem note|set|close|... [--repo DIR]   write to the problem register (problem.mjs says the options)
-//   hq slot take <name> | release <name> <status> | who | status [msg] | claim [why] | unclaim [force]
+//   hq slot take <name> | release <name> <status> | who | status [msg] | claim [why] | unclaim [force] [--extra JSON]
 //                                        one test run at a time on this machine (lib/slot.mjs)
 //   hq space host | figures | vm         free space on the disks a test run fills; exit 1 stops the run (lib/space.mjs)
 //   hq ci-keep <results> <name>          keep a self-hosted runner job's results in the ci store (lib/ci-keep.mjs)

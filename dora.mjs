@@ -111,8 +111,10 @@ save(join(out, 'dora.json'), file);
 save(join(out, 'changes.json'), { generatedAt: new Date(Date.now()).toISOString(), changes: d.changes, merges: d.merges });
 const today = dayKey(now, TZ), daily = !args.has('--no-daily');
 if (daily) save(join(out, 'daily', `${today}.json`), file);
-// Fill the days since the last copy, each as of its day's end in the figures' zone; at most 30. QuestKeep's copies were
-// made as of 08:07 New York, its nightly's time; a daily time of the project's own waits on the manifest's delivery key.
+// Fill the days since the last copy, each as of its day's end in the figures' zone; at most 30. QuestKeep's own script
+// fills them as of its nightly's time, 07:07 New York since 9 November 2026 (08:07 before), so a late copy written here
+// counts up to 17 hours more of its day than QuestKeep's did; a daily time of the project's own waits on a manifest
+// delivery key.
 const copies = readdirSync(join(out, 'daily')).filter(f => /^\d{4}-\d{2}-\d{2}\.json$/.test(f)).map(f => f.slice(0, 10));
 const late = daily ? lateDays(copies, today) : [];
 for (const k of late) save(join(out, 'daily', `${k}.json`), { ...summarise(d, { asOf: dayStart(addDays(k, 1), TZ) - 1, repo: repoSlug, sources }), writtenLate: true });

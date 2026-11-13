@@ -4,6 +4,20 @@ What each version of HomeQuarters changes for a project that installs it. The ma
 rule (docs/standards/manifest.md): a key, once published, is never renamed or removed, and a newer manifest is read with
 a warning.
 
+## Unreleased
+
+- package.json has an `exports` map. A project imports the plugin API from `homequarters`, test helpers from
+  `homequarters/testing` (empty until 0.2.0), anything else as `homequarters/internal/<path>`, and
+  `homequarters/package.json`. A bare `homequarters/lib/...` import is now refused.
+- Node 22 or later (`engines`), since Node 20 reached end of life on 30 April 2026.
+- package.json names the GitHub repository, issue tracker and home page. The tarball now carries `LICENSE`,
+  `CHANGELOG.md`, `testing.mjs` and the Inter font's licence, `theme/fonts/OFL.txt`.
+- The unused `playwright` dev dependency is gone.
+- The repo has an MIT `LICENSE`, `CLAUDE.md`, `CONTRIBUTING.md`, `SECURITY.md`, issue templates, its own `hq.json`,
+  and two workflows: `test.yml` (Node 22 and 24, Linux and macOS) and `release.yml` (publishes a `v*` tag with
+  provenance once CHANGELOG.md has its heading).
+- Tests and docs no longer name the author's home folder.
+
 ## 0.1.0 (unreleased)
 
 The first package: HQ as it left QuestKeep on 14 October 2026, with a manifest, one `hq` command for serving, checking

@@ -151,7 +151,7 @@ test('Continue in Terminal resumes the conversation in the folder claude filed i
 });
 
 test('claude files a directory\'s conversations under its path with every other character a hyphen', () => {
-  assert.equal(projectFolder('/Users/drew/repos/questkeep-backlog', '/Users/drew'), '/Users/drew/.claude/projects/-Users-drew-repos-questkeep-backlog');
+  assert.equal(projectFolder('/Users/dev/repos/questkeep-backlog', '/Users/dev'), '/Users/dev/.claude/projects/-Users-dev-repos-questkeep-backlog');
   assert.equal(projectFolder('/tmp/a.b_c', '/h'), '/h/.claude/projects/-tmp-a-b-c');
 });
 

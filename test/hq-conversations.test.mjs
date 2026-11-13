@@ -68,7 +68,7 @@ const index = w => conversationsIndex({ repo: WORKTREE, cache: w.cache, projects
 const byId = (r, id) => r.sessions.find(s => s.id === id);
 
 test('Claude Code names a folder by its path with every other character a hyphen', () => {
-  assert.equal(escapePath('/Users/drew/repos/questkeep-backlog'), '-Users-drew-repos-questkeep-backlog');
+  assert.equal(escapePath('/Users/dev/repos/questkeep-backlog'), '-Users-dev-repos-questkeep-backlog');
   assert.equal(escapePath('/a/b.c_d'), '-a-b-c-d');
 });
 

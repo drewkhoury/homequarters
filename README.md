@@ -8,10 +8,13 @@ HQ was built inside QuestKeep and left it as this package on 14 October 2026. Th
 
 ```sh
 npm install -g homequarters    # once it is on npm; until then, from a checkout:
-npm install -g /path/to/hq     # or: npm pack /path/to/hq && npm install -g homequarters-0.1.0.tgz
+git clone https://github.com/drewkhoury/homequarters.git
+npm install -g ./homequarters  # or: npm pack ./homequarters && npm install -g homequarters-0.1.0.tgz
 ```
 
-Node 20 or later. Nothing else is needed for the baseline; `git` for the Repo page, and `gh`, `docker`, `devpipe` and `claude` light up more when they are there.
+The command is `hq`, but the package is `homequarters`. The `hq` package on npm and the `hq` formula in Homebrew core are other, unrelated projects, so `npm install -g hq` and `brew install hq` install something else.
+
+Node 22 or later. Nothing else is needed for the baseline; `git` for the Repo page, and `gh`, `docker`, `devpipe` and `claude` light up more when they are there.
 
 ## Run
 
@@ -44,7 +47,7 @@ With no `hq.json`, HQ shows the baseline: Home (the files and docs, with search,
 { "schemaVersion": 1, "name": "hello", "cache": "~/.cache/hq/hello" }
 ```
 
-A full one, QuestKeep's:
+A full one: QuestKeep's own, as an example. Its paths, job names and plugin are QuestKeep's; a project names its own.
 
 ```json
 {
@@ -82,7 +85,7 @@ A full one, QuestKeep's:
 
 ## Plugins
 
-A plugin is an ES module the manifest names. Its default export takes `{ ui, m }` and answers `{ id, label, path, page(ctx, params, rest), actions?, demo? }`. `ui` is the only API HQ promises across versions: the page frame, escaping, the info mark, tables, charts, markdown, and `git` and `gh`, which HQ itself only ever calls to read (`lib/ui-api.mjs` in the repo). A plugin may import the package's internals too; those are stable per exact version only, so pin `homequarters` exactly if it does. A plugin that fails to load is reported on the Machine page and left out.
+A plugin is an ES module the manifest names. Its default export takes `{ ui, m }` and answers `{ id, label, path, page(ctx, params, rest), actions?, demo? }`. `ui` is the only API HQ promises across versions: the page frame, escaping, the info mark, tables, charts, markdown, and `git` and `gh`, which HQ itself only ever calls to read (`lib/ui-api.mjs` in the repo). A plugin imports the API from `homequarters`. It may import the package's internals too, as `homequarters/internal/lib/<file>.mjs`; those are stable per exact version only, so pin `homequarters` exactly if it does. A bare `homequarters/lib/...` is refused by the package's `exports` map. A plugin that fails to load is reported on the Machine page and left out.
 
 ## Recording runs
 
@@ -95,3 +98,5 @@ npm test                       # about seven seconds; needs node, git, npm and t
 HQ_OFFLINE=1 npm test          # skips the pack test, the one that reaches the registry
 HQ_RACE_ROUNDS=5 npm test      # more rounds of the slot's dead-holder race; `npm publish` runs this first
 ```
+
+The tests make git commits in scratch repos, so git needs an identity: `user.name` and `user.email` in your git config, or `GIT_AUTHOR_NAME`, `GIT_AUTHOR_EMAIL`, `GIT_COMMITTER_NAME` and `GIT_COMMITTER_EMAIL` in the environment, as CI sets them. `CONTRIBUTING.md` says how to run them without touching your own cache.

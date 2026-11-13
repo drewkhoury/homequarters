@@ -21,10 +21,10 @@ test('a labelled test container still running makes a take wait, through the rea
 test('a test container from a checkout without the labels is seen too, by its image and command', async t => {
   const dir = scratch(t);
   // docker lists the screenshots folder first, as it did for quest-core's gate on 27 September
-  const row = `old_gate\t\tsh -c make --no-print-directory browser; make serve >/dev/null && make _test\t2 minutes ago\t/Users/drew/repos/questkeep-core/.shots,qk-node,/Users/drew/repos/questkeep-core\n`;
+  const row = `old_gate\t\tsh -c make --no-print-directory browser; make serve >/dev/null && make _test\t2 minutes ago\t/Users/dev/repos/questkeep-core/.shots,qk-node,/Users/dev/repos/questkeep-core\n`;
   const r = await lockCli(t, dir, ['take', 'docker-test'], { LOCK_WAIT: '0', ...dockerStub(t, { byImage: row }) });
   assert.equal(r.code, 3, r.text); assert.match(r.text, /old_gate/); assert.match(r.text, /questkeep-core's test container/);
-  const shell = `a_shell\t\tbash\t2 minutes ago\t/Users/drew/repos/questkeep-core\n`;
+  const shell = `a_shell\t\tbash\t2 minutes ago\t/Users/dev/repos/questkeep-core\n`;
   assert.equal((await lockCli(t, dir, ['take', 'docker-test'], { LOCK_WAIT: '0', ...dockerStub(t, { byImage: shell }) })).code, 0, 'a shell or docker-up is not a test run');
 });
 

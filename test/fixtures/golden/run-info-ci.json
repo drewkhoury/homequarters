@@ -1,0 +1,59 @@
+{
+  "kind": "gate",
+  "where": "ci",
+  "who": "ci",
+  "branch": "main",
+  "commit": "0123456",
+  "dirty": false,
+  "lanes": 2,
+  "sdk": "network",
+  "machine": {
+    "load1": 26.82,
+    "load5": 23.26,
+    "cores": 12,
+    "swap": {
+      "usedMB": 5292,
+      "totalMB": 6144
+    },
+    "memFreePct": 46,
+    "pressure": "normal",
+    "paged": {
+      "swapIn": 7812960,
+      "swapOut": 8309346,
+      "compressed": 546865094,
+      "decompressed": 515439045
+    },
+    "therm": {
+      "thermal": 0,
+      "performance": 0,
+      "speedLimit": null
+    },
+    "power": {
+      "source": "ac",
+      "percent": 80,
+      "lowPower": false
+    },
+    "top": [
+      {
+        "cpu": 556.3,
+        "name": "OrbStack Helper"
+      },
+      {
+        "cpu": 77.8,
+        "name": "node"
+      },
+      {
+        "cpu": 65.5,
+        "name": "node"
+      }
+    ]
+  },
+  "event": "push",
+  "run": "19000000001",
+  "attempt": 2,
+  "at": "2026-11-13T06:29:37.196Z",
+  "runner": "laptop",
+  "target": "test-gate",
+  "half": "1",
+  "hash": "v3:946812ec6eaaf034421abe441fb810bf9f024013608784d22eb57dd7fa7d2b60"
+}

@@ -4,7 +4,14 @@ What each version of HomeQuarters changes for a project that installs it. The ma
 rule (docs/standards/manifest.md): a key, once published, is never renamed or removed, and a newer manifest is read with
 a warning.
 
-## Unreleased
+## 0.1.0 (unreleased)
+
+The first package: HQ as it left QuestKeep on 14 October 2026, with a manifest, one `hq` command for serving, checking
+and recording, a plugin seam, and eight data standards under docs/standards/. The `delivery` key names a project's
+GitHub jobs and steps (`gateJobs`, `deployJob`, `smokeJob`, `deploySteps`, `reuseSteps`, `testSteps`); with none, a
+deploy is any successful run of the deploy workflow.
+
+Since the package was first cut, before its first release:
 
 - package.json has an `exports` map. A project imports the plugin API from `homequarters`, test helpers from
   `homequarters/testing` (empty until 0.2.0), anything else as `homequarters/internal/<path>`, and
@@ -20,13 +27,19 @@ a warning.
 - `delivery.dailyAt` (`"07:07"`, in `delivery.tz`) says when the project's daily run takes its copy of the figures.
   `hq dora` writes a missed day's late copy as of that time on that day, as QuestKeep's nightly did; without the key
   the copy is as of the day's end, as before.
-
-## 0.1.0 (unreleased)
-
-The first package: HQ as it left QuestKeep on 14 October 2026, with a manifest, one `hq` command for serving, checking
-and recording, a plugin seam, and eight data standards under docs/standards/. The `delivery` key names a project's
-GitHub jobs and steps (`gateJobs`, `deployJob`, `smokeJob`, `deploySteps`, `reuseSteps`, `testSteps`); with none, a
-deploy is any successful run of the deploy workflow.
+- `hq slot` records the run's `tests`, `junit`, `kind` and `place` (from `HQ_RUN_TESTS`, `HQ_JUNIT`, `HQ_KIND`,
+  `HQ_PLACE`, with QuestKeep's names as aliases), and `--extra '<json>'` or `HQ_SLOT_EXTRA` adds a project's own fields;
+  the slot's own fields always win over them.
+- `hq run-info --extra` wins over HQ's own values for every field but `v`, so a project can pass its `runner`,
+  `target`, `half`, `hash` and `lanes`.
+- `hq serve` writes `{url, pid}` to the file hq.json's `link` key names, and removes it on exit.
+- `hq check` prints its version first, notes a pin at another major version, and `hq check --demo` renders the demo
+  pages against the repo and fails on any name the demo setting should hide.
+- `schema/hq.schema.json` describes hq.json schema 1, and `docs/standards/cli.md` and `plugins.md` document the command
+  line and the plugin API.
+- Tests: golden slot and run-line records taken from QuestKeep's own writers, `hq machine`'s parsing, `hq dora` on CI
+  without `gh`.
+- The release workflow refuses a tag whose CHANGELOG heading is missing or still marked unreleased.
 
 Kept for this release only, and gone at 0.2.0 (test/release.test.mjs is the clock):
 

@@ -49,10 +49,12 @@ test('the line HQ reads back is the line written', () => {
   assert.deepEqual(runInfoLine(`some output\n${runLine(info)}\nmore`), info);
 });
 
-test("--extra adds a project's own facts to the line, never over HQ's, and a malformed one is left out with a warning", () => {
-  const r = runInfo({ env: {}, args: ['gate', '--extra', '{"sdk":"local","kind":"nope"}'], git, machine });
+test("--extra adds a project's own facts to the line, over HQ's own but never over v, and a malformed one is left out with a warning", () => {
+  const r = runInfo({ env: {}, args: ['gate', '--extra', '{"sdk":"local","where":"container","v":9}'], git, machine });
   assert.equal(r.info.sdk, 'local', 'the project\'s fact is on the line');
-  assert.equal(r.info.kind, 'gate', 'a project fact never replaces one of HQ\'s');
+  assert.equal(r.info.where, 'container', 'the project knows better than HQ\'s default');
+  assert.equal(r.info.v, 1, 'the shape of the line is HQ\'s to say');
+  assert.equal(r.info.kind, 'gate');
   assert.deepEqual(r.warnings, []);
   const bad = runInfo({ env: {}, args: ['gate', '--extra', '{not json'], git, machine });
   assert.equal(bad.info.kind, 'gate');
@@ -77,4 +79,19 @@ test('a dirty tree, the run folder, a given branch and a partial flag each reach
   assert.equal(info.dirty, true); assert.equal(info.out, '/tmp/out/run-1'); assert.equal(info.branch, 'detached-copy'); assert.equal(info.partial, true);
   const clean = runInfo({ env: {}, args: ['gate'], git, machine }).info;
   assert.equal(clean.out, undefined); assert.equal(clean.partial, undefined);
+});
+
+// QuestKeep's CI fields (decision 11 of the plan to make HQ independent): its runner is "laptop", and only it knows its make
+// target, its gate half, its own tree hash (which a deploy's reuse of a run rests on), its lanes and its SDK state.
+test('on CI, --extra wins over the runner and adds the target, half, hash, lanes and sdk; without it HQ\'s own stay', () => {
+  const env = { GITHUB_ACTIONS: 'true', GITHUB_RUN_ID: '42', GITHUB_RUN_ATTEMPT: '1', GITHUB_EVENT_NAME: 'push', GITHUB_REF_NAME: 'main', QK_COMMIT: 'headsha1234567', RUNNER_ENVIRONMENT: 'self-hosted' };
+  const qk = { runner: 'laptop', target: 'test-gate', half: '1', hash: 'v3-0123abcd', lanes: 2, sdk: 'local' };
+  const ciGit = () => 'tree123', now = () => new Date('2026-10-14T00:00:00Z');
+  const withExtra = runInfo({ env, args: ['gate', '--extra', JSON.stringify(qk)], git: ciGit, machine, now }).info;
+  for (const [k, v] of Object.entries(qk)) assert.equal(withExtra[k], v, k);
+  assert.equal(withExtra.run, '42'); assert.equal(withExtra.commit, 'headsha');
+  const bare = runInfo({ env, args: ['gate'], git: ciGit, machine, now }).info;
+  assert.equal(bare.runner, 'self-hosted'); assert.equal(bare.tree, 'tree123');
+  assert.equal('lanes' in bare, false, 'lanes is left out when nothing names it');
+  for (const k of ['target', 'half', 'hash', 'sdk']) assert.equal(k in bare, false, k);
 });

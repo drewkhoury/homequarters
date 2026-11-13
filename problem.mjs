@@ -83,7 +83,9 @@ export function eventFor(cmd, opts, { events = [], now = new Date(), by = 'someo
     if (name === 'evidence' && !pointsAt(v)) leaks.push('it names no pointer: a run id, a file and line, a commit, feedback/<id> or a pull request');
     if (name === 'evidence' && canonStage(opts.foundAt || (entry && entry.foundAt)) === 'users' && !citesReport(v)) leaks.push('a problem users found cites their report, feedback/<id>, or the fix commit, never their words');
     if (leaks.length) { refused.push(`${name}: ${leaks.join('; ')}`); continue; }
-    fields[name] = f.norm ? f.norm(v) : v;
+    // stored as given: an old stage name stays old, since a reader that knows only old names drops a new one; readers
+    // translate (FIELDS' norm, applied when the register is read)
+    fields[name] = v;
   }
   // the writer's own name meets the same checks as any text
   if (typeof by !== 'string' || !/^[\w .:-]{1,40}$/.test(by)) refused.push('by: the writer is named in at most 40 letters, digits, spaces, dots, colons and dashes');

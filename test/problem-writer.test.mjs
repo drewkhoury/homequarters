@@ -130,5 +130,6 @@ test('a problem players found cites their report or the fix, never their words',
   assert.match(eventFor('note', { ...NOTE, foundAt: 'users', evidence: 'run 2026-10-11T04-50-29Z_058624' }, env()).refused.join(' '), /feedback\/<id>/);
   assert.ok(noted({ foundAt: 'users', evidence: 'feedback/8ZQ3k2' }));
   assert.ok(noted({ foundAt: 'users', evidence: 'fix 1e79f371' }));
-  assert.equal(noted({ foundAt: 'players', evidence: 'feedback/8ZQ3k2' }).fields.foundAt, 'users', 'an old stage name is written as the stage it became');
+  assert.match(eventFor('note', { ...NOTE, foundAt: 'players', evidence: 'run 2026-10-11T04-50-29Z_058624' }, env()).refused.join(' '), /feedback\/<id>/, 'an old stage name is checked as the stage it became');
+  assert.equal(noted({ foundAt: 'players', evidence: 'feedback/8ZQ3k2' }).fields.foundAt, 'players', 'and stored as given, for a reader that knows only the old name');
 });

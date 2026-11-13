@@ -13,7 +13,7 @@ import { spawnSync, execFileSync } from 'node:child_process';
 import { existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync, renameSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { compute, summarise, sourcesOf, lateDays, PLAYER_PATHS, TZ, dayKey, dayStart, addDays, configureDelivery } from './lib/dora.mjs';
+import { compute, summarise, sourcesOf, lateDays, PLAYER_PATHS, TZ, dayKey, dailyAsOf, configureDelivery } from './lib/dora.mjs';
 import { allRuns } from './lib/runs.mjs';
 import { loadManifest } from './lib/manifest.mjs';
 
@@ -111,13 +111,11 @@ save(join(out, 'dora.json'), file);
 save(join(out, 'changes.json'), { generatedAt: new Date(Date.now()).toISOString(), changes: d.changes, merges: d.merges });
 const today = dayKey(now, TZ), daily = !args.has('--no-daily');
 if (daily) save(join(out, 'daily', `${today}.json`), file);
-// Fill the days since the last copy, each as of its day's end in the figures' zone; at most 30. QuestKeep's own script
-// fills them as of its nightly's time, 07:07 New York since 9 November 2026 (08:07 before), so a late copy written here
-// counts up to 17 hours more of its day than QuestKeep's did; a daily time of the project's own waits on a manifest
-// delivery key.
+// Fill the days since the last copy, each as of the manifest's delivery.dailyAt on that day, when the project's daily
+// run would have taken it (QuestKeep's nightly, 07:07 New York), or as of the day's end with none; at most 30.
 const copies = readdirSync(join(out, 'daily')).filter(f => /^\d{4}-\d{2}-\d{2}\.json$/.test(f)).map(f => f.slice(0, 10));
 const late = daily ? lateDays(copies, today) : [];
-for (const k of late) save(join(out, 'daily', `${k}.json`), { ...summarise(d, { asOf: dayStart(addDays(k, 1), TZ) - 1, repo: repoSlug, sources }), writtenLate: true });
+for (const k of late) save(join(out, 'daily', `${k}.json`), { ...summarise(d, { asOf: dailyAsOf(k), repo: repoSlug, sources }), writtenLate: true });
 
 if (args.has('--quiet')) { console.log(`dora: wrote ${join(out, 'dora.json')}${late.length ? ` and ${late.length} late daily copies` : ''}.`); process.exit(0); }
 console.log(table(file) + `\nWrote ${join(out, 'dora.json')} ${daily ? ` and daily/${today}.json` : ''}${late.length ? `, plus ${late.length} late daily copies (${late.join(', ')})` : ''}.`);

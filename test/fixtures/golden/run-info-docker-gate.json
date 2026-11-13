@@ -1,0 +1,51 @@
+{
+  "kind": "docker-gate",
+  "where": "container",
+  "who": "person",
+  "branch": "main",
+  "commit": "6edb005",
+  "dirty": false,
+  "lanes": 3,
+  "sdk": "network",
+  "machine": {
+    "load1": 3.25,
+    "load5": 3.4,
+    "cores": 12,
+    "swap": {
+      "usedMB": 5236,
+      "totalMB": 6144
+    },
+    "memFreePct": 53,
+    "pressure": "normal",
+    "paged": {
+      "swapIn": 7813024,
+      "swapOut": 8309346,
+      "compressed": 546890414,
+      "decompressed": 515462656
+    },
+    "therm": {
+      "thermal": 0,
+      "performance": 0,
+      "speedLimit": null
+    },
+    "power": {
+      "source": "ac",
+      "percent": 80,
+      "lowPower": false
+    },
+    "top": [
+      {
+        "cpu": 116.9,
+        "name": "OrbStack Helper"
+      },
+      {
+        "cpu": 17.5,
+        "name": "xprotectd"
+      },
+      {
+        "cpu": 14.8,
+        "name": "iTerm2"
+      }
+    ]
+  }
+}

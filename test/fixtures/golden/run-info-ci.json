@@ -8,20 +8,20 @@
   "lanes": 2,
   "sdk": "network",
   "machine": {
-    "load1": 26.82,
-    "load5": 23.26,
+    "load1": 3.25,
+    "load5": 3.4,
     "cores": 12,
     "swap": {
-      "usedMB": 5292,
+      "usedMB": 5236,
       "totalMB": 6144
     },
-    "memFreePct": 46,
+    "memFreePct": 53,
     "pressure": "normal",
     "paged": {
-      "swapIn": 7812960,
+      "swapIn": 7813024,
       "swapOut": 8309346,
-      "compressed": 546865094,
-      "decompressed": 515439045
+      "compressed": 546890414,
+      "decompressed": 515462656
     },
     "therm": {
       "thermal": 0,
@@ -35,23 +35,23 @@
     },
     "top": [
       {
-        "cpu": 556.3,
+        "cpu": 125.7,
         "name": "OrbStack Helper"
       },
       {
-        "cpu": 77.8,
-        "name": "node"
+        "cpu": 26.1,
+        "name": "XprotectService"
       },
       {
-        "cpu": 65.5,
-        "name": "node"
+        "cpu": 25.2,
+        "name": "xprotectd"
       }
     ]
   },
   "event": "push",
   "run": "19000000001",
   "attempt": 2,
-  "at": "2026-11-13T06:29:37.196Z",
+  "at": "2026-11-13T07:07:40.443Z",
   "runner": "laptop",
   "target": "test-gate",
   "half": "1",

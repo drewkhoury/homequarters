@@ -16,6 +16,21 @@ env -i PATH="$PATH" HOME="$TMP/home" \
   QK_TARGET=test-gate QK_HALF=1 \
   node "$QK/tests/run-info.mjs" gate --json "$TMP/run-info.json"
 
+# The run lines a laptop writes: a person's `make test` and a container gate (`make docker-gate`), as QuestKeep's Makefile
+# starts tests/run-info.mjs for each, with no LANES given, so the writer's own lanes default shows (2, or 3 for a gate in
+# its test image). On a laptop the writer runs git in the folder it is run from, so it runs in a throwaway checkout
+# named questkeep on main whose one commit is made with fixed names and dates: its hash is the same every time, and the
+# test makes the same commit.
+GOLDEN_GIT="GIT_CONFIG_NOSYSTEM=1 GIT_CONFIG_GLOBAL=/dev/null GIT_AUTHOR_NAME=golden GIT_AUTHOR_EMAIL=golden@example.invalid GIT_COMMITTER_NAME=golden GIT_COMMITTER_EMAIL=golden@example.invalid GIT_AUTHOR_DATE=2026-11-13T00:00:00Z GIT_COMMITTER_DATE=2026-11-13T00:00:00Z"
+mkdir "$TMP/questkeep"
+env -i PATH="$PATH" HOME="$TMP/home" $GOLDEN_GIT git -C "$TMP/questkeep" init -q -b main
+env -i PATH="$PATH" HOME="$TMP/home" $GOLDEN_GIT git -C "$TMP/questkeep" commit -q --allow-empty -m golden
+laptop() {
+  (CDPATH= cd -- "$TMP/questkeep" && env -i PATH="$PATH" HOME="$TMP/home" node "$QK/tests/run-info.mjs" "$@")
+}
+laptop test --json "$TMP/run-info-test.json"
+laptop docker-gate --json "$TMP/run-info-docker-gate.json"
+
 # The slot: a take and a release by the self-hosted runner for a deploy's gate (scripts/lock.mjs). A sleep stands in for
 # the make recipe's shell, whose process number the record keeps.
 sleep 600 & HOLDER=$!
@@ -33,7 +48,10 @@ lock release test-gate 0
 node -e '
 const fs = require("fs"), [tmp, here, qk] = process.argv.slice(1);
 const scrub = o => (o.path === qk ? { ...o, path: "/path/to/questkeep" } : o);
-fs.writeFileSync(`${here}/run-info-ci.json`, JSON.stringify(JSON.parse(fs.readFileSync(`${tmp}/run-info.json`, "utf8")), null, 2) + "\n");
+const copy = (from, to) => fs.writeFileSync(`${here}/${to}`, JSON.stringify(JSON.parse(fs.readFileSync(`${tmp}/${from}`, "utf8")), null, 2) + "\n");
+copy("run-info.json", "run-info-ci.json");
+copy("run-info-test.json", "run-info-test.json");
+copy("run-info-docker-gate.json", "run-info-docker-gate.json");
 fs.writeFileSync(`${here}/slot-run.json`, JSON.stringify(scrub(JSON.parse(fs.readFileSync(`${tmp}/slot-run.json`, "utf8"))), null, 2) + "\n");
 const lines = fs.readFileSync(`${tmp}/lock/log.jsonl`, "utf8").trim().split("\n").map(l => JSON.stringify(scrub(JSON.parse(l))));
 fs.writeFileSync(`${here}/slot-log.jsonl`, lines.join("\n") + "\n");

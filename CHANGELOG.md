@@ -44,6 +44,9 @@ Since the package was first cut, before its first release:
 - Tests: golden slot and run-line records taken from QuestKeep's own writers, `hq machine`'s parsing, `hq dora` on CI
   without `gh`.
 - The release workflow refuses a tag whose CHANGELOG heading is missing or still marked unreleased.
+- `hq problem` stores a stage word exactly as given, after checking it is a stage or an old name of one:
+  `--found-at person` stays `person`, where it had been rewritten to `you`. Readers translate old names, so a reader
+  that knows only the old ones, such as QuestKeep's own before it moves to the package, keeps the stage.
 
 Kept for this release only, and gone at 0.2.0 (test/release.test.mjs is the clock):
 

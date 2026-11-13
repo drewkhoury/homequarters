@@ -1,0 +1,2 @@
+# A made-up JWT that test/problem-privacy.test.mjs feeds the problem writer to prove it refuses tokens; it signs nothing.
+60ee3708a4bf4616e6ea79243f488736af853752:test/problem-privacy.test.mjs:jwt:43

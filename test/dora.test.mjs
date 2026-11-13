@@ -165,6 +165,16 @@ test('a missed night is filled from the last copy before today, and nothing is f
   assert.equal(lateDays(['2026-01-01'], '2026-10-06', 30).length, 30);
 });
 
+// A late daily copy is taken as of the manifest's dailyAt on its day, read off the local clock, so the day the clocks
+// change moves it with them; with no dailyAt it is the last millisecond of the day.
+test('a late copy is as of dailyAt on its own day in the figures\' zone, clock changes included, or the day\'s end without one', () => {
+  const asOf = (day, at) => new Date(dora.dailyAsOf(day, 'America/New_York', at)).toISOString();
+  assert.equal(asOf('2026-11-11', '07:07'), '2026-11-11T12:07:00.000Z');
+  assert.equal(asOf('2026-11-01', '07:07'), '2026-11-01T12:07:00.000Z', 'the clocks went back at 02:00');
+  assert.equal(asOf('2026-03-08', '07:07'), '2026-03-08T11:07:00.000Z', 'the clocks went forward at 02:00');
+  assert.equal(asOf('2026-11-11', null), '2026-11-12T04:59:59.999Z');
+});
+
 // dora.json's shape, as docs/decisions/2026-10-06-make-dora-counts-delivery.md documents it
 const all = compute({ runs, jobsOf, logs, pulls, lock, commits, git });
 const file = summarise(all, { asOf: Date.parse('2026-10-06T12:00:00Z'), repo: 'owner/questkeep', sources: { runs: { status: 'read' } } });

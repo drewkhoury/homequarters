@@ -26,11 +26,21 @@ const VOLATILE = new Set(['pid', 'pidStart', 'path', 'since', 'at', 'secs', 'pag
 //   tree  git's tree of the commit tested, on a CI run line
 const SLOT_ADDS = new Set(['v']), RUN_ADDS = new Set(['v', 'tree']);
 
+// paged and machine are blocks whose values change from run to run but whose keys do not (lib/machine.mjs writes every
+// key, null where a reading failed), so their keys are compared one level down. The golden records were taken on a Mac,
+// which always reads paged; elsewhere (Linux CI) the package writes paged as null, and only there is null allowed.
+const BLOCKS = new Set(['paged', 'machine']);
+const keysOf = o => Object.keys(o).sort();
+
 function sameRecord(got, want, adds, what) {
   assert.deepEqual(Object.keys(got).filter(k => !adds.has(k)).sort(), Object.keys(want).sort(), `${what}: the same keys`);
   for (const k of Object.keys(want)) {
     if (VOLATILE.has(k)) assert.equal(typeof got[k], typeof want[k], `${what}: ${k} is there, as a ${typeof want[k]}`);
     else assert.deepEqual(got[k], want[k], `${what}: ${k}`);
+    if (BLOCKS.has(k) && want[k] !== null && !(got[k] === null && k === 'paged' && process.platform !== 'darwin')) {
+      assert.ok(got[k] !== null, `${what}: ${k} is a block, not null`);
+      assert.deepEqual(keysOf(got[k]), keysOf(want[k]), `${what}: ${k} has the same keys`);
+    }
   }
 }
 
@@ -56,6 +66,9 @@ test('hq slot writes the run.json, take line and release line QuestKeep\'s scrip
   const [take, release] = logOf(dir);
   sameRecord(take, wantTake, SLOT_ADDS, 'the take line');
   sameRecord(release, wantRelease, SLOT_ADDS, 'the release line');
+  // the release line's machine block says how hard the machine paged during the run; the Delivery page and lib/dora.mjs read it
+  assert.ok('pagingMBps' in wantRelease.machine, 'the golden release line has pagingMBps');
+  assert.ok('pagingMBps' in release.machine, 'the release line: machine has pagingMBps');
 });
 
 test('hq run-info, with QuestKeep\'s CI fields in --extra, writes the run line QuestKeep\'s tests/run-info.mjs wrote', t => {

@@ -4,8 +4,22 @@
   "description": "HQ: a local website for keeping up with your own repo. Reads what your project writes; runs no code from it.",
   "type": "module",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/drewkhoury/homequarters.git"
+  },
+  "bugs": {
+    "url": "https://github.com/drewkhoury/homequarters/issues"
+  },
+  "homepage": "https://github.com/drewkhoury/homequarters#readme",
   "bin": {
     "hq": "bin/hq.mjs"
+  },
+  "exports": {
+    ".": "./lib/ui-api.mjs",
+    "./testing": "./testing.mjs",
+    "./internal/*": "./*",
+    "./package.json": "./package.json"
   },
   "files": [
     "bin",
@@ -20,10 +34,13 @@
     "dora.mjs",
     "dora-fetch.mjs",
     "demo.json",
-    "README.md"
+    "README.md",
+    "testing.mjs",
+    "CHANGELOG.md",
+    "LICENSE"
   ],
   "engines": {
-    "node": ">=20"
+    "node": ">=22"
   },
   "scripts": {
     "test": "node --test test/*.test.mjs",
@@ -32,9 +49,6 @@
   "dependencies": {
     "highlight.js": "11.12.0",
     "marked": "18.0.14"
-  },
-  "devDependencies": {
-    "playwright": "1.63.0"
   },
   "keywords": [
     "dashboard",

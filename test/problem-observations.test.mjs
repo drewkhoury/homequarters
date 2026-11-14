@@ -175,3 +175,17 @@ test('a red carries the error line its run gave that test, and whether the line 
   assert.deepEqual([red(obs, 'smoke-sync').cause, red(obs, 'smoke-sync').causeGeneric], ['page.goto: timed out', true]);
   assert.equal(red(obs, 'smoke-tabs').cause, null, 'a test its run gave no line has none');
 });
+
+test('the reds of one runs list are sorted once: a second read asks the keyer nothing, and each read asks causes afresh', () => {
+  const runs = [run('r1', { cases: [['smoke-wake', 'fail'], ['smoke-sky', 'fail']] }), run('r2', { cases: [['smoke-wake', 'pass']] })];
+  let keyed = 0;
+  const keyOf = (task, name) => { keyed++; return name; };
+  const first = observeReds(runs, { keyOf, causeOf: () => ({ line: 'Error: before', generic: false }) });
+  const was = keyed;
+  const second = observeReds(runs, { keyOf, causeOf: (r, task, name) => ({ line: `Error: ${name} now`, generic: true }) });
+  assert.equal(keyed, was, 'the keyer was asked again');
+  assert.deepEqual(second.map(o => [o.sig, o.class, o.cause, o.causeGeneric]), [['smoke-wake', 'flaky', 'Error: smoke-wake now', true], ['smoke-sky', 'never-rerun', 'Error: smoke-sky now', true]]);
+  assert.equal(first[0].cause, 'Error: before');
+  second[0].owner = 'P-1';
+  assert.equal(observeReds(runs, { keyOf }).find(o => o.sig === 'smoke-wake').owner, undefined, 'one read changing an observation changes no other read');
+});

@@ -113,6 +113,8 @@ if (cmd === 'run-info') {
     for (const w of warnings) console.log(`  warning: ${w}`);
     for (const f of failed) console.log(`  plugin left out: ${f.file}: ${f.why}`);
     console.log('Only this machine can reach it. Ctrl-C stops it.');
+    // reads each page once now, so the first click finds the stores read (lib/warm.mjs)
+    import('../lib/warm.mjs').then(({ warmUp }) => warmUp(url)).catch(() => {});
   } catch (e) { console.error(`HQ could not start: ${e.message}`); process.exit(1); }
 } else {
   console.error(`hq: unknown command "${cmd}". Try hq --help.`);

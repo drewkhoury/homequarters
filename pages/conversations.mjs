@@ -25,18 +25,40 @@ const copyable = text => `<div class="hq-command"><code>${esc(text)}</code><butt
 const where = (s, main) => { const c = s.cwd || ''; return c === main ? 'main checkout' : c.startsWith(`${main}-`) ? c.slice(main.length + 1).split('/')[0] : c.startsWith(`${main}/`) ? c.slice(main.length + 1) : c || '?'; };
 
 // The index with each session's commits and the backlog items it mentions, kept until a transcript or a ref moves.
+// A Claude session that is open writes its transcript all the time, so the list moves every few seconds: each
+// session's commits and mentions are kept by its last activity, and only the sessions that moved are read again (the
+// text of every session, and matching every one's commits, took about a second a page). The commits are matched
+// against git's log from the earliest session, as for the whole list, and all again when a ref moves.
 let memo = null, last = null;
+const activity = s => `${s.lastActive}:${s.gone}`;
+let commitsKept = { repo: null, refs: null, by: new Map() };
+async function commitsOf(repo, sessions, refs) {
+  if (commitsKept.repo !== repo || commitsKept.refs !== refs) commitsKept = { repo, refs, by: new Map() };
+  const moved = sessions.filter(s => commitsKept.by.get(s.id)?.at !== activity(s));
+  if (moved.length) {
+    const since = sessions.map(s => s.started).filter(Boolean).sort()[0];
+    for (const s of await resolveCommits(repo, moved, runGit, { since })) commitsKept.by.set(s.id, { at: activity(s), s });
+  }
+  return sessions.map(s => commitsKept.by.get(s.id).s);
+}
+let saidKept = { cache: null, items: null, by: new Map() };
+function mentionsOf(cache, sessions, items) {
+  const itemsKey = items.map(i => `${i.slug}\t${i.title}`).join('\n');
+  if (saidKept.cache !== cache || saidKept.items !== itemsKey) saidKept = { cache, items: itemsKey, by: new Map() };
+  const moved = sessions.filter(s => saidKept.by.get(s.id)?.at !== activity(s));
+  for (const s of moved) saidKept.by.set(s.id, { at: activity(s), slugs: [] });
+  for (const [slug, ids] of mentions(cache, moved, items)) for (const id of ids) saidKept.by.get(id).slugs.push(slug);
+  return id => [...(saidKept.by.get(id)?.slugs || [])];
+}
 async function gather({ repo, cache, projectsDir, demo }) {
   const idx = await conversationsIndex({ repo, cache, projectsDir });
   const refs = await runGit(['for-each-ref', '--format=%(objectname)', 'refs/heads', 'refs/remotes'], repo);
   const items = backlogItems(repo);
   const key = `${idx.sessions.map(s => `${s.id}:${s.lastActive}:${s.gone}`).join()}|${refs}|${items.map(i => i.slug).join()}`;
   if (!memo || memo.key !== key || memo.repo !== repo || memo.demo !== demo) {
-    const sessions = await resolveCommits(repo, idx.sessions);
-    const said = mentions(cache, sessions, items);
-    const bySession = new Map();
-    for (const [slug, ids] of said) for (const id of ids) { if (!bySession.has(id)) bySession.set(id, []); bySession.get(id).push(slug); }
-    memo = { key, repo, demo, main: idx.main, projectsDir: idx.projectsDir, items, sessions: sessions.map(s => demoSession(demo, { ...s, mentions: bySession.get(s.id) || [] })).sort((a, b) => String(b.lastActive).localeCompare(String(a.lastActive))) };
+    const sessions = await commitsOf(repo, idx.sessions, refs);
+    const bySession = mentionsOf(cache, sessions, items);
+    memo = { key, repo, demo, main: idx.main, projectsDir: idx.projectsDir, items, sessions: sessions.map(s => demoSession(demo, { ...s, mentions: bySession(s.id) })).sort((a, b) => String(b.lastActive).localeCompare(String(a.lastActive))) };
   }
   last = { ...memo, cache };
   return { ...memo, running: runningNow(cache) };

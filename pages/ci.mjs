@@ -1,11 +1,10 @@
 // CI as it happens: a part for the GitHub page's dashboard and Home (the runs going now, each job's steps, and for the
 // step that runs the tests an estimate of which test it is on), and a page per run, /ci/<run id>, that refreshes itself
 // while the run goes. Read-only: HQ only asks GitHub, through gh, what it already shows on its own Actions page.
-import { join } from 'node:path';
 import { esc, layout } from '../lib/page.mjs';
 import { info } from '../lib/ui.mjs';
 import { runGh } from '../lib/github.mjs';
-import { readCiRuns } from '../lib/runs.mjs';
+import { storedCiRuns } from '../lib/runs.mjs';
 import { ciNow, runWithJobs, describeRun, planFor, stepName, span, timeOf, setOf } from '../lib/ci-live.mjs';
 
 const LIMIT = 'GitHub hands over a job\'s log only when the job ends, so which test CI is on cannot be read while it runs. The test named here is an estimate: the tests in the order CI runs them, with their times from the last CI runs that make ci-history downloaded, scaled to how long this step usually takes.';
@@ -79,7 +78,7 @@ export async function ciRunPage(ctx, runId, params = new URLSearchParams()) {
   const done = r.status === 'completed';
   // HQ's run for this attempt, whatever parts it uploaded; an attempt that uploaded nothing (only the filed job re-run)
   // shows the newest one before it
-  const attempts = done ? readCiRuns(join(ctx.cache, 'ci')).filter(x => String(x.info.run) === String(r.databaseId) && x.info.attempt <= (r.attempt || 1)) : [];
+  const attempts = done ? storedCiRuns(ctx.cache).filter(x => String(x.info.run) === String(r.databaseId) && x.info.attempt <= (r.attempt || 1)) : [];
   const results = [...new Map(attempts.sort((a, b) => a.info.attempt - b.info.attempt).map(x => [x.info.kind, x.id])).values()];
   const end = done ? `<p class="ci-done">Finished ${esc(ago(timeOf(r.updatedAt)))} ago: <span class="ci-res" data-result="${esc(r.conclusion)}">${esc(resultWord(r))}</span>.
       <a href="${esc(r.url)}" target="_blank" rel="noopener">Open it on GitHub</a>${results.map(id => ` · <a href="/runs/${esc(id)}">its test results in HQ</a>`).join('')}${results.length ? '' : ' · <span class="hint">make ci-history downloads its test results</span>'}</p>` : '';

@@ -98,3 +98,13 @@ test('a test file whose titles change is read again into the catalogue', async (
     assert.equal(catalogue(s.repo, { maxAge: 0 }).some(f => f.path === 'tests/unit/fresh.test.mjs'), true);
   } finally { s.done(); }
 });
+
+test("the CI run page's runs from the store are readCiRuns', in its order", async () => {
+  const { storedCiRuns, readCiRuns } = await import('../lib/runs.mjs');
+  const s = buildStore();
+  try {
+    const want = readCiRuns(join(s.cache, 'ci'));
+    assert.deepEqual(storedCiRuns(s.cache, { maxAge: 0 }), want);
+    assert.equal(want.length, 12);
+  } finally { s.done(); }
+});

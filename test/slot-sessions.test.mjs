@@ -14,7 +14,7 @@ import { HQ, NOW, MIN, at, me, them, living, take, lockCli, scratch, shell, wait
 
 test('two sessions asking at once: exactly one gets the slot, the other waits', async t => {
   const dir = scratch(t);
-  const a = await Promise.all([1, 2].map(i => lockCli(t, dir, ['take', 'docker-test'], { LOCK_WAIT: '0', CLAUDE_CODE_SESSION_ID: `s${i}`, HQ_SLOT_PID: String(process.pid) })));
+  const a = await Promise.all([1, 2].map(i => lockCli(t, dir, ['take', 'docker-test'], { HQ_SLOT_WAIT: '0', CLAUDE_CODE_SESSION_ID: `s${i}`, HQ_SLOT_PID: String(process.pid) })));
   assert.deepEqual(a.map(r => r.code).sort(), [0, 3], a.map(r => r.text).join('\n'));
   const run = JSON.parse(readFileSync(join(dir, 'run.json'), 'utf8'));
   assert.equal(run.target, 'docker-test'); assert.equal(run.pid, process.pid);
@@ -71,7 +71,7 @@ test('a release from anyone but the holder leaves the slot alone', async t => {
 test('a slot held by a process that has gone is taken over, and the take-over is logged', async t => {
   const dir = scratch(t);
   writeFileSync(join(dir, 'run.json'), JSON.stringify({ ...them, pid: 999999, since: new Date().toISOString() }));
-  const r = await lockCli(t, dir, ['take', 'docker-test'], { LOCK_WAIT: '0', HQ_SLOT_PID: String(process.pid) });
+  const r = await lockCli(t, dir, ['take', 'docker-test'], { HQ_SLOT_WAIT: '0', HQ_SLOT_PID: String(process.pid) });
   assert.equal(r.code, 0, r.text); assert.match(r.text, /ended without releasing/);
   const events = readFileSync(join(dir, 'log.jsonl'), 'utf8').trim().split('\n').map(l => JSON.parse(l).event);
   assert.deepEqual(events, ['takeover', 'take']);
@@ -86,7 +86,7 @@ test('set-aside claims are kept to the newest ten', async t => {
   for (const f of seeded) writeFileSync(join(dir, f), JSON.stringify({ ...them, msg: f }) + '\n');
   // and a claim whose Claude session has ended, which the take moves aside as the thirty-first
   writeFileSync(join(dir, 'claim.json'), JSON.stringify({ ...them, claudePid: 999999, msg: 'a forgotten claim' }) + '\n');
-  const r = await lockCli(t, dir, ['take', 'docker-test'], { LOCK_WAIT: '0', HQ_SLOT_PID: String(process.pid) });
+  const r = await lockCli(t, dir, ['take', 'docker-test'], { HQ_SLOT_WAIT: '0', HQ_SLOT_PID: String(process.pid) });
   assert.equal(r.code, 0, r.text); assert.match(r.text, /ended with its session/);
   const aside = readdirSync(dir).filter(n => n.startsWith('claim.json.stale-')).sort();
   assert.ok(aside.length <= 10, `the lock folder holds ${aside.length} set-aside claims, more than ten`);
@@ -108,9 +108,9 @@ test('a waiting run takes the slot as soon as it is released', async t => {
   assert.equal(r.code, 0, r.text); assert.match(r.text, /busy/); assert.match(r.text, /taken \(docker-test-after/);
 });
 
-test('on hosted CI, inside a container, or with HQ_SLOT=0 the slot stands aside and touches nothing; the QK_ names still work', async t => {
+test('on hosted CI, inside a container, or with HQ_SLOT=0 the slot stands aside and touches nothing', async t => {
   const dir = scratch(t);
-  for (const env of [{ CI: 'true' }, { CI: 'true', RUNNER_ENVIRONMENT: 'github-hosted' }, { HQ_SLOT: '0' }, { HQ_IN_CONTAINER: '1' }, { QK_LOCK: '0' }, { QK_IN_CONTAINER: '1' }]) {
+  for (const env of [{ CI: 'true' }, { CI: 'true', RUNNER_ENVIRONMENT: 'github-hosted' }, { HQ_SLOT: '0' }, { HQ_IN_CONTAINER: '1' }]) {
     const r = await lockCli(t, dir, ['take', 'docker-test'], env);
     assert.equal(r.code, 0); assert.equal(r.text, '');
   }
@@ -158,7 +158,7 @@ test('another agent of my session holding a claim makes my run wait, and leaves 
   const dir = scratch(t), s = shell(t);
   assert.equal((await lockCli(t, dir, ['claim', 'three runs'], sibling('gate-runner'))).code, 0);
   const before = readFileSync(join(dir, 'claim.json'), 'utf8');
-  const r = await lockCli(t, dir, ['take', 'docker-test'], { ...sibling('lock-builder'), HQ_SLOT_PID: String(s.pid), LOCK_WAIT: '0' });
+  const r = await lockCli(t, dir, ['take', 'docker-test'], { ...sibling('lock-builder'), HQ_SLOT_PID: String(s.pid), HQ_SLOT_WAIT: '0' });
   assert.equal(r.code, 3, r.text); assert.match(r.text, /gate-runner/);
   assert.equal(readFileSync(join(dir, 'claim.json'), 'utf8'), before, 'the claim is not renewed by another agent\'s take');
   assert.equal(existsSync(join(dir, 'run.json')), false);

@@ -1,5 +1,5 @@
 // Proves: hq slot decides who gets the test slot from fake processes and clocks (a free slot, a live holder, a dead one,
-// a claim, a container), and who's text and the LOCK_WAIT reading say what a person needs. Why: these are the decisions
+// a claim, a container), and who's text and the HQ_SLOT_WAIT reading say what a person needs. Why: these are the decisions
 // behind every take; pinned here with no process spawned, they run in milliseconds. The slot's other files run the
 // command for real against a throwaway lock folder.
 import test from 'node:test';
@@ -159,7 +159,7 @@ test('taking the slot moves a session\'s line to the checkout it is in now, and 
   assert.equal(runner.person, 'the laptop runner (after.yml)'); assert.ok(runner.msgAt, 'the message keeps its own time');
 });
 
-test('LOCK_WAIT: unset waits for good, 0 not at all, and a number of minutes that long', () => {
+test('HQ_SLOT_WAIT: unset waits for good, 0 not at all, and a number of minutes that long', () => {
   assert.equal(waitLimit(undefined), null);
   assert.equal(waitLimit(''), null);
   assert.equal(waitLimit('0'), 0);
@@ -169,11 +169,11 @@ test('LOCK_WAIT: unset waits for good, 0 not at all, and a number of minutes tha
   assert.equal(waitLimit('-1'), null);
 });
 
-test('a run given LOCK_WAIT minutes gives up once they pass, says so, and leaves the queue', async t => {
+test('a run given HQ_SLOT_WAIT minutes gives up once they pass, says so, and leaves the queue', async t => {
   const dir = scratch(t);
   writeFileSync(join(dir, 'run.json'), JSON.stringify({ ...them, pid: process.pid, since: new Date().toISOString() }));
-  const r = await lockCli(t, dir, ['take', 'docker-test-after'], { LOCK_WAIT: '0.005', HQ_SLOT_PID: '1' });
+  const r = await lockCli(t, dir, ['take', 'docker-test-after'], { HQ_SLOT_WAIT: '0.005', HQ_SLOT_PID: '1' });
   assert.equal(r.code, 3, r.text);
-  assert.match(r.text, /Giving up \(LOCK_WAIT=0\.005 minutes\)/);
+  assert.match(r.text, /Giving up \(HQ_SLOT_WAIT=0\.005 minutes\)/);
   assert.deepEqual(existsSync(join(dir, 'queue')) ? readdirSync(join(dir, 'queue')) : [], []);
 });

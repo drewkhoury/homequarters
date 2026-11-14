@@ -22,7 +22,7 @@ const WORKFLOW = `jobs:
       - name: Run the tests
         run: |
           case "$TARGET" in test|test-after) ;; esac
-          make "$TARGET" LANES=1 JUNIT=test-results
+          make "$TARGET" LANES=1 HQ_JUNIT=test-results
       - name: Keep the results
         run: node tests/run-info.mjs
 `;

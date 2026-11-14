@@ -8,7 +8,7 @@
 //   --no-daily      write dora.json only, not the dated copies: HQ's refresh, which has not fetched main, may hold
 //                   deploys git cannot judge, and the dated copies are what the meta-analysis study compares
 //   --quiet         write the files, print one line
-// HQ_CACHE (QK_CACHE for one release) points at another cache folder; the default is the manifest's.
+// HQ_CACHE points at another cache folder; the default is the manifest's.
 import { spawnSync, execFileSync } from 'node:child_process';
 import { existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync, renameSync } from 'node:fs';
 import { join, dirname } from 'node:path';
@@ -30,7 +30,7 @@ const repo = (() => {
 })();
 const { m } = loadManifest(repo);
 configureDelivery({ ...m.delivery, decisionsDir: (m.decisions && m.decisions.dir) || join(repo, 'docs', 'decisions'), decisionsEarlier: (m.decisions && m.decisions.earlier) || null });
-const cache = process.env.HQ_CACHE || process.env.QK_CACHE || m.cache;
+const cache = process.env.HQ_CACHE || m.cache;
 const raw = join(cache, 'ci', 'actions'), out = join(cache, 'dora');
 const say = (...a) => { if (!args.has('--quiet')) console.log(...a); };
 

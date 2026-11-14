@@ -100,7 +100,7 @@ export async function main(argv = process.argv.slice(2), env = process.env) {
   const keyOf = testKeyer(catalogue(repo));
   const [cmd, fileArg] = rest.filter(a => !a.startsWith('--')), write = rest.includes('--write');
   if (cmd !== 'red-gates') { console.error('Usage: hq problem-backfill red-gates [<file>] [--write] [--repo DIR]'); process.exit(2); }
-  const cache = m.cache, dir = env.HQ_PROBLEMS_DIR || env.QK_PROBLEMS_DIR || m.store('problems') || join(cache, 'problems'), events = join(dir, 'events.jsonl');
+  const cache = m.cache, dir = env.HQ_PROBLEMS_DIR || m.store('problems') || join(cache, 'problems'), events = join(dir, 'events.jsonl');
   const file = fileArg || join(cache, 'problems', 'backfill', 'red-gates.jsonl');
   const lines = readFileSync(file, 'utf8').split('\n').filter(Boolean).map(l => JSON.parse(l));
   const infra = new Map(observeReds(allRuns(cache), { keyOf }).filter(o => o.class === 'infra').map(o => [o.run, o.sig]));

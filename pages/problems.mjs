@@ -175,8 +175,8 @@ function slotTab(s, w) {
   const story = `<p class="pr-story">In the last ${esc(w.label.toLowerCase())} agents waited ${esc(dur(sum('waitMinutes')))} for the test slot behind another run, over ${plural(sum('waits'), 'wait')}. At the most, ${Math.max(0, ...days.map(d => d.atOnce))} runs held or waited for it at once.</p>`;
   return `${story}<div class="bl-stats">
       ${tile(dur(sum('waitMinutes')), 'waited behind another run', 'From the lock log: each wait to the take that ended it, behind a run that was not the same agent\'s in the same worktree.')}
-      ${tile(String(sum('gaveUp') + sum('left')), 'waits that gave up or left', 'A wait that ran out of LOCK_WAIT minutes, or stopped before its turn. A wait killed outright leaves no line.')}
-      ${tile(String(sum('refused')), 'takes refused', 'Takes under LOCK_WAIT=0 that found the slot busy.')}
+      ${tile(String(sum('gaveUp') + sum('left')), 'waits that gave up or left', 'A wait that ran out of HQ_SLOT_WAIT minutes, or stopped before its turn. A wait killed outright leaves no line.')}
+      ${tile(String(sum('refused')), 'takes refused', 'Takes under HQ_SLOT_WAIT=0 that found the slot busy.')}
       ${tile(String(sum('takeovers')), 'take-overs', 'A run took the slot from a holder whose process had gone.')}
     </div><div class="bl-charts pr-charts">
       ${panel(`Minutes waited behind another run, each day, ${w.label.toLowerCase()}`, 'Agents waiting, not machine time: a different clock.', dayChart(days.map(d => ({ day: d.day, m: d.waitMinutes })), [{ key: 'm', cls: 'now', label: 'minutes waited', bar: true }], { label: 'Minutes agents waited for the test slot each day', narrow: true })

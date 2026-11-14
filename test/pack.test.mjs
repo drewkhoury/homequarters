@@ -1,7 +1,7 @@
 // Proves: the package npm would publish installs into a scratch prefix and, run from a folder outside this repo, answers
 // every command QuestKeep's Makefile, workflows and scripts call, in the form they call it: serve (plain, and with
 // HQ_DEMO=1 and HQ_PORT), check and check --demo, backlog, dora, space host|figures|vm, ci-fetch, slot
-// take|who|status|claim|unclaim|release, run-info with --json and QK_LANES, and ci-keep; and the rest of the command
+// take|who|status|claim|unclaim|release, run-info with --json and HQ_LANES, and ci-keep; and the rest of the command
 // line (setup, machine, problem) loads. hq serve writes the link file from the install too.
 // Why: Nell found the tarball shipped bin and lib but not server.mjs, problem.mjs, backlog.mjs or dora.mjs, so a
 // stranger's first `hq` died with module-not-found; every run until then had gone through a shim at the checkout. A
@@ -67,7 +67,7 @@ test('the packed tarball installs and runs every command QuestKeep calls, from o
   ok(['slot', 'claim', 'a few runs'], {}, /Claimed/);
   ok(['slot', 'unclaim']);
   // test.yml and after.yml: the run line, then the results kept on this machine
-  ok(['run-info', 'gate', '--json', join(repo, 'test-results', 'run.json')], { QK_LANES: '2' });
+  ok(['run-info', 'gate', '--json', join(repo, 'test-results', 'run.json')], { HQ_LANES: '2' });
   assert.equal(JSON.parse(readFileSync(join(repo, 'test-results', 'run.json'), 'utf8')).kind, 'gate');
   writeFileSync(join(repo, 'test-results', 'junit.xml'), '<testsuites tests="0"></testsuites>\n');
   ok(['ci-keep', 'test-results', 'junit-1-1-gate'], { HQ_CI_DIR: join(cache, 'ci') }, /Kept/);

@@ -60,7 +60,7 @@ test('hq slot writes the run.json, take line and release line QuestKeep\'s scrip
   const want = golden('slot-run.json'), [wantTake, wantRelease] = goldenLog();
   const repo = checkout(t, want.branch), dir = scratch(t), sh = shell(t);
   // the environment regenerate.sh gave scripts/lock.mjs, under the names QuestKeep's Makefile and runner set today
-  const env = { HQ_SLOT_PID: String(sh.pid), USER: 'golden', QK_WHO: 'golden-runner', GITHUB_RUN_ID: '19000000001', GITHUB_RUN_ATTEMPT: '2', QK_RUN_TESTS: 'sync-offline island-stamps', JUNIT: '1', QK_KIND: 'deploy', QK_PLACE: 'home' };
+  const env = { HQ_SLOT_PID: String(sh.pid), USER: 'golden', HQ_WHO: 'golden-runner', GITHUB_RUN_ID: '19000000001', GITHUB_RUN_ATTEMPT: '2', HQ_RUN_TESTS: 'sync-offline island-stamps', HQ_JUNIT: '1', HQ_KIND: 'deploy', HQ_PLACE: 'home' };
   const took = await lockCli(t, dir, ['take', want.target, '--repo', repo], env);
   assert.equal(took.code, 0, took.text);
   sameRecord(JSON.parse(readFileSync(join(dir, 'run.json'), 'utf8')), want, new Set(), 'run.json');
@@ -76,7 +76,7 @@ test('hq slot writes the run.json, take line and release line QuestKeep\'s scrip
 test('hq run-info, with QuestKeep\'s CI fields in --extra, writes the run line QuestKeep\'s tests/run-info.mjs wrote', t => {
   const want = golden('run-info-ci.json'), repo = checkout(t, 'main'), out = join(scratch(t), 'run.json');
   // the workflow's environment regenerate.sh gave tests/run-info.mjs (QK_TARGET and QK_HALF are QuestKeep's, and come in extra)
-  const env = { PATH: process.env.PATH, HOME: process.env.HOME, GITHUB_ACTIONS: 'true', RUNNER_ENVIRONMENT: 'self-hosted', GITHUB_RUN_ID: '19000000001', GITHUB_RUN_ATTEMPT: '2', GITHUB_EVENT_NAME: 'push', GITHUB_REF_NAME: 'main', QK_COMMIT: '0123456789abcdef0123456789abcdef01234567' };
+  const env = { PATH: process.env.PATH, HOME: process.env.HOME, GITHUB_ACTIONS: 'true', RUNNER_ENVIRONMENT: 'self-hosted', GITHUB_RUN_ID: '19000000001', GITHUB_RUN_ATTEMPT: '2', GITHUB_EVENT_NAME: 'push', GITHUB_REF_NAME: 'main', HQ_COMMIT: '0123456789abcdef0123456789abcdef01234567' };
   // what QuestKeep passes through --extra (decision 11): its runner's name, its make target and gate half, and the three
   // it works out itself (its tree hash, its lanes default, its SDK state), here as its own writer worked them out
   const extra = { runner: 'laptop', target: 'test-gate', half: '1', hash: want.hash, lanes: want.lanes, sdk: want.sdk };

@@ -41,7 +41,7 @@ test('a take that will not wait does not jump the queue', { timeout: 30000 }, as
   // A paused waiter keeps its place: the queue drops only waiters whose process has ended.
   first.p.kill('SIGSTOP');
   await lockCli(t, dir, ['release', 'docker-test', '0'], { HQ_SLOT_PID: String(h.pid) });
-  const jumper = await lockCli(t, dir, ['take', 'jumper'], { HQ_SLOT_PID: String(c.pid), CLAUDE_CODE_SESSION_ID: 'three', LOCK_WAIT: '0' });
+  const jumper = await lockCli(t, dir, ['take', 'jumper'], { HQ_SLOT_PID: String(c.pid), CLAUDE_CODE_SESSION_ID: 'three', HQ_SLOT_WAIT: '0' });
   first.p.kill('SIGCONT');
   assert.equal(jumper.code, 3, jumper.text); assert.match(jumper.text, /waiting ahead/);
   assert.equal((await first.done).code, 0);
@@ -58,7 +58,7 @@ test('a waiter stopped with Ctrl-C, or killed outright, gives up its place', { t
   await until(() => eventCount(dir, 'wait') >= 2, 'the second waiter is waiting');
   killed.p.kill('SIGKILL'); b.kill(); await killed.done;
   await lockCli(t, dir, ['release', 'docker-test', '0'], { HQ_SLOT_PID: String(h.pid) });
-  const r = await lockCli(t, dir, ['take', 'next'], { HQ_SLOT_PID: String(c.pid), CLAUDE_CODE_SESSION_ID: 'three', LOCK_WAIT: '0' });
+  const r = await lockCli(t, dir, ['take', 'next'], { HQ_SLOT_PID: String(c.pid), CLAUDE_CODE_SESSION_ID: 'three', HQ_SLOT_WAIT: '0' });
   assert.equal(r.code, 0, r.text);
 });
 
@@ -78,12 +78,12 @@ test('a waiter stopped before its turn logs that it left, how long it waited and
   assert.match(left[0].for, /docker-test/, 'what it was waiting behind');
 });
 
-// Proves: a waiter that gets its turn, or gives up after LOCK_WAIT minutes, logs no left line as well.
+// Proves: a waiter that gets its turn, or gives up after HQ_SLOT_WAIT minutes, logs no left line as well.
 // Why: one wait must count once; a give-up already has a line of its own.
 test('a waiter that takes the slot or gives up logs no left line', { timeout: 30000 }, async t => {
   const dir = scratch(t), h = shell(t), a = shell(t);
   await lockCli(t, dir, ['take', 'docker-test'], { HQ_SLOT_PID: String(h.pid) });
-  const gaveUp = await lockCli(t, dir, ['take', 'after'], { HQ_SLOT_PID: String(a.pid), LOCK_WAIT: '0.005' });
+  const gaveUp = await lockCli(t, dir, ['take', 'after'], { HQ_SLOT_PID: String(a.pid), HQ_SLOT_WAIT: '0.005' });
   assert.equal(gaveUp.code, 3, gaveUp.text);
   const next = waiter(t, dir, 'next', { HQ_SLOT_PID: String(a.pid), CLAUDE_CODE_SESSION_ID: 'one' });
   await until(() => logOf(dir).some(e => e.event === 'wait' && e.target === 'next'), 'the next waiter is waiting');
@@ -96,12 +96,12 @@ test('a waiter that takes the slot or gives up logs no left line', { timeout: 30
   assert.equal(count('take'), 2);
 });
 
-// Proves: a take that will not wait (LOCK_WAIT=0) and finds the slot busy logs that it was refused, with whose run it met.
+// Proves: a take that will not wait (HQ_SLOT_WAIT=0) and finds the slot busy logs that it was refused, with whose run it met.
 // Why: a refusal is a run that did not happen because of the slot, and nothing recorded it, so the register could not count it.
 test('a take that will not wait logs its refusal and what it met', async t => {
   const dir = scratch(t), h = shell(t);
   await lockCli(t, dir, ['take', 'docker-test'], { HQ_SLOT_PID: String(h.pid) });
-  const r = await lockCli(t, dir, ['take', 'smoke'], { HQ_SLOT_PID: String(process.pid), CLAUDE_CODE_SESSION_ID: 'two', LOCK_WAIT: '0' });
+  const r = await lockCli(t, dir, ['take', 'smoke'], { HQ_SLOT_PID: String(process.pid), CLAUDE_CODE_SESSION_ID: 'two', HQ_SLOT_WAIT: '0' });
   assert.equal(r.code, 3, r.text);
   const refused = logOf(dir).filter(e => e.event === 'refused');
   assert.equal(refused.length, 1);
@@ -115,7 +115,7 @@ test('a session holding a claim goes ahead of the queue, since the others are wa
   assert.equal((await lockCli(t, dir, ['claim', 'three runs'], mine)).code, 0);
   const other = waiter(t, dir, 'other', { HQ_SLOT_PID: String(a.pid), CLAUDE_CODE_SESSION_ID: 'one' });
   await until(() => eventCount(dir, 'wait') >= 1, 'the other session waits for the claim');
-  const r = await lockCli(t, dir, ['take', 'docker-test'], { ...mine, HQ_SLOT_PID: String(s.pid), LOCK_WAIT: '0' });
+  const r = await lockCli(t, dir, ['take', 'docker-test'], { ...mine, HQ_SLOT_PID: String(s.pid), HQ_SLOT_WAIT: '0' });
   assert.equal(r.code, 0, r.text);
   const who = (await lockCli(t, dir, ['who'])).text;
   assert.match(who, /Waiting: 1\. .*for other, since \d\d:\d\d/);

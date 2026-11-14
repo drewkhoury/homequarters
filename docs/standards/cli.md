@@ -110,42 +110,43 @@ The free-space check before a test run. It stands aside on GitHub-hosted runners
 
 ## Environment
 
-Every `HQ_` name the package reads. The `QK_` names in the second column are QuestKeep's, read as well through 0.2 and removed in 0.3.0; the `HQ_` name wins when both are set.
+Every environment name the package reads. Through 0.2 it also read QuestKeep's own `QK_` names, `LOCK_WAIT` and `JUNIT` beside these; 0.3.0 reads only the names below.
 
-| Name | Read by | Also read as | Means |
-| --- | --- | --- | --- |
-| `HQ_REPO` | every command | | the repo, when `--repo` is not given |
-| `HQ_PORT` | `serve` | | the port, taken as it is; 0 is any free one |
-| `HQ_DEMO` | `serve` | | `1` turns on the demo setting |
-| `HQ_DEMO_PRIVATE` | `check --demo` | | more names the demo must hide, comma separated |
-| `HQ_EDITOR` | `serve` | | the editor link template, with `{path}` and `{line}`; default `vscode://file/{path}:{line}` |
-| `HQ_TERMINAL` | `serve` | | the terminal Open in Claude uses on macOS |
-| `HQ_CACHE` | `dora` | `QK_CACHE` | another cache folder than the manifest's |
-| `HQ_SLOT_DIR` | `slot` | `QK_LOCK_DIR` | another lock store than the manifest's |
-| `HQ_SLOT` | `slot` | `QK_LOCK` | `0` makes the slot stand aside |
-| `HQ_SLOT_WAIT` | `slot take` | `LOCK_WAIT` | minutes to wait for the slot; 0 fails at once with exit 3 |
-| `HQ_SLOT_PID` | `slot` | `QK_LOCK_PID` | the process that holds the slot, when it is not hq's parent |
-| `HQ_SLOT_POLL_MS` | `slot take` | `QK_LOCK_POLL_MS` | how often a waiter looks again; default 2000 |
-| `HQ_SLOT_EXTRA` | `slot` | `QK_SLOT_EXTRA` | a project's own fields for the slot record, as a JSON object |
-| `HQ_RUN_TESTS` | `slot take` | `QK_RUN_TESTS` | the run's tests, space-separated, recorded as `tests` |
-| `HQ_JUNIT` | `slot take` | `JUNIT` | set, the run's results feed a check or a deploy, recorded as `junit: true` |
-| `HQ_PLACE` | `slot take` | `QK_PLACE` | where the run was placed, recorded as `place` |
-| `HQ_AGENT` | `slot`, `run-info`, `problem` | `QK_AGENT` | an agent started by another agent names itself |
-| `HQ_WHO` | `slot` | `QK_WHO` | the name a run without a Claude session goes by; default `$USER` |
-| `HQ_NO_DOCKER` | `slot` | `QK_NO_DOCKER` | set, the slot does not look for test containers |
-| `HQ_TEST_IMAGE` | `slot` | `QK_TEST_IMAGE` | the image whose containers count as test runs |
-| `HQ_IN_CONTAINER` | `slot`, `space` | `QK_IN_CONTAINER` | `1` inside a test container: the host already took the slot and checked the disk |
-| `HQ_SPACE_WARN_GB` | `space` | `QK_SPACE_WARN_GB` | the free space under which a run warns; default 20 |
-| `HQ_SPACE_FAIL_GB` | `space` | `QK_SPACE_FAIL_GB` | the free space under which a run is not started; default 5 |
-| `HQ_SPACE_HOST` | `space vm` | `QK_SPACE_HOST` | the host's figures, from `hq space figures` |
-| `HQ_KIND` | `run-info`, `slot take` | `QK_KIND` | the kind, over the argument; on the slot, recorded as `kind` |
-| `HQ_WHERE` | `run-info` | `QK_WHERE` | laptop, container or ci, when the kind alone cannot say |
-| `HQ_BRANCH` | `run-info` | `QK_BRANCH` | the branch, for a detached checkout |
-| `HQ_COMMIT` | `run-info` | `QK_COMMIT` | the commit on CI, where a pull request's checkout is a merge commit |
-| `HQ_LANES` | `run-info` | `QK_LANES` | how many tests ran side by side |
-| `HQ_OUT` | `run-info` | `QK_OUT` | the run's folder of test files |
-| `HQ_PARTIAL` | `run-info` | `QK_PARTIAL` | `1` when the run named its own tests, so it ran part of a set |
-| `HQ_CI_DIR` | `ci-keep` | `QK_CI_DIR` | another ci store than the manifest's |
-| `HQ_PROBLEMS_DIR` | `problem`, `problem-backfill` | `QK_PROBLEMS_DIR` | another problems store than the manifest's |
+| Name | Read by | Means |
+| --- | --- | --- |
+| `HQ_REPO` | every command | the repo, when `--repo` is not given |
+| `HQ_PORT` | `serve` | the port, taken as it is; 0 is any free one |
+| `HQ_DEMO` | `serve` | `1` turns on the demo setting |
+| `HQ_DEMO_PRIVATE` | `check --demo` | more names the demo must hide, comma separated |
+| `HQ_EDITOR` | `serve` | the editor link template, with `{path}` and `{line}`; default `vscode://file/{path}:{line}` |
+| `HQ_TERMINAL` | `serve` | the terminal Open in Claude uses on macOS |
+| `HQ_CACHE` | `dora` | another cache folder than the manifest's |
+| `HQ_SLOT_DIR` | `slot` | another lock store than the manifest's |
+| `HQ_SLOT` | `slot` | `0` makes the slot stand aside |
+| `HQ_SLOT_WAIT` | `slot take` | minutes to wait for the slot; 0 fails at once with exit 3 |
+| `HQ_SLOT_PID` | `slot` | the process that holds the slot, when it is not hq's parent |
+| `HQ_SLOT_POLL_MS` | `slot take` | how often a waiter looks again; default 2000 |
+| `HQ_SLOT_EXTRA` | `slot` | a project's own fields for the slot record, as a JSON object |
+| `HQ_RUN_TESTS` | `slot take` | the run's tests, space-separated, recorded as `tests` |
+| `HQ_JUNIT` | `slot take` | set, the run's results feed a check or a deploy, recorded as `junit: true` |
+| `HQ_PLACE` | `slot take` | where the run was placed, recorded as `place` |
+| `HQ_AGENT` | `slot`, `run-info`, `problem` | an agent started by another agent names itself |
+| `HQ_WHO` | `slot` | the name a run without a Claude session goes by; default `$USER` |
+| `HQ_NO_DOCKER` | `slot` | set, the slot does not look for test containers |
+| `HQ_TEST_IMAGE` | `slot` | the image whose containers count as test runs |
+| `HQ_IN_CONTAINER` | `slot`, `space` | `1` inside a test container: the host already took the slot and checked the disk |
+| `HQ_SPACE_WARN_GB` | `space` | the free space under which a run warns; default 20 |
+| `HQ_SPACE_FAIL_GB` | `space` | the free space under which a run is not started; default 5 |
+| `HQ_SPACE_HOST` | `space vm` | the host's figures, from `hq space figures` |
+| `HQ_KIND` | `run-info`, `slot take` | the kind, over the argument; on the slot, recorded as `kind` |
+| `HQ_WHERE` | `run-info` | laptop, container or ci, when the kind alone cannot say |
+| `HQ_BRANCH` | `run-info` | the branch, for a detached checkout |
+| `HQ_NOW` | `node lib/facts.mjs` | an ISO time a red is read as of, for replaying an old one; default now |
+| `HQ_COMMIT` | `run-info` | the commit on CI, where a pull request's checkout is a merge commit |
+| `HQ_LANES` | `run-info` | how many tests ran side by side |
+| `HQ_OUT` | `run-info` | the run's folder of test files |
+| `HQ_PARTIAL` | `run-info` | `1` when the run named its own tests, so it ran part of a set |
+| `HQ_CI_DIR` | `ci-keep` | another ci store than the manifest's |
+| `HQ_PROBLEMS_DIR` | `problem`, `problem-backfill` | another problems store than the manifest's |
 
 Two names only the package's own tests read: `HQ_OFFLINE=1` skips the tests that need the npm registry, and `HQ_RACE_ROUNDS` sets how many rounds the slot's race tests run.

@@ -83,7 +83,7 @@ test('the slot line passes a failing command\'s status through unchanged, and th
 test('the slot line never runs the command when it cannot get the slot', t => {
   const m = slotMake(t);
   writeFileSync(join(m.lock, 'run.json'), JSON.stringify({ session: 'other', pid: process.pid, worktree: 'elsewhere', target: 'gate', since: new Date().toISOString() }));
-  const r = m.make('browser-test', { LOCK_WAIT: '0' });
+  const r = m.make('browser-test', { HQ_SLOT_WAIT: '0' });
   assert.notEqual(r.status, 0); assert.equal(existsSync(join(m.dir, 'ran')), false); assert.match(r.out, /busy/);
 });
 

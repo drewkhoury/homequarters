@@ -126,11 +126,11 @@ function repoOf(argv, env) {
 }
 
 // The command line in: the repo's manifest says where the events file is (its problems store, else <cache>/problems)
-// and which pipeline file names the stages. HQ_PROBLEMS_DIR (QK_PROBLEMS_DIR for one release) points elsewhere.
+// and which pipeline file names the stages. HQ_PROBLEMS_DIR points elsewhere.
 export function main(argv = process.argv.slice(2), env = process.env) {
   const repo = repoOf(argv, env), { m } = loadManifest(repo);
   configureStages(stagesFrom(loadPipeline(m.tests && m.tests.pipeline)));
-  const dir = env.HQ_PROBLEMS_DIR || env.QK_PROBLEMS_DIR || m.store('problems') || join(m.cache, 'problems'), file = join(dir, 'events.jsonl');
+  const dir = env.HQ_PROBLEMS_DIR || m.store('problems') || join(m.cache, 'problems'), file = join(dir, 'events.jsonl');
   if (argv.includes('--help') || argv[0] === 'help') {
     const src = readFileSync(new URL(import.meta.url), 'utf8').split('\n');
     const usage = src.slice(src.findIndex(l => l.startsWith('// Usage:')), src.findIndex(l => l.startsWith('import '))).filter(l => l.startsWith('//')).map(l => l.slice(3));
@@ -144,7 +144,7 @@ export function main(argv = process.argv.slice(2), env = process.env) {
   let events = [];
   try { events = readFileSync(file, 'utf8').split('\n').filter(Boolean).map(l => { try { return JSON.parse(l); } catch { return null; } }).filter(Boolean); } catch { /* none yet */ }
   // who writes: the agent that names itself, else the Claude session, else the person at the terminal
-  const by = env.HQ_AGENT || env.QK_AGENT || (env.CLAUDE_CODE_SESSION_ID ? `session ${env.CLAUDE_CODE_SESSION_ID.slice(0, 8)}` : 'person');
+  const by = env.HQ_AGENT || (env.CLAUDE_CODE_SESSION_ID ? `session ${env.CLAUDE_CODE_SESSION_ID.slice(0, 8)}` : 'person');
   const r = eventFor(cmd, opts, { events, now: new Date(), by, ctx: privacyContext({ home: homedir() }) });
   if (r.refused) { console.error(`Not written:\n${r.refused.map(x => `  ${x}`).join('\n')}`); process.exit(1); }
   mkdirSync(dir, { recursive: true });

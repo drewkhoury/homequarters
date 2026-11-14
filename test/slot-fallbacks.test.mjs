@@ -1,4 +1,4 @@
-// Proves: the QK_ names QuestKeep set still work for one release, the lock store defaults to the manifest's cache, unclaim
+// Proves: from 0.3.0 the slot reads none of the QK_ names QuestKeep set, the lock store defaults to the manifest's cache, unclaim
 // force takes another session's claim, and the claimer's own take renews its claim. Why: the adversary's survivors of
 // 15 October, the fallbacks nothing exercised.
 import test from 'node:test';
@@ -11,18 +11,16 @@ import { fileURLToPath } from 'node:url';
 import { decideTake, whoText, waitLimit, sameOwner, SLOT_V } from '../lib/slot.mjs';
 import { HQ, NOW, MIN, at, me, them, living, take, lockCli, scratch, shell, waiter, eventCount, until, holderTarget, logOf, sibling, dockerStub, rawCli } from './slot-helpers.mjs';
 
-test('the QK_ names QuestKeep set still work for one release: the folder, the agent, the process, who, no docker', async t => {
+test('from 0.3.0 the slot reads none of the QK_ names: the agent, the process and who come from HQ_ names alone', async t => {
   const dir = scratch(t);
-  const r = await rawCli(t, ['take', 'docker-test'], { QK_LOCK_DIR: dir, QK_NO_DOCKER: '1', QK_LOCK_PID: String(process.pid), QK_AGENT: 'gate-runner', CLAUDE_CODE_SESSION_ID: 's1' });
+  const r = await rawCli(t, ['take', 'docker-test'], { HQ_SLOT_DIR: dir, HQ_NO_DOCKER: '1', HQ_SLOT_PID: String(process.pid), QK_LOCK_PID: '1', QK_AGENT: 'gate-runner', CLAUDE_CODE_SESSION_ID: 's1' });
   assert.equal(r.code, 0, r.text);
   const run = JSON.parse(readFileSync(join(dir, 'run.json'), 'utf8'));
-  assert.equal(run.pid, process.pid, 'QK_LOCK_PID'); assert.equal(run.agent, 'gate-runner', 'QK_AGENT');
-  // a run outside any Claude session is a person's, named the QuestKeep way
-  const who = await rawCli(t, ['status', 'posting'], { QK_LOCK_DIR: dir, QK_NO_DOCKER: '1', QK_WHO: 'the laptop runner' });
+  assert.equal(run.pid, process.pid, 'HQ_SLOT_PID, not QK_LOCK_PID'); assert.equal(run.agent, null, 'QK_AGENT is not read');
+  const who = await rawCli(t, ['status', 'posting'], { HQ_SLOT_DIR: dir, HQ_NO_DOCKER: '1', QK_WHO: 'the laptop runner' });
   assert.equal(who.code, 0, who.text);
-  assert.ok(readdirSync(join(dir, 'board')).some(b => JSON.parse(readFileSync(join(dir, 'board', b), 'utf8')).person === 'the laptop runner'), 'QK_WHO');
-  const hq = await rawCli(t, ['release', 'docker-test', '0'], { QK_LOCK_DIR: dir, HQ_SLOT_DIR: dir, QK_NO_DOCKER: '1', HQ_SLOT_PID: String(process.pid), QK_LOCK_PID: '1', HQ_AGENT: 'gate-runner', QK_AGENT: 'other', CLAUDE_CODE_SESSION_ID: 's1' });
-  assert.equal(hq.code, 0, `the HQ_ name wins over the QK_ one: ${hq.text}`);
+  assert.ok(!readdirSync(join(dir, 'board')).some(b => JSON.parse(readFileSync(join(dir, 'board', b), 'utf8')).person === 'the laptop runner'), 'QK_WHO is not read');
+  assert.equal((await rawCli(t, ['release', 'docker-test', '0'], { HQ_SLOT_DIR: dir, HQ_NO_DOCKER: '1', HQ_SLOT_PID: String(process.pid), CLAUDE_CODE_SESSION_ID: 's1' })).code, 0);
   assert.equal(existsSync(join(dir, 'run.json')), false);
 });
 
@@ -34,7 +32,7 @@ test('with no folder named, the slot is the manifest\'s lock store, under the re
   assert.equal(existsSync(join(cache, 'lock', 'run.json')), true, 'run.json under <cache>/lock');
   const moved = scratch(t);
   writeFileSync(join(repo, 'hq.json'), JSON.stringify({ schemaVersion: 1, name: 'doors', cache, stores: [{ id: 'lock', path: moved }] }));
-  const r2 = await rawCli(t, ['take', 'docker-test', '--repo', repo], { HQ_NO_DOCKER: '1', HQ_SLOT_PID: String(process.pid), LOCK_WAIT: '0' });
+  const r2 = await rawCli(t, ['take', 'docker-test', '--repo', repo], { HQ_NO_DOCKER: '1', HQ_SLOT_PID: String(process.pid), HQ_SLOT_WAIT: '0' });
   assert.equal(r2.code, 0, `a store with its own path is the slot: ${r2.text}`);
   assert.equal(existsSync(join(moved, 'run.json')), true);
 });

@@ -709,8 +709,8 @@ test("a test red in the gate and again on its rerun links to each run's own log"
 // checkout holds one commit.
 const ENTRY = 'P-2026-10-11-agent-mistake-0f0f0f', MERGED = 'P-2026-10-11-agent-mistake-1e1e1e';
 async function problemsServer(t) {
-  const pcache = mkdtempSync(join(tmpdir(), 'hq-problems-')), had = process.env.QK_PROBLEMS_DIR;
-  process.env.QK_PROBLEMS_DIR = join(pcache, 'problems');
+  const pcache = mkdtempSync(join(tmpdir(), 'hq-problems-')), had = process.env.HQ_PROBLEMS_DIR;
+  process.env.HQ_PROBLEMS_DIR = join(pcache, 'problems');
   const day = n => new Date(Date.now() - n * 86400000).toISOString();
   for (const [n, seq] of [[1, '000001'], [2, '000002']]) {
     const id = `${day(n).slice(0, 19).replace(/:/g, '-')}Z_${seq}`, d = join(pcache, 'runs', 'runs', id);
@@ -736,7 +736,7 @@ async function problemsServer(t) {
     { at: '2026-10-10T01:32:17Z', ev: 'opened', id: 'P-2026-10-10-tooling-breakage-3b3b3b', by: 'builder', fields: { title: 'Opened at 01:32Z', kind: 'tooling-breakage', evidence: 'run 2026-10-10T00-00-00Z_000003' } },
   ].map(e => JSON.stringify(e)).join('\n') + '\n');
   const p = await start({ port: 0, repo: REPO, cache: pcache, m: manifest(pcache), projectsDir: join(cache, 'no-transcripts'), gh: async () => { throw Object.assign(new Error('spawn gh ENOENT'), { code: 'ENOENT' }); } });
-  t.after(() => { p.server.close(); rmSync(pcache, { recursive: true, force: true }); if (had === undefined) delete process.env.QK_PROBLEMS_DIR; else process.env.QK_PROBLEMS_DIR = had; });
+  t.after(() => { p.server.close(); rmSync(pcache, { recursive: true, force: true }); if (had === undefined) delete process.env.HQ_PROBLEMS_DIR; else process.env.HQ_PROBLEMS_DIR = had; });
   return path => fetch(new URL(path, p.url));
 }
 

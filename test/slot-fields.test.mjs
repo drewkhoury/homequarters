@@ -8,7 +8,7 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { lockCli, scratch, shell, logOf } from './slot-helpers.mjs';
 
-// What QuestKeep's Makefile sets for a long set run on the laptop that feeds a deploy: the list, JUNIT, the kind, a placement.
+// What QuestKeep's Makefile sets for a long set run on the laptop that feeds a deploy: the list, HQ_JUNIT, the kind, a placement.
 const ASKED = { tests: ['sync-offline', 'island-stamps'], junit: true, kind: 'deploy', place: 'home' };
 const runJson = dir => JSON.parse(readFileSync(join(dir, 'run.json'), 'utf8'));
 
@@ -26,9 +26,9 @@ test('a take and a release carry the run\'s tests, junit, kind and place from HQ
   for (const rec of [r.run, r.take, r.release]) for (const [k, v] of Object.entries(ASKED)) assert.deepEqual(rec[k], v, `${k} in ${rec.event || 'run.json'}`);
 });
 
-test('QuestKeep\'s names (QK_RUN_TESTS, JUNIT, QK_KIND, QK_PLACE) give the same record', async t => {
+test('QuestKeep\'s old names (QK_RUN_TESTS, JUNIT, QK_KIND, QK_PLACE) are not read from 0.3.0', async t => {
   const r = await takeAndRelease(t, { QK_RUN_TESTS: 'sync-offline island-stamps', JUNIT: '1', QK_KIND: 'deploy', QK_PLACE: 'home' });
-  for (const rec of [r.run, r.take, r.release]) for (const [k, v] of Object.entries(ASKED)) assert.deepEqual(rec[k], v, `${k} in ${rec.event || 'run.json'}`);
+  for (const rec of [r.run, r.take, r.release]) for (const k of Object.keys(ASKED)) assert.equal(k in rec, false, `${k} in ${rec.event || 'run.json'}`);
 });
 
 test('a run that sets none of them records none of them, and a blank test list counts as unset', async t => {

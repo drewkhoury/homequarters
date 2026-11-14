@@ -25,15 +25,15 @@ test('an agent in a Claude Code session is named, with its own name when it is o
   assert.equal(info.agent, 'builder-2');
 });
 
-test('the QK_ names QuestKeep sets still work, and HQ_ names win over them', () => {
+test('the QK_ names QuestKeep set are not read from 0.3.0; the HQ_ ones are', () => {
   const a = runInfo({ env: { QK_KIND: 'soak', QK_LANES: '3' }, args: ['gate'], git, machine }).info;
-  assert.equal(a.kind, 'soak'); assert.equal(a.where, 'container'); assert.equal(a.lanes, 3);
-  const b = runInfo({ env: { QK_KIND: 'soak', HQ_KIND: 'deploy' }, args: [], git, machine }).info;
-  assert.equal(b.kind, 'deploy');
+  assert.equal(a.kind, 'gate', 'the argument, not QK_KIND'); assert.notEqual(a.lanes, 3);
+  const b = runInfo({ env: { HQ_KIND: 'soak', HQ_LANES: '3' }, args: ['gate'], git, machine }).info;
+  assert.equal(b.kind, 'soak'); assert.equal(b.where, 'container'); assert.equal(b.lanes, 3);
 });
 
 test('on GitHub Actions the run, attempt, event and runner come from the workflow, and the commit from the head it tested', () => {
-  const env = { GITHUB_ACTIONS: 'true', GITHUB_RUN_ID: '42', GITHUB_RUN_ATTEMPT: '2', GITHUB_EVENT_NAME: 'pull_request', GITHUB_HEAD_REF: 'fix/x', GITHUB_SHA: 'merge00000', QK_COMMIT: 'headsha1234567', RUNNER_ENVIRONMENT: 'self-hosted' };
+  const env = { GITHUB_ACTIONS: 'true', GITHUB_RUN_ID: '42', GITHUB_RUN_ATTEMPT: '2', GITHUB_EVENT_NAME: 'pull_request', GITHUB_HEAD_REF: 'fix/x', GITHUB_SHA: 'merge00000', HQ_COMMIT: 'headsha1234567', RUNNER_ENVIRONMENT: 'self-hosted' };
   const { info } = runInfo({ env, args: ['gate'], git: () => 'tree123', machine, now: () => new Date('2026-10-14T00:00:00Z') });
   assert.equal(info.where, 'ci'); assert.equal(info.who, 'ci'); assert.equal(info.branch, 'fix/x'); assert.equal(info.commit, 'headsha');
   assert.equal(info.run, '42'); assert.equal(info.attempt, 2); assert.equal(info.runner, 'self-hosted'); assert.equal(info.tree, 'tree123'); assert.equal(info.dirty, false);
@@ -84,7 +84,7 @@ test('a dirty tree, the run folder, a given branch and a partial flag each reach
 // QuestKeep's CI fields (decision 11 of the plan to make HQ independent): its runner is "laptop", and only it knows its make
 // target, its gate half, its own tree hash (which a deploy's reuse of a run rests on), its lanes and its SDK state.
 test('on CI, --extra wins over the runner and adds the target, half, hash, lanes and sdk; without it HQ\'s own stay', () => {
-  const env = { GITHUB_ACTIONS: 'true', GITHUB_RUN_ID: '42', GITHUB_RUN_ATTEMPT: '1', GITHUB_EVENT_NAME: 'push', GITHUB_REF_NAME: 'main', QK_COMMIT: 'headsha1234567', RUNNER_ENVIRONMENT: 'self-hosted' };
+  const env = { GITHUB_ACTIONS: 'true', GITHUB_RUN_ID: '42', GITHUB_RUN_ATTEMPT: '1', GITHUB_EVENT_NAME: 'push', GITHUB_REF_NAME: 'main', HQ_COMMIT: 'headsha1234567', RUNNER_ENVIRONMENT: 'self-hosted' };
   const qk = { runner: 'laptop', target: 'test-gate', half: '1', hash: 'v3-0123abcd', lanes: 2, sdk: 'local' };
   const ciGit = () => 'tree123', now = () => new Date('2026-10-14T00:00:00Z');
   const withExtra = runInfo({ env, args: ['gate', '--extra', JSON.stringify(qk)], git: ciGit, machine, now }).info;

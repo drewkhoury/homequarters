@@ -37,13 +37,12 @@ test('a disk that could not be measured never stops a run, and the others still 
   assert.match(report(decide([unknown, vm(2 * GB)], DEFAULT), DEFAULT, {}), /this Mac's disk: unknown/);
 });
 
-test('HQ_SPACE_WARN_GB and HQ_SPACE_FAIL_GB move the lines, anything that is not a number keeps the defaults, and the QK_ names still work', () => {
+test('HQ_SPACE_WARN_GB and HQ_SPACE_FAIL_GB move the lines, anything that is not a number keeps the defaults, and the QK_ names are not read from 0.3.0', () => {
   assert.deepEqual(thresholds({}), DEFAULT);
   assert.deepEqual(thresholds({ HQ_SPACE_WARN_GB: '50', HQ_SPACE_FAIL_GB: '100000' }), { warnGb: 50, failGb: 100000 });
   assert.deepEqual(thresholds({ HQ_SPACE_WARN_GB: 'lots', HQ_SPACE_FAIL_GB: '' }), DEFAULT);
   assert.equal(decide([mac(500 * GB)], thresholds({ HQ_SPACE_FAIL_GB: '100000' })).level, 'fail');
-  assert.deepEqual(thresholds({ QK_SPACE_WARN_GB: '50', QK_SPACE_FAIL_GB: '7' }), { warnGb: 50, failGb: 7 });
-  assert.deepEqual(thresholds({ QK_SPACE_WARN_GB: '50', HQ_SPACE_WARN_GB: '60' }), { warnGb: 60, failGb: 5 }, 'the HQ_ name wins');
+  assert.deepEqual(thresholds({ QK_SPACE_WARN_GB: '50', QK_SPACE_FAIL_GB: '7' }), DEFAULT);
 });
 
 test('a stopped run says it started nothing and deleted nothing, gives each disk, the cache and what would make room', () => {
@@ -97,7 +96,7 @@ test('the check stands aside on GitHub-hosted runners, and on the host side when
   assert.equal(standsAside({ RUNNER_ENVIRONMENT: 'self-hosted', CI: 'true' }, 'host'), false, 'the laptop runner fills the same disks');
   assert.equal(standsAside({ HQ_IN_CONTAINER: '1' }, 'host'), true);
   assert.equal(standsAside({ HQ_IN_CONTAINER: '1' }, 'vm'), false);
-  assert.equal(standsAside({ QK_IN_CONTAINER: '1' }, 'host'), true, 'the QK_ name still works');
+  assert.equal(standsAside({ QK_IN_CONTAINER: '1' }, 'host'), false, 'the QK_ name is not read from 0.3.0');
   assert.equal(standsAside({}, 'host'), false);
 });
 

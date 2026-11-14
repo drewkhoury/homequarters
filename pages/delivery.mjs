@@ -49,7 +49,7 @@ let running = null, lastError = null;
 export function refresh(ctx, run = execFile) {
   if (!running) {
     running = new Promise(res => run(process.execPath, [join(dirname(fileURLToPath(import.meta.url)), '..', 'dora.mjs'), '--no-fetch-git', '--no-daily', '--quiet'],
-      { cwd: ctx.repo, env: { ...process.env, QK_CACHE: ctx.cache }, timeout: 5 * 60000 }, err => res(err ? String(err.message).split('\n')[0] : null)))
+      { cwd: ctx.repo, env: { ...process.env, HQ_CACHE: ctx.cache }, timeout: 5 * 60000 }, err => res(err ? String(err.message).split('\n')[0] : null)))
       .then(err => { lastError = err; return err; })
       .finally(() => { running = null; });
   }

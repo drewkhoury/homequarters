@@ -1,5 +1,5 @@
 // Proves: a project adds its own fields to the slot's run record and log lines with `hq slot take ... --extra '<json>'`
-// or HQ_SLOT_EXTRA (QK_SLOT_EXTRA), never over the slot's own fields, and a value that is not a JSON object is left out
+// or HQ_SLOT_EXTRA (HQ_SLOT_EXTRA), never over the slot's own fields, and a value that is not a JSON object is left out
 // with a warning while the take still goes ahead.
 // Why: QuestKeep's next slot field should need no HQ release (the plan's Rule 2), and a project's typo in its extra must
 // not stop its test runs or break the slot's own bookkeeping (the process, the session, the time taken).
@@ -22,8 +22,8 @@ test('--extra on a take puts the project\'s fields in run.json and the take line
   for (const rec of [run, take]) assert.deepEqual({ pool: rec.pool, lanesAsked: rec.lanesAsked }, POOL);
 });
 
-test('HQ_SLOT_EXTRA reaches the take and the release; QK_SLOT_EXTRA is its alias; --extra wins a key over either', async t => {
-  for (const name of ['HQ_SLOT_EXTRA', 'QK_SLOT_EXTRA']) {
+test('HQ_SLOT_EXTRA reaches the take and the release, and --extra wins a key over it', async t => {
+  for (const name of ['HQ_SLOT_EXTRA']) {
     const dir = scratch(t), sh = shell(t), env = { HQ_SLOT_PID: String(sh.pid), [name]: JSON.stringify(POOL) };
     assert.equal((await lockCli(t, dir, ['take', 'gate', '--extra', '{"pool":"vm-pool-9"}'], env)).code, 0);
     assert.equal(runJson(dir).pool, 'vm-pool-9', `${name}: the flag wins`);

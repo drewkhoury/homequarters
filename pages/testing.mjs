@@ -10,10 +10,11 @@ import { kept } from '../lib/kept.mjs';
 import { safePath } from '../lib/paths.mjs';
 import { gitInfo } from '../lib/outside.mjs';
 import { pipelineView } from './pipeline.mjs';
+import { localMinute } from '../lib/when.mjs';
 import { loadLayers, layersPath, layerOf } from '../lib/layers.mjs';
 import { layerCards, layerModals, layerButton } from './layers.mjs';
 
-export const when = iso => { const d = new Date(iso); return isNaN(d) ? '?' : d.toLocaleString('sv-SE', { hour12: false }).slice(0, 16); };
+export const when = iso => localMinute(iso) ?? '?';
 export const secs = s => (s < 1 ? 'under 1 s' : s >= 60 ? `${Math.floor(s / 60)} min ${Math.round(s % 60)} s` : `${Math.round(s)} s`);
 const commitOf = i => (i.commit ? `${i.commit}${i.dirty ? '+' : ''}` : '?');
 const WHERE = [['', 'Anywhere'], ['laptop', 'Laptop'], ['container', 'Container'], ['ci', 'CI']];

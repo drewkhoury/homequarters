@@ -8,6 +8,7 @@
 // bl-s-real, bl-s-flaky and bl-s-infra, with not known as bl-s-unknown's dashed outline, the test slot is bl-s-now, a product bug that reached players is bl-s-fail, and
 // who found a problem is bl-s-find1 to 4, one hue in shades, each named in a legend.
 import { readFileSync } from 'node:fs';
+import { localMinute } from '../lib/when.mjs';
 import { join } from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { esc, layout, urlPath } from '../lib/page.mjs';
@@ -53,7 +54,7 @@ const FAMILY = { flaky: 'flaky reds', real: 'real breaks', 'passed-alone': 'pass
 const familyOf = g => (g.family === 'shared-cause' && g.tests ? `one error in ${g.tests.length} tests: ${g.tests.join(', ')}` : FAMILY[g.family] || g.family);
 // a value for the shell, in single quotes: an error line holds spaces and quotes of its own (Juno)
 const shellWord = v => `'${String(v).replace(/'/g, `'\\''`)}'`;
-const when = iso => { if (!iso) return ''; const d = new Date(iso); return Number.isNaN(d.getTime()) ? '' : d.toLocaleString('sv-SE', { hour12: false }).slice(0, 16); };
+const when = iso => (iso ? localMinute(iso) ?? '' : '');
 const dayOf = iso => when(iso).slice(0, 10);
 const shortDay = t => new Date(t).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
 // v sorts as text: the stores write their own offsets (git -04:00, the run store Z), so each is read back as UTC

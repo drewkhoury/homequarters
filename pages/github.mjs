@@ -3,6 +3,7 @@
 // whether gh works here. The page comes back at once; hq.js asks /github/part/<name> for the open tab, which answers
 // that tab's HTML.
 import { ciNowPart } from './ci.mjs';
+import { localMinute } from '../lib/when.mjs';
 import { join } from 'node:path';
 import { esc, layout } from '../lib/page.mjs';
 import { ghPart, checksOf } from '../lib/github.mjs';
@@ -13,7 +14,7 @@ const servedHashOf = () => null;
 import { info, dataTable } from '../lib/ui.mjs';
 import { actionsHtml } from './actions.mjs';
 
-const when = iso => { const d = new Date(iso); return isNaN(d) ? '' : d.toLocaleString('sv-SE', { hour12: false }).slice(0, 16); };
+const when = iso => localMinute(iso) ?? '';
 const ago = iso => {
   const s = (Date.now() - new Date(iso)) / 1000;
   if (!(s >= 0)) return '';

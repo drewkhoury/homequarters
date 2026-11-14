@@ -3,6 +3,7 @@
 // session links to the commits it made, the files it changed and the backlog items it talked about. HQ only reads the
 // transcripts; Continue in Terminal (hq-claude.js) opens the session again in claude.
 import { existsSync } from 'node:fs';
+import { localMinute } from '../lib/when.mjs';
 import { esc, urlPath, layout } from '../lib/page.mjs';
 import { info, dataTable } from '../lib/ui.mjs';
 import { renderMarkdown } from '../lib/markdown.mjs';
@@ -17,7 +18,7 @@ import { demoSession } from '../lib/demo.mjs';
 
 const PAGE = 30; // turns on one page of a transcript
 const DAY = 86400000;
-const when = iso => { const d = new Date(iso); return isNaN(d) ? '' : d.toLocaleString('sv-SE', { hour12: false }).slice(0, 16); };
+const when = iso => localMinute(iso) ?? '';
 const ago = (iso, now = Date.now()) => { const s = (now - new Date(iso)) / 1000; return !(s >= 0) ? '' : s < 90 ? 'just now' : s < 3600 ? `${Math.round(s / 60)} min ago` : s < DAY / 1000 ? `${Math.round(s / 3600)} h ago` : `${Math.round(s / 86400)} d ago`; };
 const k = n => (n >= 1e6 ? `${(n / 1e6).toFixed(1)}M` : n >= 1e3 ? `${Math.round(n / 1e3)}k` : String(n));
 const copyable = text => `<div class="hq-command"><code>${esc(text)}</code><button type="button" class="btn btn-ghost hq-copy" data-copy="${esc(text)}">Copy</button></div>`;

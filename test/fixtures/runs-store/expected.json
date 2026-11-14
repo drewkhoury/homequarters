@@ -1,0 +1,3188 @@
+{
+ "runs": [
+  {
+   "id": "junit-62-1-load",
+   "source": "ci",
+   "when": "2026-11-05T21:00:00Z",
+   "info": {
+    "kind": "load",
+    "who": "ci",
+    "where": "ci",
+    "branch": "main",
+    "commit": "c0ffee1",
+    "dirty": false,
+    "lanes": 1,
+    "event": "schedule",
+    "run": "62",
+    "attempt": 1
+   },
+   "ok": true,
+   "tasks": [
+    {
+     "id": "gate",
+     "name": "gate",
+     "status": "pass",
+     "seconds": 40,
+     "log": null,
+     "cases": [
+      {
+       "name": "smoke-sync",
+       "status": "pass",
+       "seconds": 40
+      },
+      {
+       "name": "load-check",
+       "status": "skip",
+       "seconds": 0
+      }
+     ]
+    }
+   ],
+   "parts": [
+    {
+     "id": "junit-62-1-load",
+     "part": "load",
+     "attempt": 1,
+     "half": null,
+     "tasks": [
+      {
+       "id": "gate",
+       "name": "gate",
+       "status": "pass",
+       "seconds": 40,
+       "log": null,
+       "cases": [
+        {
+         "name": "smoke-sync",
+         "status": "pass",
+         "seconds": 40
+        },
+        {
+         "name": "load-check",
+         "status": "skip",
+         "seconds": 0
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "junit-61-2-gate",
+   "source": "ci",
+   "when": "2026-11-05T18:10:00Z",
+   "info": {
+    "kind": "gate",
+    "who": "ci",
+    "where": "ci",
+    "branch": "main",
+    "commit": "feed2b3",
+    "dirty": false,
+    "lanes": 1,
+    "event": "push",
+    "run": "61",
+    "attempt": 2
+   },
+   "ok": true,
+   "tasks": [
+    {
+     "id": "gate",
+     "name": "gate",
+     "status": "pass",
+     "seconds": 9,
+     "log": null,
+     "cases": [
+      {
+       "name": "smoke-wake",
+       "status": "pass",
+       "seconds": 9
+      }
+     ]
+    }
+   ],
+   "parts": [
+    {
+     "id": "junit-61-2-gate",
+     "part": "gate",
+     "attempt": 2,
+     "half": null,
+     "tasks": [
+      {
+       "id": "gate",
+       "name": "gate",
+       "status": "pass",
+       "seconds": 9,
+       "log": null,
+       "cases": [
+        {
+         "name": "smoke-wake",
+         "status": "pass",
+         "seconds": 9
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "junit-61-1-gate",
+   "source": "ci",
+   "when": "2026-11-05T18:00:00Z",
+   "info": {
+    "kind": "gate",
+    "who": "ci",
+    "where": "ci",
+    "branch": "main",
+    "commit": "feed2b3",
+    "dirty": false,
+    "lanes": 1,
+    "event": "push",
+    "run": "61",
+    "attempt": 1
+   },
+   "ok": false,
+   "tasks": [
+    {
+     "id": "gate",
+     "name": "gate",
+     "status": "fail",
+     "seconds": 9,
+     "log": null,
+     "cases": [
+      {
+       "name": "smoke-wake",
+       "status": "fail",
+       "seconds": 9,
+       "crashed": true
+      }
+     ]
+    }
+   ],
+   "parts": [
+    {
+     "id": "junit-61-1-gate",
+     "part": "gate",
+     "attempt": 1,
+     "half": null,
+     "tasks": [
+      {
+       "id": "gate",
+       "name": "gate",
+       "status": "fail",
+       "seconds": 9,
+       "log": null,
+       "cases": [
+        {
+         "name": "smoke-wake",
+         "status": "fail",
+         "seconds": 9,
+         "crashed": true
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "junit-60-10-gate",
+   "source": "ci",
+   "when": "2026-11-04T18:10:00Z",
+   "info": {
+    "kind": "gate",
+    "who": "ci",
+    "where": "ci",
+    "branch": "main",
+    "commit": "c0ffee1",
+    "dirty": false,
+    "lanes": 1,
+    "event": "push",
+    "run": "60",
+    "attempt": 10
+   },
+   "ok": true,
+   "tasks": [
+    {
+     "id": "gate",
+     "name": "gate",
+     "status": "pass",
+     "seconds": 5,
+     "log": null,
+     "cases": [
+      {
+       "name": "load-check",
+       "status": "pass",
+       "seconds": 5
+      }
+     ]
+    }
+   ],
+   "parts": [
+    {
+     "id": "junit-60-10-gate",
+     "part": "gate",
+     "attempt": 10,
+     "half": null,
+     "tasks": [
+      {
+       "id": "gate",
+       "name": "gate",
+       "status": "pass",
+       "seconds": 5,
+       "log": null,
+       "cases": [
+        {
+         "name": "load-check",
+         "status": "pass",
+         "seconds": 5
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "junit-60-9-gate",
+   "source": "ci",
+   "when": "2026-11-04T18:09:00Z",
+   "info": {
+    "kind": "gate",
+    "who": "ci",
+    "where": "ci",
+    "branch": "main",
+    "commit": "c0ffee1",
+    "dirty": false,
+    "lanes": 1,
+    "event": "push",
+    "run": "60",
+    "attempt": 9
+   },
+   "ok": false,
+   "tasks": [
+    {
+     "id": "gate",
+     "name": "gate",
+     "status": "fail",
+     "seconds": 5,
+     "log": null,
+     "cases": [
+      {
+       "name": "load-check",
+       "status": "fail",
+       "seconds": 5
+      }
+     ]
+    }
+   ],
+   "parts": [
+    {
+     "id": "junit-60-9-gate",
+     "part": "gate",
+     "attempt": 9,
+     "half": null,
+     "tasks": [
+      {
+       "id": "gate",
+       "name": "gate",
+       "status": "fail",
+       "seconds": 5,
+       "log": null,
+       "cases": [
+        {
+         "name": "load-check",
+         "status": "fail",
+         "seconds": 5
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "junit-50-1-after",
+   "source": "ci",
+   "when": "2026-11-03T20:31:00Z",
+   "info": {
+    "kind": "after",
+    "who": "ci",
+    "where": "ci",
+    "branch": "main",
+    "commit": "c0ffee1",
+    "dirty": false,
+    "lanes": 1,
+    "event": "schedule",
+    "run": "50",
+    "attempt": 1
+   },
+   "ok": true,
+   "tasks": [
+    {
+     "id": "after",
+     "name": "after",
+     "status": "pass",
+     "seconds": 55,
+     "log": null,
+     "cases": [
+      {
+       "name": "walk-world",
+       "status": "pass",
+       "seconds": 55
+      }
+     ]
+    }
+   ],
+   "parts": [
+    {
+     "id": "junit-50-1-after",
+     "part": "after",
+     "attempt": 1,
+     "half": null,
+     "tasks": [
+      {
+       "id": "after",
+       "name": "after",
+       "status": "pass",
+       "seconds": 55,
+       "log": null,
+       "cases": [
+        {
+         "name": "walk-world",
+         "status": "pass",
+         "seconds": 55
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "2026-11-03T20-00-00Z_000010",
+   "source": "laptop",
+   "when": "2026-11-03T20:01:00Z",
+   "info": {
+    "kind": "soak",
+    "who": "agent:Ivy",
+    "where": "laptop",
+    "branch": "feat/x",
+    "commit": "c0ffee1",
+    "dirty": false,
+    "lanes": 2,
+    "out": "<root>/cache/runs/runs/2026-11-03T20-00-00Z_000010"
+   },
+   "ok": true,
+   "tasks": [
+    {
+     "id": "gate",
+     "name": "gate",
+     "status": "pass",
+     "seconds": 1.5,
+     "log": "<root>/cache/runs/runs/2026-11-03T20-00-00Z_000010/logs/gate.log",
+     "cases": [
+      {
+       "name": "smoke-sync",
+       "status": "pass",
+       "seconds": 20
+      },
+      {
+       "name": "smoke-wake",
+       "status": "pass",
+       "seconds": 12
+      },
+      {
+       "name": "load-check",
+       "status": "pass",
+       "seconds": 5
+      }
+     ]
+    }
+   ],
+   "command": "devpipe"
+  },
+  {
+   "id": "junit-50-1-after_first",
+   "source": "ci",
+   "when": "2026-11-03T20:01:00Z",
+   "info": {
+    "kind": "after",
+    "who": "ci",
+    "where": "ci",
+    "branch": "main",
+    "commit": "c0ffee1",
+    "dirty": false,
+    "lanes": 1,
+    "event": "schedule",
+    "run": "50",
+    "attempt": 1
+   },
+   "ok": false,
+   "tasks": [
+    {
+     "id": "after",
+     "name": "after",
+     "status": "fail",
+     "seconds": 60,
+     "log": null,
+     "cases": [
+      {
+       "name": "walk-world",
+       "status": "fail",
+       "seconds": 60
+      }
+     ]
+    }
+   ],
+   "parts": [
+    {
+     "id": "junit-50-1-after_first",
+     "part": "after_first",
+     "attempt": 1,
+     "half": null,
+     "tasks": [
+      {
+       "id": "after",
+       "name": "after",
+       "status": "fail",
+       "seconds": 60,
+       "log": null,
+       "cases": [
+        {
+         "name": "walk-world",
+         "status": "fail",
+         "seconds": 60
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "junit-42-2-gate",
+   "source": "ci",
+   "when": "2026-11-02T18:12:00Z",
+   "info": {
+    "kind": "gate",
+    "who": "ci",
+    "where": "ci",
+    "branch": "main",
+    "commit": "c0ffee1",
+    "dirty": false,
+    "lanes": 1,
+    "event": "push",
+    "run": "42",
+    "attempt": 2
+   },
+   "ok": true,
+   "tasks": [
+    {
+     "id": "gate",
+     "name": "gate",
+     "status": "pass",
+     "seconds": 34,
+     "log": null,
+     "cases": [
+      {
+       "name": "smoke-sync",
+       "status": "pass",
+       "seconds": 29
+      },
+      {
+       "name": "load-check",
+       "status": "pass",
+       "seconds": 5
+      }
+     ]
+    },
+    {
+     "id": "rules",
+     "name": "rules",
+     "status": "pass",
+     "seconds": 0.1,
+     "log": null,
+     "cases": [
+      {
+       "name": "owner can write their profile",
+       "status": "pass",
+       "seconds": 0.1
+      }
+     ]
+    },
+    {
+     "id": "unit",
+     "name": "unit",
+     "status": "pass",
+     "seconds": 0,
+     "log": null,
+     "cases": [
+      {
+       "name": "a round over 25 minutes is refused",
+       "status": "pass",
+       "seconds": 0.01
+      },
+      {
+       "name": "midnight rolls the day",
+       "status": "pass",
+       "seconds": 0.01
+      }
+     ]
+    }
+   ],
+   "parts": [
+    {
+     "id": "junit-42-2-gate_a",
+     "part": "gate_a",
+     "attempt": 2,
+     "half": "a",
+     "tasks": [
+      {
+       "id": "gate",
+       "name": "gate",
+       "status": "pass",
+       "seconds": 29,
+       "log": null,
+       "cases": [
+        {
+         "name": "smoke-sync",
+         "status": "pass",
+         "seconds": 29
+        }
+       ]
+      },
+      {
+       "id": "rules",
+       "name": "rules",
+       "status": "pass",
+       "seconds": 0.1,
+       "log": null,
+       "cases": [
+        {
+         "name": "owner can write their profile",
+         "status": "pass",
+         "seconds": 0.1
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "id": "junit-42-1-gate_b",
+     "part": "gate_b",
+     "attempt": 1,
+     "half": "b",
+     "tasks": [
+      {
+       "id": "gate",
+       "name": "gate",
+       "status": "pass",
+       "seconds": 5,
+       "log": null,
+       "cases": [
+        {
+         "name": "load-check",
+         "status": "pass",
+         "seconds": 5
+        }
+       ]
+      },
+      {
+       "id": "unit",
+       "name": "unit",
+       "status": "pass",
+       "seconds": 0,
+       "log": null,
+       "cases": [
+        {
+         "name": "a round over 25 minutes is refused",
+         "status": "pass",
+         "seconds": 0.01
+        },
+        {
+         "name": "midnight rolls the day",
+         "status": "pass",
+         "seconds": 0.01
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "junit-42-1-gate",
+   "source": "ci",
+   "when": "2026-11-02T18:02:00Z",
+   "info": {
+    "kind": "gate",
+    "who": "ci",
+    "where": "ci",
+    "branch": "main",
+    "commit": "c0ffee1",
+    "dirty": false,
+    "lanes": 1,
+    "event": "push",
+    "run": "42",
+    "attempt": 1
+   },
+   "ok": false,
+   "tasks": [
+    {
+     "id": "gate",
+     "name": "gate",
+     "status": "fail",
+     "seconds": 35,
+     "log": null,
+     "cases": [
+      {
+       "name": "smoke-sync",
+       "status": "fail",
+       "seconds": 30
+      },
+      {
+       "name": "load-check",
+       "status": "pass",
+       "seconds": 5
+      }
+     ]
+    },
+    {
+     "id": "rules",
+     "name": "rules",
+     "status": "pass",
+     "seconds": 0.1,
+     "log": null,
+     "cases": [
+      {
+       "name": "owner can write their profile",
+       "status": "pass",
+       "seconds": 0.1
+      }
+     ]
+    },
+    {
+     "id": "unit",
+     "name": "unit",
+     "status": "pass",
+     "seconds": 0,
+     "log": null,
+     "cases": [
+      {
+       "name": "a round over 25 minutes is refused",
+       "status": "pass",
+       "seconds": 0.01
+      },
+      {
+       "name": "midnight rolls the day",
+       "status": "pass",
+       "seconds": 0.01
+      }
+     ]
+    }
+   ],
+   "parts": [
+    {
+     "id": "junit-42-1-gate_a",
+     "part": "gate_a",
+     "attempt": 1,
+     "half": "a",
+     "tasks": [
+      {
+       "id": "gate",
+       "name": "gate",
+       "status": "fail",
+       "seconds": 30,
+       "log": null,
+       "cases": [
+        {
+         "name": "smoke-sync",
+         "status": "fail",
+         "seconds": 30
+        }
+       ]
+      },
+      {
+       "id": "rules",
+       "name": "rules",
+       "status": "pass",
+       "seconds": 0.1,
+       "log": null,
+       "cases": [
+        {
+         "name": "owner can write their profile",
+         "status": "pass",
+         "seconds": 0.1
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "id": "junit-42-1-gate_b",
+     "part": "gate_b",
+     "attempt": 1,
+     "half": "b",
+     "tasks": [
+      {
+       "id": "gate",
+       "name": "gate",
+       "status": "pass",
+       "seconds": 5,
+       "log": null,
+       "cases": [
+        {
+         "name": "load-check",
+         "status": "pass",
+         "seconds": 5
+        }
+       ]
+      },
+      {
+       "id": "unit",
+       "name": "unit",
+       "status": "pass",
+       "seconds": 0,
+       "log": null,
+       "cases": [
+        {
+         "name": "a round over 25 minutes is refused",
+         "status": "pass",
+         "seconds": 0.01
+        },
+        {
+         "name": "midnight rolls the day",
+         "status": "pass",
+         "seconds": 0.01
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "2026-11-02T09-30-00Z_000008",
+   "source": "laptop",
+   "when": "2026-11-02T09:31:00Z",
+   "info": {
+    "kind": "test",
+    "who": "drew",
+    "where": "laptop",
+    "branch": "main",
+    "commit": "feed2b3",
+    "dirty": false,
+    "lanes": 2,
+    "out": "<root>/cache/runs/runs/2026-11-02T09-30-00Z_000008"
+   },
+   "ok": true,
+   "tasks": [
+    {
+     "id": "unit",
+     "name": "unit",
+     "status": "pass",
+     "seconds": 1.5,
+     "log": "<root>/cache/runs/runs/2026-11-02T09-30-00Z_000008/logs/unit.log",
+     "cases": [
+      {
+       "name": "a round over 25 minutes is refused",
+       "status": "pass",
+       "seconds": 0.01
+      },
+      {
+       "name": "midnight rolls the day",
+       "status": "pass",
+       "seconds": 0.01
+      },
+      {
+       "name": "the newer copy wins",
+       "status": "pass",
+       "seconds": 0.01
+      }
+     ]
+    }
+   ],
+   "command": "devpipe"
+  },
+  {
+   "id": "2026-11-02T09-00-00Z_000007",
+   "source": "laptop",
+   "when": "2026-11-02T09:01:00Z",
+   "info": {
+    "kind": "test",
+    "who": "drew",
+    "where": "laptop",
+    "branch": "main",
+    "commit": "feed2b3",
+    "dirty": false,
+    "lanes": 2,
+    "out": "<root>/cache/runs/runs/2026-11-02T09-00-00Z_000007"
+   },
+   "ok": false,
+   "tasks": [
+    {
+     "id": "unit",
+     "name": "unit",
+     "status": "fail",
+     "seconds": 1.5,
+     "log": "<root>/cache/runs/runs/2026-11-02T09-00-00Z_000007/logs/unit.log",
+     "cases": [
+      {
+       "name": "a round over 25 minutes is refused",
+       "status": "pass",
+       "seconds": 0.01
+      },
+      {
+       "name": "midnight rolls the day",
+       "status": "fail",
+       "seconds": 1
+      },
+      {
+       "name": "the newer copy wins",
+       "status": "pass",
+       "seconds": 0.01
+      }
+     ]
+    }
+   ],
+   "command": "devpipe"
+  },
+  {
+   "id": "junit-41-2-gate",
+   "source": "ci",
+   "when": "2026-11-01T18:10:00Z",
+   "info": {
+    "kind": "gate",
+    "who": "ci",
+    "where": "ci",
+    "branch": "main",
+    "commit": "c0ffee1",
+    "dirty": false,
+    "lanes": 1,
+    "event": "push",
+    "run": "41",
+    "attempt": 2
+   },
+   "ok": true,
+   "tasks": [
+    {
+     "id": "gate",
+     "name": "gate",
+     "status": "pass",
+     "seconds": 38,
+     "log": null,
+     "cases": [
+      {
+       "name": "smoke-sync",
+       "status": "pass",
+       "seconds": 28
+      },
+      {
+       "name": "smoke-wake",
+       "status": "pass",
+       "seconds": 10
+      }
+     ]
+    },
+    {
+     "id": "rules",
+     "name": "rules",
+     "status": "pass",
+     "seconds": 0.1,
+     "log": null,
+     "cases": [
+      {
+       "name": "owner can write their profile",
+       "status": "pass",
+       "seconds": 0.1
+      }
+     ]
+    },
+    {
+     "id": "unit",
+     "name": "unit",
+     "status": "pass",
+     "seconds": 0,
+     "log": null,
+     "cases": [
+      {
+       "name": "a round over 25 minutes is refused",
+       "status": "pass",
+       "seconds": 0.01
+      },
+      {
+       "name": "midnight rolls the day",
+       "status": "pass",
+       "seconds": 0.01
+      }
+     ]
+    }
+   ],
+   "parts": [
+    {
+     "id": "junit-41-2-gate",
+     "part": "gate",
+     "attempt": 2,
+     "half": null,
+     "tasks": [
+      {
+       "id": "gate",
+       "name": "gate",
+       "status": "pass",
+       "seconds": 38,
+       "log": null,
+       "cases": [
+        {
+         "name": "smoke-sync",
+         "status": "pass",
+         "seconds": 28
+        },
+        {
+         "name": "smoke-wake",
+         "status": "pass",
+         "seconds": 10
+        }
+       ]
+      },
+      {
+       "id": "rules",
+       "name": "rules",
+       "status": "pass",
+       "seconds": 0.1,
+       "log": null,
+       "cases": [
+        {
+         "name": "owner can write their profile",
+         "status": "pass",
+         "seconds": 0.1
+        }
+       ]
+      },
+      {
+       "id": "unit",
+       "name": "unit",
+       "status": "pass",
+       "seconds": 0,
+       "log": null,
+       "cases": [
+        {
+         "name": "a round over 25 minutes is refused",
+         "status": "pass",
+         "seconds": 0.01
+        },
+        {
+         "name": "midnight rolls the day",
+         "status": "pass",
+         "seconds": 0.01
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "junit-41-1-after",
+   "source": "ci",
+   "when": "2026-11-01T18:05:00Z",
+   "info": {
+    "kind": "after",
+    "who": "ci",
+    "where": "ci",
+    "branch": "main",
+    "commit": "c0ffee1",
+    "dirty": false,
+    "lanes": 1,
+    "event": "push",
+    "run": "41",
+    "attempt": 1
+   },
+   "ok": true,
+   "tasks": [
+    {
+     "id": "after",
+     "name": "after",
+     "status": "pass",
+     "seconds": 50,
+     "log": null,
+     "cases": [
+      {
+       "name": "walk-world",
+       "status": "pass",
+       "seconds": 50
+      }
+     ]
+    }
+   ],
+   "parts": [
+    {
+     "id": "junit-41-1-after",
+     "part": "after",
+     "attempt": 1,
+     "half": null,
+     "tasks": [
+      {
+       "id": "after",
+       "name": "after",
+       "status": "pass",
+       "seconds": 50,
+       "log": null,
+       "cases": [
+        {
+         "name": "walk-world",
+         "status": "pass",
+         "seconds": 50
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "junit-41-1-gate",
+   "source": "ci",
+   "when": "2026-11-01T18:00:00Z",
+   "info": {
+    "kind": "gate",
+    "who": "ci",
+    "where": "ci",
+    "branch": "main",
+    "commit": "c0ffee1",
+    "dirty": false,
+    "lanes": 1,
+    "event": "push",
+    "run": "41",
+    "attempt": 1
+   },
+   "ok": false,
+   "tasks": [
+    {
+     "id": "gate",
+     "name": "gate",
+     "status": "fail",
+     "seconds": 40,
+     "log": null,
+     "cases": [
+      {
+       "name": "smoke-sync",
+       "status": "fail",
+       "seconds": 30
+      },
+      {
+       "name": "smoke-wake",
+       "status": "pass",
+       "seconds": 10
+      }
+     ]
+    },
+    {
+     "id": "rules",
+     "name": "rules",
+     "status": "pass",
+     "seconds": 0.1,
+     "log": null,
+     "cases": [
+      {
+       "name": "owner can write their profile",
+       "status": "pass",
+       "seconds": 0.1
+      }
+     ]
+    },
+    {
+     "id": "unit",
+     "name": "unit",
+     "status": "pass",
+     "seconds": 0,
+     "log": null,
+     "cases": [
+      {
+       "name": "a round over 25 minutes is refused",
+       "status": "pass",
+       "seconds": 0.01
+      },
+      {
+       "name": "midnight rolls the day",
+       "status": "pass",
+       "seconds": 0.01
+      }
+     ]
+    }
+   ],
+   "parts": [
+    {
+     "id": "junit-41-1-gate",
+     "part": "gate",
+     "attempt": 1,
+     "half": null,
+     "tasks": [
+      {
+       "id": "gate",
+       "name": "gate",
+       "status": "fail",
+       "seconds": 40,
+       "log": null,
+       "cases": [
+        {
+         "name": "smoke-sync",
+         "status": "fail",
+         "seconds": 30
+        },
+        {
+         "name": "smoke-wake",
+         "status": "pass",
+         "seconds": 10
+        }
+       ]
+      },
+      {
+       "id": "rules",
+       "name": "rules",
+       "status": "pass",
+       "seconds": 0.1,
+       "log": null,
+       "cases": [
+        {
+         "name": "owner can write their profile",
+         "status": "pass",
+         "seconds": 0.1
+        }
+       ]
+      },
+      {
+       "id": "unit",
+       "name": "unit",
+       "status": "pass",
+       "seconds": 0,
+       "log": null,
+       "cases": [
+        {
+         "name": "a round over 25 minutes is refused",
+         "status": "pass",
+         "seconds": 0.01
+        },
+        {
+         "name": "midnight rolls the day",
+         "status": "pass",
+         "seconds": 0.01
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "2026-11-01T14-00-00Z_000006",
+   "source": "laptop",
+   "when": "2026-11-01T14:01:00Z",
+   "info": {
+    "kind": "gate",
+    "who": "drew",
+    "where": "laptop",
+    "branch": "probe/red-once",
+    "commit": "c0ffee1",
+    "dirty": false,
+    "lanes": 2,
+    "out": "<root>/cache/runs/runs/2026-11-01T14-00-00Z_000006"
+   },
+   "ok": false,
+   "tasks": [
+    {
+     "id": "gate",
+     "name": "gate",
+     "status": "fail",
+     "seconds": 1.5,
+     "log": "<root>/cache/runs/runs/2026-11-01T14-00-00Z_000006/logs/gate.log",
+     "cases": [
+      {
+       "name": "smoke-sync",
+       "status": "fail",
+       "seconds": 31,
+       "log": "<root>/cache/runs/runs/2026-11-01T14-00-00Z_000006/logs/smoke-sync.log"
+      },
+      {
+       "name": "smoke-wake",
+       "status": "pass",
+       "seconds": 12
+      },
+      {
+       "name": "load-check",
+       "status": "pass",
+       "seconds": 5
+      }
+     ]
+    }
+   ],
+   "command": "devpipe"
+  },
+  {
+   "id": "2026-11-01T13-00-00Z_000005",
+   "source": "laptop",
+   "when": "2026-11-01T13:01:00Z",
+   "info": {
+    "kind": "test",
+    "who": "drew",
+    "where": "laptop",
+    "branch": "main",
+    "commit": "c0ffee1",
+    "dirty": true,
+    "lanes": 2,
+    "out": "<root>/cache/runs/runs/2026-11-01T13-00-00Z_000005"
+   },
+   "ok": false,
+   "tasks": [
+    {
+     "id": "unit",
+     "name": "unit",
+     "status": "fail",
+     "seconds": 1.5,
+     "log": "<root>/cache/runs/runs/2026-11-01T13-00-00Z_000005/logs/unit.log",
+     "cases": [
+      {
+       "name": "a round over 25 minutes is refused",
+       "status": "pass",
+       "seconds": 0.01
+      },
+      {
+       "name": "midnight rolls the day",
+       "status": "fail",
+       "seconds": 1
+      },
+      {
+       "name": "the newer copy wins",
+       "status": "pass",
+       "seconds": 0.01
+      }
+     ]
+    }
+   ],
+   "command": "devpipe"
+  },
+  {
+   "id": "2026-11-01T12-00-00Z_000003",
+   "source": "laptop",
+   "when": "2026-11-01T12:01:00Z",
+   "info": {
+    "kind": "gate",
+    "who": "drew",
+    "where": "container",
+    "branch": "main",
+    "commit": "c0ffee1",
+    "dirty": false,
+    "lanes": 2,
+    "out": "<root>/cache/runs/runs/2026-11-01T12-00-00Z_000003"
+   },
+   "ok": false,
+   "tasks": [
+    {
+     "id": "docker-gate",
+     "name": "docker-gate",
+     "status": "fail",
+     "seconds": 1.5,
+     "log": "<root>/cache/runs/runs/2026-11-01T12-00-00Z_000003/logs/docker-gate.log",
+     "cases": [
+      {
+       "name": "smoke-sync",
+       "status": "pass",
+       "seconds": 19
+      },
+      {
+       "name": "smoke-wake",
+       "status": "fail",
+       "seconds": 1
+      },
+      {
+       "name": "load-check",
+       "status": "pass",
+       "seconds": 0.01
+      }
+     ]
+    },
+    {
+     "id": "rerun",
+     "name": "Rerun of the failing tests",
+     "status": "pass",
+     "seconds": 11,
+     "log": null,
+     "cases": [
+      {
+       "name": "smoke-wake",
+       "status": "pass",
+       "seconds": 11
+      }
+     ]
+    }
+   ],
+   "command": "devpipe"
+  },
+  {
+   "id": "2026-11-01T11-00-00Z_000002",
+   "source": "laptop",
+   "when": "2026-11-01T11:01:00Z",
+   "info": {
+    "kind": "gate",
+    "who": "drew",
+    "where": "laptop",
+    "branch": "main",
+    "commit": "c0ffee1",
+    "dirty": false,
+    "lanes": 2,
+    "out": "<root>/cache/runs/runs/2026-11-01T11-00-00Z_000002"
+   },
+   "ok": false,
+   "tasks": [
+    {
+     "id": "gate",
+     "name": "gate",
+     "status": "fail",
+     "seconds": 1.5,
+     "log": "<root>/cache/runs/runs/2026-11-01T11-00-00Z_000002/logs/gate.log",
+     "cases": [
+      {
+       "name": "smoke-sync",
+       "status": "fail",
+       "seconds": 31,
+       "log": "<root>/cache/runs/runs/2026-11-01T11-00-00Z_000002/logs/smoke-sync.log"
+      },
+      {
+       "name": "smoke-wake",
+       "status": "pass",
+       "seconds": 12
+      },
+      {
+       "name": "load-check",
+       "status": "pass",
+       "seconds": 5
+      }
+     ]
+    }
+   ],
+   "command": "devpipe"
+  },
+  {
+   "id": "2026-11-01T10-00-00Z_000001",
+   "source": "laptop",
+   "when": "2026-11-01T10:01:00Z",
+   "info": {
+    "kind": "gate",
+    "who": "drew",
+    "where": "laptop",
+    "branch": "main",
+    "commit": "c0ffee1",
+    "dirty": false,
+    "lanes": 2,
+    "out": "<root>/cache/runs/runs/2026-11-01T10-00-00Z_000001"
+   },
+   "ok": true,
+   "tasks": [
+    {
+     "id": "unit",
+     "name": "unit",
+     "status": "pass",
+     "seconds": 1.5,
+     "log": "<root>/cache/runs/runs/2026-11-01T10-00-00Z_000001/logs/unit.log",
+     "cases": [
+      {
+       "name": "a round over 25 minutes is refused",
+       "status": "pass",
+       "seconds": 0.01
+      },
+      {
+       "name": "midnight rolls the day",
+       "status": "pass",
+       "seconds": 0.01
+      },
+      {
+       "name": "the newer copy wins",
+       "status": "pass",
+       "seconds": 0.01
+      }
+     ]
+    },
+    {
+     "id": "rules",
+     "name": "rules",
+     "status": "pass",
+     "seconds": 1.5,
+     "log": "<root>/cache/runs/runs/2026-11-01T10-00-00Z_000001/logs/rules.log",
+     "cases": [
+      {
+       "name": "owner can write their profile",
+       "status": "pass",
+       "seconds": 0.2
+      },
+      {
+       "name": "a stranger cannot read it",
+       "status": "pass",
+       "seconds": 0.1
+      }
+     ]
+    },
+    {
+     "id": "gate",
+     "name": "gate",
+     "status": "pass",
+     "seconds": 1.5,
+     "log": "<root>/cache/runs/runs/2026-11-01T10-00-00Z_000001/logs/gate.log",
+     "cases": [
+      {
+       "name": "smoke-sync",
+       "status": "pass",
+       "seconds": 20
+      },
+      {
+       "name": "smoke-wake",
+       "status": "pass",
+       "seconds": 12
+      },
+      {
+       "name": "load-check",
+       "status": "pass",
+       "seconds": 5
+      }
+     ]
+    }
+   ],
+   "command": "devpipe",
+   "report": "runs/runs/2026-11-01T10-00-00Z_000001/report.html"
+  },
+  {
+   "id": "2026-10-20T09-00-00Z_000004",
+   "source": "laptop",
+   "when": "2026-10-20T09:01:00Z",
+   "info": {
+    "kind": "test",
+    "who": "drew",
+    "where": "laptop",
+    "branch": "main",
+    "commit": "c0ffee1",
+    "dirty": false,
+    "lanes": 2,
+    "out": "<root>/cache/runs/runs/2026-10-20T09-00-00Z_000004"
+   },
+   "ok": true,
+   "tasks": [
+    {
+     "id": "unit",
+     "name": "unit",
+     "status": "pass",
+     "seconds": 1.5,
+     "log": "<root>/cache/runs/runs/2026-10-20T09-00-00Z_000004/logs/unit.log",
+     "cases": [
+      {
+       "name": "a round over 25 minutes is refused",
+       "status": "pass",
+       "seconds": 0.01
+      },
+      {
+       "name": "midnight rolls the day",
+       "status": "pass",
+       "seconds": 0.01
+      },
+      {
+       "name": "the newer copy wins",
+       "status": "pass",
+       "seconds": 0.01
+      }
+     ]
+    }
+   ],
+   "command": "devpipe"
+  },
+  {
+   "id": "2026-10-01T08-00-00Z_000009",
+   "source": "laptop",
+   "when": "2026-10-01T08:01:00Z",
+   "info": {},
+   "ok": true,
+   "tasks": [
+    {
+     "id": "unit",
+     "name": "unit",
+     "status": "pass",
+     "seconds": 1.5,
+     "log": "<root>/cache/runs/runs/2026-10-01T08-00-00Z_000009/logs/unit.log",
+     "cases": [
+      {
+       "name": "a round over 25 minutes is refused",
+       "status": "pass",
+       "seconds": 0.01
+      },
+      {
+       "name": "midnight rolls the day",
+       "status": "pass",
+       "seconds": 0.01
+      },
+      {
+       "name": "the newer copy wins",
+       "status": "pass",
+       "seconds": 0.01
+      }
+     ]
+    }
+   ],
+   "command": "devpipe"
+  }
+ ],
+ "flakes": [
+  {
+   "commit": "c0ffee1",
+   "kind": "ci-gate",
+   "task": "ci-gate",
+   "test": "load-check"
+  },
+  {
+   "commit": "c0ffee1",
+   "kind": "ci-after",
+   "task": "ci-after",
+   "test": "walk-world"
+  },
+  {
+   "commit": "c0ffee1",
+   "kind": "ci-gate",
+   "task": "ci-gate",
+   "test": "smoke-sync"
+  },
+  {
+   "commit": "feed2b3",
+   "kind": "test",
+   "task": "unit",
+   "test": "midnight rolls the day"
+  },
+  {
+   "commit": "c0ffee1",
+   "kind": "gate",
+   "task": "docker-gate",
+   "test": "smoke-sync"
+  },
+  {
+   "commit": "c0ffee1",
+   "kind": "gate",
+   "task": "docker-gate",
+   "test": "smoke-wake"
+  }
+ ],
+ "byFile": {
+  "tests/load-check.js": [
+   {
+    "run": "junit-62-1-load",
+    "task": "gate",
+    "source": "ci",
+    "where": "ci",
+    "when": "2026-11-05T21:00:00Z",
+    "commit": "c0ffee1",
+    "dirty": false,
+    "status": "pass",
+    "seconds": 0,
+    "cases": [
+     {
+      "name": "load-check",
+      "status": "skip",
+      "seconds": 0
+     }
+    ]
+   },
+   {
+    "run": "junit-60-10-gate",
+    "task": "gate",
+    "source": "ci",
+    "where": "ci",
+    "when": "2026-11-04T18:10:00Z",
+    "commit": "c0ffee1",
+    "dirty": false,
+    "status": "pass",
+    "seconds": 5,
+    "cases": [
+     {
+      "name": "load-check",
+      "status": "pass",
+      "seconds": 5
+     }
+    ]
+   },
+   {
+    "run": "junit-60-9-gate",
+    "task": "gate",
+    "source": "ci",
+    "where": "ci",
+    "when": "2026-11-04T18:09:00Z",
+    "commit": "c0ffee1",
+    "dirty": false,
+    "status": "fail",
+    "seconds": 5,
+    "cases": [
+     {
+      "name": "load-check",
+      "status": "fail",
+      "seconds": 5
+     }
+    ]
+   },
+   {
+    "run": "2026-11-03T20-00-00Z_000010",
+    "task": "gate",
+    "source": "laptop",
+    "where": "laptop",
+    "when": "2026-11-03T20:01:00Z",
+    "commit": "c0ffee1",
+    "dirty": false,
+    "status": "pass",
+    "seconds": 5,
+    "cases": [
+     {
+      "name": "load-check",
+      "status": "pass",
+      "seconds": 5
+     }
+    ]
+   },
+   {
+    "run": "junit-42-2-gate",
+    "task": "gate",
+    "source": "ci",
+    "where": "ci",
+    "when": "2026-11-02T18:12:00Z",
+    "commit": "c0ffee1",
+    "dirty": false,
+    "status": "pass",
+    "seconds": 5,
+    "cases": [
+     {
+      "name": "load-check",
+      "status": "pass",
+      "seconds": 5
+     }
+    ]
+   },
+   {
+    "run": "junit-42-1-gate",
+    "task": "gate",
+    "source": "ci",
+    "where": "ci",
+    "when": "2026-11-02T18:02:00Z",
+    "commit": "c0ffee1",
+    "dirty": false,
+    "status": "pass",
+    "seconds": 5,
+    "cases": [
+     {
+      "name": "load-check",
+      "status": "pass",
+      "seconds": 5
+     }
+    ]
+   },
+   {
+    "run": "2026-11-01T14-00-00Z_000006",
+    "task": "gate",
+    "source": "laptop",
+    "where": "laptop",
+    "when": "2026-11-01T14:01:00Z",
+    "commit": "c0ffee1",
+    "dirty": false,
+    "status": "pass",
+    "seconds": 5,
+    "cases": [
+     {
+      "name": "load-check",
+      "status": "pass",
+      "seconds": 5
+     }
+    ]
+   },
+   {
+    "run": "2026-11-01T12-00-00Z_000003",
+    "task": "docker-gate",
+    "source": "laptop",
+    "where": "container",
+    "when": "2026-11-01T12:01:00Z",
+    "commit": "c0ffee1",
+    "dirty": false,
+    "status": "pass",
+    "seconds": 0.01,
+    "cases": [
+     {
+      "name": "load-check",
+      "status": "pass",
+      "seconds": 0.01
+     }
+    ]
+   },
+   {
+    "run": "2026-11-01T11-00-00Z_000002",
+    "task": "gate",
+    "source": "laptop",
+    "where": "laptop",
+    "when": "2026-11-01T11:01:00Z",
+    "commit": "c0ffee1",
+    "dirty": false,
+    "status": "pass",
+    "seconds": 5,
+    "cases": [
+     {
+      "name": "load-check",
+      "status": "pass",
+      "seconds": 5
+     }
+    ]
+   },
+   {
+    "run": "2026-11-01T10-00-00Z_000001",
+    "task": "gate",
+    "source": "laptop",
+    "where": "laptop",
+    "when": "2026-11-01T10:01:00Z",
+    "commit": "c0ffee1",
+    "dirty": false,
+    "status": "pass",
+    "seconds": 5,
+    "cases": [
+     {
+      "name": "load-check",
+      "status": "pass",
+      "seconds": 5
+     }
+    ]
+   }
+  ],
+  "tests/smoke-sync.js": [
+   {
+    "run": "junit-62-1-load",
+    "task": "gate",
+    "source": "ci",
+    "where": "ci",
+    "when": "2026-11-05T21:00:00Z",
+    "commit": "c0ffee1",
+    "dirty": false,
+    "status": "pass",
+    "seconds": 40,
+    "cases": [
+     {
+      "name": "smoke-sync",
+      "status": "pass",
+      "seconds": 40
+     }
+    ]
+   },
+   {
+    "run": "2026-11-03T20-00-00Z_000010",
+    "task": "gate",
+    "source": "laptop",
+    "where": "laptop",
+    "when": "2026-11-03T20:01:00Z",
+    "commit": "c0ffee1",
+    "dirty": false,
+    "status": "pass",
+    "seconds": 20,
+    "cases": [
+     {
+      "name": "smoke-sync",
+      "status": "pass",
+      "seconds": 20
+     }
+    ]
+   },
+   {
+    "run": "junit-42-2-gate",
+    "task": "gate",
+    "source": "ci",
+    "where": "ci",
+    "when": "2026-11-02T18:12:00Z",
+    "commit": "c0ffee1",
+    "dirty": false,
+    "status": "pass",
+    "seconds": 29,
+    "cases": [
+     {
+      "name": "smoke-sync",
+      "status": "pass",
+      "seconds": 29
+     }
+    ]
+   },
+   {
+    "run": "junit-42-1-gate",
+    "task": "gate",
+    "source": "ci",
+    "where": "ci",
+    "when": "2026-11-02T18:02:00Z",
+    "commit": "c0ffee1",
+    "dirty": false,
+    "status": "fail",
+    "seconds": 30,
+    "cases": [
+     {
+      "name": "smoke-sync",
+      "status": "fail",
+      "seconds": 30
+     }
+    ]
+   },
+   {
+    "run": "junit-41-2-gate",
+    "task": "gate",
+    "source": "ci",
+    "where": "ci",
+    "when": "2026-11-01T18:10:00Z",
+    "commit": "c0ffee1",
+    "dirty": false,
+    "status": "pass",
+    "seconds": 28,
+    "cases": [
+     {
+      "name": "smoke-sync",
+      "status": "pass",
+      "seconds": 28
+     }
+    ]
+   },
+   {
+    "run": "junit-41-1-gate",
+    "task": "gate",
+    "source": "ci",
+    "where": "ci",
+    "when": "2026-11-01T18:00:00Z",
+    "commit": "c0ffee1",
+    "dirty": false,
+    "status": "fail",
+    "seconds": 30,
+    "cases": [
+     {
+      "name": "smoke-sync",
+      "status": "fail",
+      "seconds": 30
+     }
+    ]
+   },
+   {
+    "run": "2026-11-01T14-00-00Z_000006",
+    "task": "gate",
+    "source": "laptop",
+    "where": "laptop",
+    "when": "2026-11-01T14:01:00Z",
+    "commit": "c0ffee1",
+    "dirty": false,
+    "status": "fail",
+    "seconds": 31,
+    "cases": [
+     {
+      "name": "smoke-sync",
+      "status": "fail",
+      "seconds": 31,
+      "log": "<root>/cache/runs/runs/2026-11-01T14-00-00Z_000006/logs/smoke-sync.log"
+     }
+    ]
+   },
+   {
+    "run": "2026-11-01T12-00-00Z_000003",
+    "task": "docker-gate",
+    "source": "laptop",
+    "where": "container",
+    "when": "2026-11-01T12:01:00Z",
+    "commit": "c0ffee1",
+    "dirty": false,
+    "status": "pass",
+    "seconds": 19,
+    "cases": [
+     {
+      "name": "smoke-sync",
+      "status": "pass",
+      "seconds": 19
+     }
+    ]
+   },
+   {
+    "run": "2026-11-01T11-00-00Z_000002",
+    "task": "gate",
+    "source": "laptop",
+    "where": "laptop",
+    "when": "2026-11-01T11:01:00Z",
+    "commit": "c0ffee1",
+    "dirty": false,
+    "status": "fail",
+    "seconds": 31,
+    "cases": [
+     {
+      "name": "smoke-sync",
+      "status": "fail",
+      "seconds": 31,
+      "log": "<root>/cache/runs/runs/2026-11-01T11-00-00Z_000002/logs/smoke-sync.log"
+     }
+    ]
+   },
+   {
+    "run": "2026-11-01T10-00-00Z_000001",
+    "task": "gate",
+    "source": "laptop",
+    "where": "laptop",
+    "when": "2026-11-01T10:01:00Z",
+    "commit": "c0ffee1",
+    "dirty": false,
+    "status": "pass",
+    "seconds": 20,
+    "cases": [
+     {
+      "name": "smoke-sync",
+      "status": "pass",
+      "seconds": 20
+     }
+    ]
+   }
+  ],
+  "tests/smoke-wake.js": [
+   {
+    "run": "junit-61-2-gate",
+    "task": "gate",
+    "source": "ci",
+    "where": "ci",
+    "when": "2026-11-05T18:10:00Z",
+    "commit": "feed2b3",
+    "dirty": false,
+    "status": "pass",
+    "seconds": 9,
+    "cases": [
+     {
+      "name": "smoke-wake",
+      "status": "pass",
+      "seconds": 9
+     }
+    ]
+   },
+   {
+    "run": "junit-61-1-gate",
+    "task": "gate",
+    "source": "ci",
+    "where": "ci",
+    "when": "2026-11-05T18:00:00Z",
+    "commit": "feed2b3",
+    "dirty": false,
+    "status": "fail",
+    "seconds": 9,
+    "cases": [
+     {
+      "name": "smoke-wake",
+      "status": "fail",
+      "seconds": 9,
+      "crashed": true
+     }
+    ]
+   },
+   {
+    "run": "2026-11-03T20-00-00Z_000010",
+    "task": "gate",
+    "source": "laptop",
+    "where": "laptop",
+    "when": "2026-11-03T20:01:00Z",
+    "commit": "c0ffee1",
+    "dirty": false,
+    "status": "pass",
+    "seconds": 12,
+    "cases": [
+     {
+      "name": "smoke-wake",
+      "status": "pass",
+      "seconds": 12
+     }
+    ]
+   },
+   {
+    "run": "junit-41-2-gate",
+    "task": "gate",
+    "source": "ci",
+    "where": "ci",
+    "when": "2026-11-01T18:10:00Z",
+    "commit": "c0ffee1",
+    "dirty": false,
+    "status": "pass",
+    "seconds": 10,
+    "cases": [
+     {
+      "name": "smoke-wake",
+      "status": "pass",
+      "seconds": 10
+     }
+    ]
+   },
+   {
+    "run": "junit-41-1-gate",
+    "task": "gate",
+    "source": "ci",
+    "where": "ci",
+    "when": "2026-11-01T18:00:00Z",
+    "commit": "c0ffee1",
+    "dirty": false,
+    "status": "pass",
+    "seconds": 10,
+    "cases": [
+     {
+      "name": "smoke-wake",
+      "status": "pass",
+      "seconds": 10
+     }
+    ]
+   },
+   {
+    "run": "2026-11-01T14-00-00Z_000006",
+    "task": "gate",
+    "source": "laptop",
+    "where": "laptop",
+    "when": "2026-11-01T14:01:00Z",
+    "commit": "c0ffee1",
+    "dirty": false,
+    "status": "pass",
+    "seconds": 12,
+    "cases": [
+     {
+      "name": "smoke-wake",
+      "status": "pass",
+      "seconds": 12
+     }
+    ]
+   },
+   {
+    "run": "2026-11-01T12-00-00Z_000003",
+    "task": "docker-gate",
+    "source": "laptop",
+    "where": "container",
+    "when": "2026-11-01T12:01:00Z",
+    "commit": "c0ffee1",
+    "dirty": false,
+    "status": "fail",
+    "seconds": 1,
+    "cases": [
+     {
+      "name": "smoke-wake",
+      "status": "fail",
+      "seconds": 1
+     }
+    ]
+   },
+   {
+    "run": "2026-11-01T11-00-00Z_000002",
+    "task": "gate",
+    "source": "laptop",
+    "where": "laptop",
+    "when": "2026-11-01T11:01:00Z",
+    "commit": "c0ffee1",
+    "dirty": false,
+    "status": "pass",
+    "seconds": 12,
+    "cases": [
+     {
+      "name": "smoke-wake",
+      "status": "pass",
+      "seconds": 12
+     }
+    ]
+   },
+   {
+    "run": "2026-11-01T10-00-00Z_000001",
+    "task": "gate",
+    "source": "laptop",
+    "where": "laptop",
+    "when": "2026-11-01T10:01:00Z",
+    "commit": "c0ffee1",
+    "dirty": false,
+    "status": "pass",
+    "seconds": 12,
+    "cases": [
+     {
+      "name": "smoke-wake",
+      "status": "pass",
+      "seconds": 12
+     }
+    ]
+   }
+  ],
+  "tests/walk-world.js": [
+   {
+    "run": "junit-50-1-after",
+    "task": "after",
+    "source": "ci",
+    "where": "ci",
+    "when": "2026-11-03T20:31:00Z",
+    "commit": "c0ffee1",
+    "dirty": false,
+    "status": "pass",
+    "seconds": 55,
+    "cases": [
+     {
+      "name": "walk-world",
+      "status": "pass",
+      "seconds": 55
+     }
+    ]
+   },
+   {
+    "run": "junit-50-1-after_first",
+    "task": "after",
+    "source": "ci",
+    "where": "ci",
+    "when": "2026-11-03T20:01:00Z",
+    "commit": "c0ffee1",
+    "dirty": false,
+    "status": "fail",
+    "seconds": 60,
+    "cases": [
+     {
+      "name": "walk-world",
+      "status": "fail",
+      "seconds": 60
+     }
+    ]
+   },
+   {
+    "run": "junit-41-1-after",
+    "task": "after",
+    "source": "ci",
+    "where": "ci",
+    "when": "2026-11-01T18:05:00Z",
+    "commit": "c0ffee1",
+    "dirty": false,
+    "status": "pass",
+    "seconds": 50,
+    "cases": [
+     {
+      "name": "walk-world",
+      "status": "pass",
+      "seconds": 50
+     }
+    ]
+   }
+  ],
+  "tests/unit/clock.test.mjs": [
+   {
+    "run": "junit-42-2-gate",
+    "task": "unit",
+    "source": "ci",
+    "where": "ci",
+    "when": "2026-11-02T18:12:00Z",
+    "commit": "c0ffee1",
+    "dirty": false,
+    "status": "pass",
+    "seconds": 0.02,
+    "cases": [
+     {
+      "name": "a round over 25 minutes is refused",
+      "status": "pass",
+      "seconds": 0.01
+     },
+     {
+      "name": "midnight rolls the day",
+      "status": "pass",
+      "seconds": 0.01
+     }
+    ]
+   },
+   {
+    "run": "junit-42-1-gate",
+    "task": "unit",
+    "source": "ci",
+    "where": "ci",
+    "when": "2026-11-02T18:02:00Z",
+    "commit": "c0ffee1",
+    "dirty": false,
+    "status": "pass",
+    "seconds": 0.02,
+    "cases": [
+     {
+      "name": "a round over 25 minutes is refused",
+      "status": "pass",
+      "seconds": 0.01
+     },
+     {
+      "name": "midnight rolls the day",
+      "status": "pass",
+      "seconds": 0.01
+     }
+    ]
+   },
+   {
+    "run": "2026-11-02T09-30-00Z_000008",
+    "task": "unit",
+    "source": "laptop",
+    "where": "laptop",
+    "when": "2026-11-02T09:31:00Z",
+    "commit": "feed2b3",
+    "dirty": false,
+    "status": "pass",
+    "seconds": 0.02,
+    "cases": [
+     {
+      "name": "a round over 25 minutes is refused",
+      "status": "pass",
+      "seconds": 0.01
+     },
+     {
+      "name": "midnight rolls the day",
+      "status": "pass",
+      "seconds": 0.01
+     }
+    ]
+   },
+   {
+    "run": "2026-11-02T09-00-00Z_000007",
+    "task": "unit",
+    "source": "laptop",
+    "where": "laptop",
+    "when": "2026-11-02T09:01:00Z",
+    "commit": "feed2b3",
+    "dirty": false,
+    "status": "fail",
+    "seconds": 1.01,
+    "cases": [
+     {
+      "name": "a round over 25 minutes is refused",
+      "status": "pass",
+      "seconds": 0.01
+     },
+     {
+      "name": "midnight rolls the day",
+      "status": "fail",
+      "seconds": 1
+     }
+    ]
+   },
+   {
+    "run": "junit-41-2-gate",
+    "task": "unit",
+    "source": "ci",
+    "where": "ci",
+    "when": "2026-11-01T18:10:00Z",
+    "commit": "c0ffee1",
+    "dirty": false,
+    "status": "pass",
+    "seconds": 0.02,
+    "cases": [
+     {
+      "name": "a round over 25 minutes is refused",
+      "status": "pass",
+      "seconds": 0.01
+     },
+     {
+      "name": "midnight rolls the day",
+      "status": "pass",
+      "seconds": 0.01
+     }
+    ]
+   },
+   {
+    "run": "junit-41-1-gate",
+    "task": "unit",
+    "source": "ci",
+    "where": "ci",
+    "when": "2026-11-01T18:00:00Z",
+    "commit": "c0ffee1",
+    "dirty": false,
+    "status": "pass",
+    "seconds": 0.02,
+    "cases": [
+     {
+      "name": "a round over 25 minutes is refused",
+      "status": "pass",
+      "seconds": 0.01
+     },
+     {
+      "name": "midnight rolls the day",
+      "status": "pass",
+      "seconds": 0.01
+     }
+    ]
+   },
+   {
+    "run": "2026-11-01T13-00-00Z_000005",
+    "task": "unit",
+    "source": "laptop",
+    "where": "laptop",
+    "when": "2026-11-01T13:01:00Z",
+    "commit": "c0ffee1",
+    "dirty": true,
+    "status": "fail",
+    "seconds": 1.01,
+    "cases": [
+     {
+      "name": "a round over 25 minutes is refused",
+      "status": "pass",
+      "seconds": 0.01
+     },
+     {
+      "name": "midnight rolls the day",
+      "status": "fail",
+      "seconds": 1
+     }
+    ]
+   },
+   {
+    "run": "2026-11-01T10-00-00Z_000001",
+    "task": "unit",
+    "source": "laptop",
+    "where": "laptop",
+    "when": "2026-11-01T10:01:00Z",
+    "commit": "c0ffee1",
+    "dirty": false,
+    "status": "pass",
+    "seconds": 0.02,
+    "cases": [
+     {
+      "name": "a round over 25 minutes is refused",
+      "status": "pass",
+      "seconds": 0.01
+     },
+     {
+      "name": "midnight rolls the day",
+      "status": "pass",
+      "seconds": 0.01
+     }
+    ]
+   },
+   {
+    "run": "2026-10-20T09-00-00Z_000004",
+    "task": "unit",
+    "source": "laptop",
+    "where": "laptop",
+    "when": "2026-10-20T09:01:00Z",
+    "commit": "c0ffee1",
+    "dirty": false,
+    "status": "pass",
+    "seconds": 0.02,
+    "cases": [
+     {
+      "name": "a round over 25 minutes is refused",
+      "status": "pass",
+      "seconds": 0.01
+     },
+     {
+      "name": "midnight rolls the day",
+      "status": "pass",
+      "seconds": 0.01
+     }
+    ]
+   },
+   {
+    "run": "2026-10-01T08-00-00Z_000009",
+    "task": "unit",
+    "source": "laptop",
+    "where": "laptop",
+    "when": "2026-10-01T08:01:00Z",
+    "dirty": false,
+    "status": "pass",
+    "seconds": 0.02,
+    "cases": [
+     {
+      "name": "a round over 25 minutes is refused",
+      "status": "pass",
+      "seconds": 0.01
+     },
+     {
+      "name": "midnight rolls the day",
+      "status": "pass",
+      "seconds": 0.01
+     }
+    ]
+   }
+  ],
+  "tests/unit/merge.test.mjs": [
+   {
+    "run": "2026-11-02T09-30-00Z_000008",
+    "task": "unit",
+    "source": "laptop",
+    "where": "laptop",
+    "when": "2026-11-02T09:31:00Z",
+    "commit": "feed2b3",
+    "dirty": false,
+    "status": "pass",
+    "seconds": 0.01,
+    "cases": [
+     {
+      "name": "the newer copy wins",
+      "status": "pass",
+      "seconds": 0.01
+     }
+    ]
+   },
+   {
+    "run": "2026-11-02T09-00-00Z_000007",
+    "task": "unit",
+    "source": "laptop",
+    "where": "laptop",
+    "when": "2026-11-02T09:01:00Z",
+    "commit": "feed2b3",
+    "dirty": false,
+    "status": "pass",
+    "seconds": 0.01,
+    "cases": [
+     {
+      "name": "the newer copy wins",
+      "status": "pass",
+      "seconds": 0.01
+     }
+    ]
+   },
+   {
+    "run": "2026-11-01T13-00-00Z_000005",
+    "task": "unit",
+    "source": "laptop",
+    "where": "laptop",
+    "when": "2026-11-01T13:01:00Z",
+    "commit": "c0ffee1",
+    "dirty": true,
+    "status": "pass",
+    "seconds": 0.01,
+    "cases": [
+     {
+      "name": "the newer copy wins",
+      "status": "pass",
+      "seconds": 0.01
+     }
+    ]
+   },
+   {
+    "run": "2026-11-01T10-00-00Z_000001",
+    "task": "unit",
+    "source": "laptop",
+    "where": "laptop",
+    "when": "2026-11-01T10:01:00Z",
+    "commit": "c0ffee1",
+    "dirty": false,
+    "status": "pass",
+    "seconds": 0.01,
+    "cases": [
+     {
+      "name": "the newer copy wins",
+      "status": "pass",
+      "seconds": 0.01
+     }
+    ]
+   },
+   {
+    "run": "2026-10-20T09-00-00Z_000004",
+    "task": "unit",
+    "source": "laptop",
+    "where": "laptop",
+    "when": "2026-10-20T09:01:00Z",
+    "commit": "c0ffee1",
+    "dirty": false,
+    "status": "pass",
+    "seconds": 0.01,
+    "cases": [
+     {
+      "name": "the newer copy wins",
+      "status": "pass",
+      "seconds": 0.01
+     }
+    ]
+   },
+   {
+    "run": "2026-10-01T08-00-00Z_000009",
+    "task": "unit",
+    "source": "laptop",
+    "where": "laptop",
+    "when": "2026-10-01T08:01:00Z",
+    "dirty": false,
+    "status": "pass",
+    "seconds": 0.01,
+    "cases": [
+     {
+      "name": "the newer copy wins",
+      "status": "pass",
+      "seconds": 0.01
+     }
+    ]
+   }
+  ],
+  "tests/rules.test.js": [
+   {
+    "run": "junit-42-2-gate",
+    "task": "rules",
+    "source": "ci",
+    "where": "ci",
+    "when": "2026-11-02T18:12:00Z",
+    "commit": "c0ffee1",
+    "dirty": false,
+    "status": "pass",
+    "seconds": 0.1,
+    "cases": [
+     {
+      "name": "owner can write their profile",
+      "status": "pass",
+      "seconds": 0.1
+     }
+    ]
+   },
+   {
+    "run": "junit-42-1-gate",
+    "task": "rules",
+    "source": "ci",
+    "where": "ci",
+    "when": "2026-11-02T18:02:00Z",
+    "commit": "c0ffee1",
+    "dirty": false,
+    "status": "pass",
+    "seconds": 0.1,
+    "cases": [
+     {
+      "name": "owner can write their profile",
+      "status": "pass",
+      "seconds": 0.1
+     }
+    ]
+   },
+   {
+    "run": "junit-41-2-gate",
+    "task": "rules",
+    "source": "ci",
+    "where": "ci",
+    "when": "2026-11-01T18:10:00Z",
+    "commit": "c0ffee1",
+    "dirty": false,
+    "status": "pass",
+    "seconds": 0.1,
+    "cases": [
+     {
+      "name": "owner can write their profile",
+      "status": "pass",
+      "seconds": 0.1
+     }
+    ]
+   },
+   {
+    "run": "junit-41-1-gate",
+    "task": "rules",
+    "source": "ci",
+    "where": "ci",
+    "when": "2026-11-01T18:00:00Z",
+    "commit": "c0ffee1",
+    "dirty": false,
+    "status": "pass",
+    "seconds": 0.1,
+    "cases": [
+     {
+      "name": "owner can write their profile",
+      "status": "pass",
+      "seconds": 0.1
+     }
+    ]
+   },
+   {
+    "run": "2026-11-01T10-00-00Z_000001",
+    "task": "rules",
+    "source": "laptop",
+    "where": "laptop",
+    "when": "2026-11-01T10:01:00Z",
+    "commit": "c0ffee1",
+    "dirty": false,
+    "status": "pass",
+    "seconds": 0.30000000000000004,
+    "cases": [
+     {
+      "name": "owner can write their profile",
+      "status": "pass",
+      "seconds": 0.2
+     },
+     {
+      "name": "a stranger cannot read it",
+      "status": "pass",
+      "seconds": 0.1
+     }
+    ]
+   }
+  ],
+  "tests/helper-page.js": []
+ },
+ "results": {
+  "smoke-sync": [
+   {
+    "run": "2026-11-01T10-00-00Z_000001",
+    "when": "2026-11-01T10:01:00Z",
+    "commit": "c0ffee1",
+    "status": "pass",
+    "full": true,
+    "kind": "gate",
+    "seconds": 20
+   },
+   {
+    "run": "2026-11-01T11-00-00Z_000002",
+    "when": "2026-11-01T11:01:00Z",
+    "commit": "c0ffee1",
+    "status": "fail",
+    "full": true,
+    "kind": "gate",
+    "seconds": 31
+   },
+   {
+    "run": "2026-11-01T12-00-00Z_000003",
+    "when": "2026-11-01T12:01:00Z",
+    "commit": "c0ffee1",
+    "status": "pass",
+    "full": true,
+    "kind": "gate",
+    "seconds": 19
+   },
+   {
+    "run": "2026-11-01T14-00-00Z_000006",
+    "when": "2026-11-01T14:01:00Z",
+    "commit": "c0ffee1",
+    "status": "fail",
+    "full": true,
+    "kind": "gate",
+    "seconds": 31
+   },
+   {
+    "run": "junit-41-1-gate",
+    "when": "2026-11-01T18:00:00Z",
+    "commit": "c0ffee1",
+    "status": "fail",
+    "full": true,
+    "kind": "gate",
+    "seconds": 30
+   },
+   {
+    "run": "junit-41-2-gate",
+    "when": "2026-11-01T18:10:00Z",
+    "commit": "c0ffee1",
+    "status": "pass",
+    "full": true,
+    "kind": "gate",
+    "seconds": 28
+   },
+   {
+    "run": "junit-42-1-gate",
+    "when": "2026-11-02T18:02:00Z",
+    "commit": "c0ffee1",
+    "status": "fail",
+    "full": true,
+    "kind": "gate",
+    "seconds": 30
+   },
+   {
+    "run": "junit-42-2-gate",
+    "when": "2026-11-02T18:12:00Z",
+    "commit": "c0ffee1",
+    "status": "pass",
+    "full": true,
+    "kind": "gate",
+    "seconds": 29
+   },
+   {
+    "run": "2026-11-03T20-00-00Z_000010",
+    "when": "2026-11-03T20:01:00Z",
+    "commit": "c0ffee1",
+    "status": "pass",
+    "full": true,
+    "kind": "soak",
+    "seconds": 20
+   },
+   {
+    "run": "junit-62-1-load",
+    "when": "2026-11-05T21:00:00Z",
+    "commit": "c0ffee1",
+    "status": "pass",
+    "full": true,
+    "kind": "load",
+    "seconds": 40
+   }
+  ],
+  "load-check": [
+   {
+    "run": "2026-11-01T10-00-00Z_000001",
+    "when": "2026-11-01T10:01:00Z",
+    "commit": "c0ffee1",
+    "status": "pass",
+    "full": true,
+    "kind": "gate",
+    "seconds": 5
+   },
+   {
+    "run": "2026-11-01T11-00-00Z_000002",
+    "when": "2026-11-01T11:01:00Z",
+    "commit": "c0ffee1",
+    "status": "pass",
+    "full": true,
+    "kind": "gate",
+    "seconds": 5
+   },
+   {
+    "run": "2026-11-01T12-00-00Z_000003",
+    "when": "2026-11-01T12:01:00Z",
+    "commit": "c0ffee1",
+    "status": "pass",
+    "full": true,
+    "kind": "gate",
+    "seconds": 0.01
+   },
+   {
+    "run": "2026-11-01T14-00-00Z_000006",
+    "when": "2026-11-01T14:01:00Z",
+    "commit": "c0ffee1",
+    "status": "pass",
+    "full": true,
+    "kind": "gate",
+    "seconds": 5
+   },
+   {
+    "run": "junit-42-1-gate",
+    "when": "2026-11-02T18:02:00Z",
+    "commit": "c0ffee1",
+    "status": "pass",
+    "full": true,
+    "kind": "gate",
+    "seconds": 5
+   },
+   {
+    "run": "junit-42-2-gate",
+    "when": "2026-11-02T18:12:00Z",
+    "commit": "c0ffee1",
+    "status": "pass",
+    "full": true,
+    "kind": "gate",
+    "seconds": 5
+   },
+   {
+    "run": "2026-11-03T20-00-00Z_000010",
+    "when": "2026-11-03T20:01:00Z",
+    "commit": "c0ffee1",
+    "status": "pass",
+    "full": true,
+    "kind": "soak",
+    "seconds": 5
+   },
+   {
+    "run": "junit-60-9-gate",
+    "when": "2026-11-04T18:09:00Z",
+    "commit": "c0ffee1",
+    "status": "fail",
+    "full": true,
+    "kind": "gate",
+    "seconds": 5
+   },
+   {
+    "run": "junit-60-10-gate",
+    "when": "2026-11-04T18:10:00Z",
+    "commit": "c0ffee1",
+    "status": "pass",
+    "full": true,
+    "kind": "gate",
+    "seconds": 5
+   },
+   {
+    "run": "junit-62-1-load",
+    "when": "2026-11-05T21:00:00Z",
+    "commit": "c0ffee1",
+    "status": "skip",
+    "full": true,
+    "kind": "load",
+    "seconds": 0
+   }
+  ],
+  "smoke-wake": [
+   {
+    "run": "2026-11-01T10-00-00Z_000001",
+    "when": "2026-11-01T10:01:00Z",
+    "commit": "c0ffee1",
+    "status": "pass",
+    "full": true,
+    "kind": "gate",
+    "seconds": 12
+   },
+   {
+    "run": "2026-11-01T11-00-00Z_000002",
+    "when": "2026-11-01T11:01:00Z",
+    "commit": "c0ffee1",
+    "status": "pass",
+    "full": true,
+    "kind": "gate",
+    "seconds": 12
+   },
+   {
+    "run": "2026-11-01T12-00-00Z_000003",
+    "when": "2026-11-01T12:01:00Z",
+    "commit": "c0ffee1",
+    "status": "fail",
+    "full": true,
+    "kind": "gate",
+    "seconds": 1
+   },
+   {
+    "run": "2026-11-01T14-00-00Z_000006",
+    "when": "2026-11-01T14:01:00Z",
+    "commit": "c0ffee1",
+    "status": "pass",
+    "full": true,
+    "kind": "gate",
+    "seconds": 12
+   },
+   {
+    "run": "junit-41-1-gate",
+    "when": "2026-11-01T18:00:00Z",
+    "commit": "c0ffee1",
+    "status": "pass",
+    "full": true,
+    "kind": "gate",
+    "seconds": 10
+   },
+   {
+    "run": "junit-41-2-gate",
+    "when": "2026-11-01T18:10:00Z",
+    "commit": "c0ffee1",
+    "status": "pass",
+    "full": true,
+    "kind": "gate",
+    "seconds": 10
+   },
+   {
+    "run": "2026-11-03T20-00-00Z_000010",
+    "when": "2026-11-03T20:01:00Z",
+    "commit": "c0ffee1",
+    "status": "pass",
+    "full": true,
+    "kind": "soak",
+    "seconds": 12
+   },
+   {
+    "run": "junit-61-1-gate",
+    "when": "2026-11-05T18:00:00Z",
+    "commit": "feed2b3",
+    "status": "fail",
+    "full": true,
+    "kind": "gate",
+    "seconds": 9
+   },
+   {
+    "run": "junit-61-2-gate",
+    "when": "2026-11-05T18:10:00Z",
+    "commit": "feed2b3",
+    "status": "pass",
+    "full": true,
+    "kind": "gate",
+    "seconds": 9
+   }
+  ],
+  "walk-world": [
+   {
+    "run": "junit-41-1-after",
+    "when": "2026-11-01T18:05:00Z",
+    "commit": "c0ffee1",
+    "status": "pass",
+    "full": true,
+    "kind": "after",
+    "seconds": 50
+   },
+   {
+    "run": "junit-50-1-after_first",
+    "when": "2026-11-03T20:01:00Z",
+    "commit": "c0ffee1",
+    "status": "fail",
+    "full": true,
+    "kind": "after",
+    "seconds": 60
+   },
+   {
+    "run": "junit-50-1-after",
+    "when": "2026-11-03T20:31:00Z",
+    "commit": "c0ffee1",
+    "status": "pass",
+    "full": true,
+    "kind": "after",
+    "seconds": 55
+   }
+  ],
+  "tests/rules.test.js": [
+   {
+    "run": "2026-11-01T10-00-00Z_000001",
+    "when": "2026-11-01T10:01:00Z",
+    "commit": "c0ffee1",
+    "status": "pass",
+    "full": true,
+    "kind": "gate",
+    "seconds": 0.2
+   },
+   {
+    "run": "2026-11-01T10-00-00Z_000001",
+    "when": "2026-11-01T10:01:00Z",
+    "commit": "c0ffee1",
+    "status": "pass",
+    "full": true,
+    "kind": "gate",
+    "seconds": 0.1
+   },
+   {
+    "run": "junit-41-1-gate",
+    "when": "2026-11-01T18:00:00Z",
+    "commit": "c0ffee1",
+    "status": "pass",
+    "full": true,
+    "kind": "gate",
+    "seconds": 0.1
+   },
+   {
+    "run": "junit-41-2-gate",
+    "when": "2026-11-01T18:10:00Z",
+    "commit": "c0ffee1",
+    "status": "pass",
+    "full": true,
+    "kind": "gate",
+    "seconds": 0.1
+   },
+   {
+    "run": "junit-42-1-gate",
+    "when": "2026-11-02T18:02:00Z",
+    "commit": "c0ffee1",
+    "status": "pass",
+    "full": true,
+    "kind": "gate",
+    "seconds": 0.1
+   },
+   {
+    "run": "junit-42-2-gate",
+    "when": "2026-11-02T18:12:00Z",
+    "commit": "c0ffee1",
+    "status": "pass",
+    "full": true,
+    "kind": "gate",
+    "seconds": 0.1
+   }
+  ],
+  "tests/unit/clock.test.mjs": [
+   {
+    "run": "2026-10-01T08-00-00Z_000009",
+    "when": "2026-10-01T08:01:00Z",
+    "commit": null,
+    "status": "pass",
+    "full": true,
+    "kind": null,
+    "seconds": 0.01
+   },
+   {
+    "run": "2026-10-01T08-00-00Z_000009",
+    "when": "2026-10-01T08:01:00Z",
+    "commit": null,
+    "status": "pass",
+    "full": true,
+    "kind": null,
+    "seconds": 0.01
+   },
+   {
+    "run": "2026-10-20T09-00-00Z_000004",
+    "when": "2026-10-20T09:01:00Z",
+    "commit": "c0ffee1",
+    "status": "pass",
+    "full": true,
+    "kind": "test",
+    "seconds": 0.01
+   },
+   {
+    "run": "2026-10-20T09-00-00Z_000004",
+    "when": "2026-10-20T09:01:00Z",
+    "commit": "c0ffee1",
+    "status": "pass",
+    "full": true,
+    "kind": "test",
+    "seconds": 0.01
+   },
+   {
+    "run": "2026-11-01T10-00-00Z_000001",
+    "when": "2026-11-01T10:01:00Z",
+    "commit": "c0ffee1",
+    "status": "pass",
+    "full": true,
+    "kind": "gate",
+    "seconds": 0.01
+   },
+   {
+    "run": "2026-11-01T10-00-00Z_000001",
+    "when": "2026-11-01T10:01:00Z",
+    "commit": "c0ffee1",
+    "status": "pass",
+    "full": true,
+    "kind": "gate",
+    "seconds": 0.01
+   },
+   {
+    "run": "2026-11-01T13-00-00Z_000005",
+    "when": "2026-11-01T13:01:00Z",
+    "commit": "c0ffee1",
+    "status": "pass",
+    "full": false,
+    "kind": "test",
+    "seconds": 0.01
+   },
+   {
+    "run": "2026-11-01T13-00-00Z_000005",
+    "when": "2026-11-01T13:01:00Z",
+    "commit": "c0ffee1",
+    "status": "fail",
+    "full": false,
+    "kind": "test",
+    "seconds": 1
+   },
+   {
+    "run": "junit-41-1-gate",
+    "when": "2026-11-01T18:00:00Z",
+    "commit": "c0ffee1",
+    "status": "pass",
+    "full": true,
+    "kind": "gate",
+    "seconds": 0.01
+   },
+   {
+    "run": "junit-41-1-gate",
+    "when": "2026-11-01T18:00:00Z",
+    "commit": "c0ffee1",
+    "status": "pass",
+    "full": true,
+    "kind": "gate",
+    "seconds": 0.01
+   },
+   {
+    "run": "junit-41-2-gate",
+    "when": "2026-11-01T18:10:00Z",
+    "commit": "c0ffee1",
+    "status": "pass",
+    "full": true,
+    "kind": "gate",
+    "seconds": 0.01
+   },
+   {
+    "run": "junit-41-2-gate",
+    "when": "2026-11-01T18:10:00Z",
+    "commit": "c0ffee1",
+    "status": "pass",
+    "full": true,
+    "kind": "gate",
+    "seconds": 0.01
+   },
+   {
+    "run": "2026-11-02T09-00-00Z_000007",
+    "when": "2026-11-02T09:01:00Z",
+    "commit": "feed2b3",
+    "status": "pass",
+    "full": true,
+    "kind": "test",
+    "seconds": 0.01
+   },
+   {
+    "run": "2026-11-02T09-00-00Z_000007",
+    "when": "2026-11-02T09:01:00Z",
+    "commit": "feed2b3",
+    "status": "fail",
+    "full": true,
+    "kind": "test",
+    "seconds": 1
+   },
+   {
+    "run": "2026-11-02T09-30-00Z_000008",
+    "when": "2026-11-02T09:31:00Z",
+    "commit": "feed2b3",
+    "status": "pass",
+    "full": true,
+    "kind": "test",
+    "seconds": 0.01
+   },
+   {
+    "run": "2026-11-02T09-30-00Z_000008",
+    "when": "2026-11-02T09:31:00Z",
+    "commit": "feed2b3",
+    "status": "pass",
+    "full": true,
+    "kind": "test",
+    "seconds": 0.01
+   },
+   {
+    "run": "junit-42-1-gate",
+    "when": "2026-11-02T18:02:00Z",
+    "commit": "c0ffee1",
+    "status": "pass",
+    "full": true,
+    "kind": "gate",
+    "seconds": 0.01
+   },
+   {
+    "run": "junit-42-1-gate",
+    "when": "2026-11-02T18:02:00Z",
+    "commit": "c0ffee1",
+    "status": "pass",
+    "full": true,
+    "kind": "gate",
+    "seconds": 0.01
+   },
+   {
+    "run": "junit-42-2-gate",
+    "when": "2026-11-02T18:12:00Z",
+    "commit": "c0ffee1",
+    "status": "pass",
+    "full": true,
+    "kind": "gate",
+    "seconds": 0.01
+   },
+   {
+    "run": "junit-42-2-gate",
+    "when": "2026-11-02T18:12:00Z",
+    "commit": "c0ffee1",
+    "status": "pass",
+    "full": true,
+    "kind": "gate",
+    "seconds": 0.01
+   }
+  ],
+  "tests/unit/merge.test.mjs": [
+   {
+    "run": "2026-10-01T08-00-00Z_000009",
+    "when": "2026-10-01T08:01:00Z",
+    "commit": null,
+    "status": "pass",
+    "full": true,
+    "kind": null,
+    "seconds": 0.01
+   },
+   {
+    "run": "2026-10-20T09-00-00Z_000004",
+    "when": "2026-10-20T09:01:00Z",
+    "commit": "c0ffee1",
+    "status": "pass",
+    "full": true,
+    "kind": "test",
+    "seconds": 0.01
+   },
+   {
+    "run": "2026-11-01T10-00-00Z_000001",
+    "when": "2026-11-01T10:01:00Z",
+    "commit": "c0ffee1",
+    "status": "pass",
+    "full": true,
+    "kind": "gate",
+    "seconds": 0.01
+   },
+   {
+    "run": "2026-11-01T13-00-00Z_000005",
+    "when": "2026-11-01T13:01:00Z",
+    "commit": "c0ffee1",
+    "status": "pass",
+    "full": false,
+    "kind": "test",
+    "seconds": 0.01
+   },
+   {
+    "run": "2026-11-02T09-00-00Z_000007",
+    "when": "2026-11-02T09:01:00Z",
+    "commit": "feed2b3",
+    "status": "pass",
+    "full": true,
+    "kind": "test",
+    "seconds": 0.01
+   },
+   {
+    "run": "2026-11-02T09-30-00Z_000008",
+    "when": "2026-11-02T09:31:00Z",
+    "commit": "feed2b3",
+    "status": "pass",
+    "full": true,
+    "kind": "test",
+    "seconds": 0.01
+   }
+  ]
+ }
+}

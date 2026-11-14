@@ -85,7 +85,7 @@ A full one: QuestKeep's own, as an example. Its paths, job names and plugin are 
 
 ## Plugins
 
-A plugin is an ES module the manifest names. Its default export takes `{ ui, m }` and answers `{ id, label, path, page(ctx, params, rest), actions?, demo? }`. `ui` is the only API HQ promises across versions: the page frame, escaping, the info mark, tables, charts, markdown, and `git` and `gh`, which HQ itself only ever calls to read (`lib/ui-api.mjs` in the repo). A plugin imports the API from `homequarters`. It may import the package's internals too, as `homequarters/internal/lib/<file>.mjs`; those are stable per exact version only, so pin `homequarters` exactly if it does. A bare `homequarters/lib/...` is refused by the package's `exports` map. A plugin that fails to load is reported on the Machine page and left out.
+A plugin is an ES module the manifest names. Its default export takes `{ ui, m }` and answers `{ id, label, path, page(ctx, params, rest), actions?, demo? }`. `ui` is the only API HQ promises across versions: the page frame, escaping, the info mark, tables, charts, markdown, and `git` and `gh`, which HQ itself only ever calls to read (`lib/ui-api.mjs` in the repo). A plugin imports the API from `homequarters`. It may import the helpers in `homequarters/unstable` too; those may change in any release, so pin `homequarters` exactly if it does. A bare `homequarters/lib/...` is refused by the package's `exports` map. A plugin that fails to load is reported on the Machine page and left out.
 
 ## Recording runs
 

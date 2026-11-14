@@ -4,6 +4,22 @@ What each version of HomeQuarters changes for a project that installs it. The ma
 rule (docs/standards/manifest.md): a key, once published, is never renamed or removed, and a newer manifest is read with
 a warning.
 
+## 0.3.0
+
+Removes what 0.2 kept for projects moving off it. A project that runs on 0.2 without warnings and imports nothing
+from `homequarters/internal/...` needs no change, apart from the environment names below.
+
+- `homequarters/internal/...` is gone from the `exports` map. Use `homequarters`, `homequarters/testing` or
+  `homequarters/unstable`.
+- Only `HQ_` environment names are read. The `QK_` names, `LOCK_WAIT` and `JUNIT` that 0.2 read beside them are not;
+  docs/standards/cli.md lists the names. `HQ_NOW` replaces `QK_NOW` for replaying an old red.
+- The slot finds test containers by the `hq.test` and `hq.worktree` labels; QuestKeep's `qk.*` ones are not read. A
+  container with neither is still counted by the test image, as before.
+- A daily DORA copy no longer carries the `questkeep` copy of the project's figures. Delivery still reads a file that
+  has only that block.
+- The counting notes the package carried from QuestKeep are gone: a project lists its own in
+  `delivery.countingChanges`.
+
 ## 0.2.0
 
 Additions only: everything 0.1 read still works.

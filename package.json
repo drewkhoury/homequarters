@@ -1,6 +1,6 @@
 {
   "name": "homequarters",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "HQ: a local website for keeping up with your own repo. Reads what your project writes; runs no code from it.",
   "type": "module",
   "license": "MIT",
@@ -19,7 +19,6 @@
     ".": "./lib/ui-api.mjs",
     "./testing": "./testing.mjs",
     "./unstable": "./unstable.mjs",
-    "./internal/*": "./*",
     "./package.json": "./package.json"
   },
   "files": [

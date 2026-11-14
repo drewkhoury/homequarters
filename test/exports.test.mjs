@@ -1,8 +1,8 @@
 // Proves: a project that installs the package can import the plugin API from `homequarters`, the test helpers from
-// `homequarters/testing`, the unpromised helpers from `homequarters/unstable`, any file under `homequarters/internal/`, and `homequarters/package.json`, and is refused a
-// deep import such as `homequarters/lib/backlog.mjs`. Why: QuestKeep's 40 deep imports move to one `internal/` prefix
-// (decision 18), so 0.2.0 can drop that prefix in one place; a bare `lib/` path that still resolved would hide the
-// imports the switch missed.
+// `homequarters/testing`, the unpromised helpers from `homequarters/unstable`, and `homequarters/package.json`, and is
+// refused any other path into the package: `homequarters/lib/...`, and from 0.3.0 `homequarters/internal/...` too.
+// Why: what a project may import is what the package promises, or says it does not; a deep path that still resolved
+// would let a project lean on a file the package may rename in any release.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { spawnSync } from 'node:child_process';
@@ -35,8 +35,6 @@ const allowed = {
   homequarters: 'lib/ui-api.mjs',
   'homequarters/testing': 'testing.mjs',
   'homequarters/unstable': 'unstable.mjs',
-  'homequarters/internal/lib/backlog.mjs': 'lib/backlog.mjs',
-  'homequarters/internal/server.mjs': 'server.mjs',
   'homequarters/package.json': 'package.json',
 };
 
@@ -49,6 +47,9 @@ for (const [specifier, file] of Object.entries(allowed)) {
   });
 }
 
-test('a deep import outside internal/ is refused as not exported', t => {
-  assert.deepEqual(resolveFrom(project(t), 'homequarters/lib/backlog.mjs'), { code: 'ERR_PACKAGE_PATH_NOT_EXPORTED' });
+test('a deep import is refused as not exported, internal/ included from 0.3.0', t => {
+  const dir = project(t);
+  for (const deep of ['homequarters/lib/backlog.mjs', 'homequarters/internal/lib/backlog.mjs', 'homequarters/internal/server.mjs']) {
+    assert.deepEqual(resolveFrom(dir, deep), { code: 'ERR_PACKAGE_PATH_NOT_EXPORTED' }, deep);
+  }
 });

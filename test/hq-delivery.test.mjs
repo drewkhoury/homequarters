@@ -217,7 +217,8 @@ test('Waiting on you lists the open pull requests oldest first, with age, checks
 
 test('the deploys chart has no same-app series; same-app redeploys are counted in Method with the rule\'s own date', async t => {
   const moved = structuredClone(dora);
-  moved.countingChanges.find(c => /served-files-change/.test(c.decision || '')).date = '2026-10-04';
+  // the project's own note on the rule, as QuestKeep's hq.json lists it (delivery.countingChanges), moved a day
+  moved.countingChanges = [{ date: '2026-10-04', what: 'Pushes that don\'t change served files stop deploying.', decision: '2026-10-05-deploy-only-when-served-files-change.md' }];
   const html = await open(t, '', moved);
   assert.doesNotMatch(section(html, 'dv-deploys'), /Same-app|bl-s-ghost/);
   assert.match(text(html), /Same-app redeploys: 0 · skipped since 4 Oct/);
@@ -348,7 +349,7 @@ test('the period choice offers 7 and 30 days; yesterday is not a period', async 
 
 test('the slot wait counts every Laptop gate run, and says none delayed a live change', async t => {
   const busy = structuredClone(dora);
-  window7(busy).questkeep.cost.slotWait = { gates: 62, waited: 8, sec: { n: 8, median: 172 } };
+  window7(busy).project.cost.slotWait = { gates: 62, waited: 8, sec: { n: 8, median: 172 } };
   assert.match(text(await open(t, '', busy)), /Test slot waits: 8 of 62 Laptop runs · median 3 min · none delayed a live change/);
 });
 

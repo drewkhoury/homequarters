@@ -1,9 +1,7 @@
-// Proves: hq dora's counting changes keep a note that has no decision file of its own when the manifest's
-// decisions.earlier file exists in the repo, and leave it out when that file does not.
-// Why: QuestKeep's 27 September note ("Deploys skip a tree live already serves...") predates its docs/decisions/ folder,
-// so it names no decision file, and keeping only notes whose decision file exists dropped a line from make dora and the
-// Delivery page that QuestKeep's main shows. Its decisions before that folder live in the earlier file
-// (docs/DECISIONS.md), so a repo that has that file has that history.
+// Proves: hq dora writes the counting notes the manifest lists (delivery.countingChanges) into dora.json: a note that
+// names no decision file always, and one that names a file while the file is in the decisions folder.
+// Why: a note from before a project kept decisions names no file, and dropping it took a line off the Delivery page;
+// a note whose file has gone is the one hq check reports. From 0.3.0 the notes are the project's own, never the package's.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { mkdtempSync, mkdirSync, writeFileSync, readFileSync, rmSync } from 'node:fs';
@@ -11,23 +9,23 @@ import { join, dirname } from 'node:path';
 import { tmpdir } from 'node:os';
 import { execFileSync, spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
-import { COUNTING_CHANGES } from '../lib/dora.mjs';
 
 const HQ = join(dirname(fileURLToPath(import.meta.url)), '..', 'bin', 'hq.mjs');
 const git = (dir, ...a) => execFileSync('git', ['-C', dir, ...a], { encoding: 'utf8', env: { ...process.env, GIT_CONFIG_NOSYSTEM: '1', GIT_AUTHOR_NAME: 't', GIT_AUTHOR_EMAIL: 't@x', GIT_COMMITTER_NAME: 't', GIT_COMMITTER_EMAIL: 't@x' } }).trim();
 
-// the notes as lib/dora.mjs lists them: the one with no decision file, and one that has a file
-const EARLY_NOTE = COUNTING_CHANGES.find(c => c.decision === null);
-const FILED_NOTE = COUNTING_CHANGES.find(c => c.decision === '2026-10-03-ci-on-the-laptop.md');
+// Two made-up notes: one from before the project kept decisions, so it names no file, and one tied to a decision file
+const EARLY_NOTE = { date: '2026-01-10', what: 'Deploys skip a tree already live.' };
+const FILED_NOTE = { date: '2026-02-03', what: 'CI moved to the laptop.', decision: '2026-02-03-ci-on-the-laptop.md' };
 
-// A repo whose manifest names docs/decisions and docs/DECISIONS.md, holding FILED_NOTE's decision file and, when asked,
-// the earlier file. One deploy run is fetched, so hq dora has something to work out and writes dora.json.
-function countingChanges({ earlierFile }) {
+// A repo whose manifest lists both notes, holding FILED_NOTE's decision file when asked. One deploy run is fetched, so
+// hq dora has something to work out and writes dora.json.
+function countingChanges({ filedFile }) {
   const dir = mkdtempSync(join(tmpdir(), 'hq-dora-notes-')), cache = join(dir, 'cache'), raw = join(cache, 'ci', 'actions');
-  writeFileSync(join(dir, 'hq.json'), JSON.stringify({ schemaVersion: 1, name: 'doors', cache, stores: ['dora', 'ci'], decisions: { dir: 'docs/decisions', earlier: 'docs/DECISIONS.md' } }));
+  writeFileSync(join(dir, 'hq.json'), JSON.stringify({ schemaVersion: 1, name: 'doors', cache, stores: ['dora', 'ci'], decisions: { dir: 'docs/decisions' },
+    delivery: { countingChanges: [EARLY_NOTE, FILED_NOTE] } }));
   mkdirSync(join(dir, 'docs', 'decisions'), { recursive: true });
-  writeFileSync(join(dir, 'docs', 'decisions', FILED_NOTE.decision), '# CI runs on the laptop\n');
-  if (earlierFile) writeFileSync(join(dir, 'docs', 'DECISIONS.md'), '# Decisions\n\n- 27 September: deploys skip a tree live already serves.\n');
+  writeFileSync(join(dir, 'docs', 'decisions', 'other.md'), '# Another decision\n');
+  if (filedFile) writeFileSync(join(dir, 'docs', 'decisions', FILED_NOTE.decision), '# CI runs on the laptop\n');
   git(dir, 'init', '-q', '-b', 'main'); git(dir, 'add', '.'); git(dir, 'commit', '-q', '-m', 'm');
   const sha = git(dir, 'rev-parse', 'HEAD'), live = Date.now() - 86400000;
   mkdirSync(join(raw, 'jobs'), { recursive: true });
@@ -41,10 +39,10 @@ function countingChanges({ earlierFile }) {
   return notes.map(c => c.what);
 }
 
-test('a counting change with no decision file is kept when the manifest\'s earlier decisions file exists', () => {
-  assert.deepEqual(countingChanges({ earlierFile: true }), [EARLY_NOTE.what, FILED_NOTE.what]);
+test('a note with no decision file shows, and so does one whose file is in the folder', () => {
+  assert.deepEqual(countingChanges({ filedFile: true }), [EARLY_NOTE.what, FILED_NOTE.what]);
 });
 
-test('a counting change with no decision file is left out when the earlier decisions file is not there', () => {
-  assert.deepEqual(countingChanges({ earlierFile: false }), [FILED_NOTE.what]);
+test('a note whose decision file is not in the folder is left out, and the one with no file still shows', () => {
+  assert.deepEqual(countingChanges({ filedFile: false }), [EARLY_NOTE.what]);
 });

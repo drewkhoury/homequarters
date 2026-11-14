@@ -8,7 +8,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { compute, summarise, deploysOf, failuresOf, recoveriesOf, changesOf, mergesOf, prRedsOf, gatesOf, fixesOf, rowFromLog, slotOf, stats, dayStart, dayKey, addDays, windowsAt, lateDays, COUNTING_CHANGES, P90_FROM, configureDelivery } from '../lib/dora.mjs';
+import { compute, summarise, deploysOf, failuresOf, recoveriesOf, changesOf, mergesOf, prRedsOf, gatesOf, fixesOf, rowFromLog, slotOf, stats, dayStart, dayKey, addDays, windowsAt, lateDays, P90_FROM, configureDelivery } from '../lib/dora.mjs';
 import * as dora from '../lib/dora.mjs';
 import { QK_DELIVERY } from './fixtures/delivery.mjs';
 
@@ -194,7 +194,7 @@ test('yesterday\'s figures: three deploys, decide\'s rows, and a change with no 
   const day = file.windows[0];
   assert.equal(day.from, '2026-10-05T04:00:00.000Z');
   assert.equal(day.portable.deploys.n, 3);
-  assert.deepEqual(day.questkeep.rows, { 5: 0, 6: 1, 7: 2 });
+  assert.deepEqual(day.project.rows, { 5: 0, 6: 1, 7: 2 });
   assert.equal(day.portable.leadTime.n, 2);
   assert.equal(day.portable.leadTime.noStart, 1);
   assert.deepEqual(day.portable.leadTime.paths, { pr: 3 });
@@ -204,7 +204,7 @@ test('an empty figure says why instead of showing 0, and machine figures are not
   const asOf = Date.parse('2026-10-04T12:00:00Z');
   const f = summarise(all, { asOf, repo: null, sources: {} });
   // 3 October ran on the laptop and 2 October on GitHub's machines
-  assert.equal(f.windows[0].prev.questkeep.cost.reason, 'different runner');
+  assert.equal(f.windows[0].prev.project.cost.reason, 'different runner');
   const empty = summarise(compute({ runs: [], jobsOf, git }), { asOf, sources: {} });
   assert.equal(empty.windows[0].portable.leadTime.n, 0);
   assert.match(empty.windows[0].portable.leadTime.reason, /No change/);
@@ -232,17 +232,17 @@ test('a deploy git could not judge is unknown: neither a deploy players got nor 
   const day = summarise(all, { asOf: Date.parse('2026-10-06T12:00:00Z'), sources: {} }).windows[0];
   assert.equal(day.portable.deploys.n, 2);
   assert.equal(day.portable.deploys.unknown, 1);
-  assert.equal(day.questkeep.identicalRedeploys, 0);
+  assert.equal(day.project.identicalRedeploys, 0);
 });
 
 // Until early November the 7- and 30-day windows straddle the 3 October switch to the laptop runner. A gate median
 // across both machines measures neither, so the figure says it is mixed and gives each runner its own.
 test('a window whose gates ran on both GitHub\'s machines and the laptop says so, with each runner\'s own figure', () => {
   const week = file.windows[1];
-  assert.deepEqual(week.questkeep.cost.mixed, { hosted: 1, laptop: 3 });
-  assert.equal(week.questkeep.cost.gateSecByRunner.hosted.median, 400);
-  assert.equal(week.questkeep.cost.gateSecByRunner.laptop.median, 274);
-  assert.equal(file.windows[0].questkeep.cost.mixed, null);
+  assert.deepEqual(week.project.cost.mixed, { hosted: 1, laptop: 3 });
+  assert.equal(week.project.cost.gateSecByRunner.hosted.median, 400);
+  assert.equal(week.project.cost.gateSecByRunner.laptop.median, 274);
+  assert.equal(file.windows[0].project.cost.mixed, null);
 });
 
 // The figures a reader sees, not only the flags under them: each count must leave out what its definition leaves out.
@@ -252,14 +252,14 @@ const sameDay = summarise(compute({ runs, jobsOf, logs, pulls, lock, commits, gi
 
 test('yesterday counts the deploys players got, and the identical one apart', () => {
   assert.equal(sameDay.windows[0].portable.deploys.n, 2);
-  assert.equal(sameDay.windows[0].questkeep.identicalRedeploys, 1);
+  assert.equal(sameDay.windows[0].project.identicalRedeploys, 1);
 });
 
 test('over 30 days the smoke red is a failed deploy and the deploy step that failed is a pipeline red, not both', () => {
   const month = sameDay.windows[2];
   assert.equal(month.portable.failedDeploys.n, 1);
   assert.deepEqual(month.portable.failedDeploys.items, [36692304266]);
-  assert.equal(month.questkeep.cost.pipelineReds, 1);
+  assert.equal(month.project.cost.pipelineReds, 1);
 });
 
 // The two variants below are real jobs with one step's result changed, since no real run has that shape yet
@@ -269,8 +269,8 @@ const variant = (key, name, step, conclusion) => ({ ...jobs, [key]: jobs[key].ma
 test('a gate that reused a laptop gate is counted as reused and kept out of gate seconds', () => {
   const reusedJobs = variant('37379510900-1', 'laptop', /^Run the tests$/, 'skipped');
   const week = summarise(compute({ runs, jobsOf: (id, a) => reusedJobs[`${id}-${a}`], logs, pulls, lock, git }), { asOf: Date.parse('2026-10-06T12:00:00Z'), sources: {} }).windows[1];
-  assert.equal(week.questkeep.cost.gateReused, 1);
-  assert.equal(week.questkeep.cost.gateSec.n, 3);
+  assert.equal(week.project.cost.gateReused, 1);
+  assert.equal(week.project.cost.gateSec.n, 3);
 });
 
 test('a deploy job that went red after its deploy step passed released, so it is a failed deploy', () => {
@@ -281,7 +281,7 @@ test('a deploy job that went red after its deploy step passed released, so it is
   assert.equal(f.released, true);
   const month = summarise(compute({ runs, jobsOf: (id, a) => released[`${id}-${a}`], logs, pulls, lock, git }), { asOf: Date.parse('2026-10-06T12:00:00Z'), sources: {} }).windows[2];
   assert.equal(month.portable.failedDeploys.n, 2);
-  assert.equal(month.questkeep.cost.pipelineReds, 0);
+  assert.equal(month.project.cost.pipelineReds, 0);
 });
 
 test('recovery ends at the next release whose smoke test passed, not one whose smoke test was skipped', () => {
@@ -377,7 +377,7 @@ test('failed deploys are out of the deploys players got, the same count as deplo
 const week = file.windows[1];
 
 test('the typical change is the one at the median, and its own parts add up to its total', () => {
-  const t = week.questkeep.typical;
+  const t = week.project.typical;
   assert.equal(t.pr, 132);
   assert.equal(t.totalSec, 728);
   assert.equal(t.title, 'CI runs on the laptop runner behind one switch');
@@ -386,12 +386,12 @@ test('the typical change is the one at the median, and its own parts add up to i
 });
 
 test('hours sums each part over the period\'s changes', () => {
-  assert.deepEqual(week.questkeep.hours, { n: 3, totalSec: 728 + 604 + 6691, runnerWaitSec: 2 + 19 + 2, slotWaitSec: 0, gateSec: 346 + 252 + 274,
+  assert.deepEqual(week.project.hours, { n: 3, totalSec: 728 + 604 + 6691, runnerWaitSec: 2 + 19 + 2, slotWaitSec: 0, gateSec: 346 + 252 + 274,
     greenToMergeSec: 262 + 282 + 116, mergeToLiveSec: 117 + 51 + 365, otherSec: 1 + 0 + 5934 });
 });
 
 test('the slowest changes come longest first, each with its title, total, parts and link', () => {
-  const s = week.questkeep.slowest;
+  const s = week.project.slowest;
   assert.deepEqual(s.map(x => [x.pr, x.totalSec]), [[175, 6691], [132, 728], [172, 604]]);
   assert.equal(s[0].title, 'feat: lists can be pinned to the top');
   assert.equal(s[0].split.otherSec, 5934);
@@ -431,7 +431,7 @@ test('each gate and red carries its slot wait, and the period counts the gates t
   const d = compute({ runs: slot.runs, jobsOf: slotJobsOf, lock: slot.lock, git });
   assert.deepEqual(d.gates.map(g => [g.run, g.slotWaitSec, g.sec]), [[37255436574, 0, 337], [37434109311, 330, 518 - 330]]);
   assert.equal(d.prReds.find(run(37239479411)).slotWaitSec, 793);
-  const cost = summarise(d, { asOf: Date.parse('2026-10-07T12:00:00Z'), sources: {} }).windows[1].questkeep.cost;
+  const cost = summarise(d, { asOf: Date.parse('2026-10-07T12:00:00Z'), sources: {} }).windows[1].project.cost;
   assert.equal(cost.slotWait.gates, 3);
   assert.equal(cost.slotWait.waited, 2);
   assert.equal(cost.slotWait.sec.median, 562);
@@ -705,10 +705,9 @@ test('flakes per 100 runs says how many of its flakes the rerun found', () => {
     one('r3', 'b7dd840', [{ id: 'docker-gate', cases: [{ name: 'smoke-sync', status: 'pass', seconds: 20 }] }]),
   ];
   const week = summarise(compute({ runs: [], jobsOf, git, testRuns }), { asOf: Date.parse('2026-10-12T12:00:00Z'), sources: {} }).windows.find(w => w.days === 7);
-  assert.equal(week.questkeep.cost.flakes, 2);
-  assert.equal(week.questkeep.cost.testRuns, 3, 'the rerun adds no run');
-  assert.equal(week.questkeep.cost.flakesByRerun, 1);
-  assert.ok(COUNTING_CHANGES.some(c => c.decision === '2026-10-11-rerun-once-on-a-gate-red.md'), 'the change of count is dated on Delivery');
+  assert.equal(week.project.cost.flakes, 2);
+  assert.equal(week.project.cost.testRuns, 3, 'the rerun adds no run');
+  assert.equal(week.project.cost.flakesByRerun, 1);
 });
 
 // "Green PRs waiting on you" took only the pull requests that changed what players get (66 of 112 for the week of
@@ -737,7 +736,7 @@ test("the delivery key's workflows and time zone are read, and the figures' proj
     const f = summarise(all, { asOf: Date.parse('2026-10-06T12:00:00Z'), sources: {} });
     assert.equal(f.tz, 'UTC');
     assert.ok(f.windows[0].project && f.windows[0].project.cost, 'the project block');
-    assert.deepEqual(f.windows[0].questkeep, f.windows[0].project, 'and its old name, read by the pages of one release ago');
+    assert.equal('questkeep' in f.windows[0], false, 'and from 0.3.0 no copy under its old name');
   } finally { configureDelivery(QK_DELIVERY); }
 });
 

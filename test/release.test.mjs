@@ -1,6 +1,7 @@
 // Proves: the package's version has a line in CHANGELOG.md, and the things kept "for one release" (the QK_ names, the
-// questkeep block the dora writer copies beside project) are gone once the version passes 0.1. Why: Nell's third review
-// found six files saying "for one release" with no clock; this is the clock, red the day 0.2.0 is cut with them still in.
+// questkeep block the dora writer copies beside project) are gone once the version passes 0.2. Why: Nell's third review
+// found six files saying "for one release" with no clock; this is the clock, red the day 0.3.0 is cut with them still in.
+// It moved from 0.2 to 0.3 when QuestKeep's own CI turned out to check with the laptop's global hq.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
@@ -16,7 +17,9 @@ test('the current version has its line in the changelog', () => {
   assert.match(read('CHANGELOG.md'), new RegExp(`^## ${version.replace(/\./g, '\\.')}\\b`, 'm'));
 });
 
-test('what is kept for one release leaves at 0.2: the dora writer\'s questkeep copy and the QK_ names the writers read', { skip: major === 0 && minor < 2 && 'still 0.1: the aliases may stay' }, () => {
+// 0.3, not 0.2: QuestKeep's CI checks with the laptop's global hq, so the names can only go once QuestKeep has moved off
+// them on a release that still reads them (CHANGELOG 0.2.0)
+test('what is kept for one release leaves at 0.3: the dora writer\'s questkeep copy and the QK_ names the writers read', { skip: major === 0 && minor < 3 && 'still 0.1 or 0.2: the aliases may stay' }, () => {
   assert.doesNotMatch(read('lib/dora.mjs'), /fig\.questkeep\s*=/, 'the writer alias');
   for (const f of ['lib/slot.mjs', 'problem.mjs', 'lib/space.mjs', 'lib/run-info.mjs', 'lib/ci-keep.mjs']) assert.doesNotMatch(read(f), /QK_[A-Z_]+/, `${f} still reads a QK_ name`);
 });

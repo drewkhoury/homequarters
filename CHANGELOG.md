@@ -4,6 +4,25 @@ What each version of HomeQuarters changes for a project that installs it. The ma
 rule (docs/standards/manifest.md): a key, once published, is never renamed or removed, and a newer manifest is read with
 a warning.
 
+## 0.2.0
+
+Additions only: everything 0.1 read still works.
+
+- `ui` is version 2. New members: `kindIn`, `gh.checksOf`, `git.belongs`, `claude.folderName`, `days.key`,
+  `days.start`, and `backlog.parseItem`, `check`, `openBlockers`, `dir()` and `stages()`. A plugin written for 1 still
+  loads, with a warning.
+- `homequarters/unstable` names HQ's helpers that make no promise between releases, for projects moving off
+  `homequarters/internal/...`.
+- `homequarters/testing` has `start()`, HQ's server for a test, which writes no link file, ignores `HQ_DEMO`, finds
+  no claude and shows the Machine page with every tool missing unless the test says otherwise; `NO_TOOLS`; and HQ's
+  readers a project's contract tests use.
+- `start()` takes `probes`, which the Machine page asks in place of the machine's tools.
+- `delivery.countingChanges` in hq.json lists the project's own counting notes for Delivery, and `hq check` reports
+  a note whose decision file is missing.
+- To go in 0.3.0: `homequarters/internal/...`; the `QK_` names, `LOCK_WAIT` and `JUNIT` the environment table lists
+  as "also read as"; the counting notes the package carries from QuestKeep; the `questkeep` copy of the project's
+  figures in a daily DORA copy.
+
 ## 0.1.1
 
 - The demo setting no longer takes a git name that starts with HQ ("HQ Test") for a person. It used to swap every

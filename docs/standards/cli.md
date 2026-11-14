@@ -110,7 +110,7 @@ The free-space check before a test run. It stands aside on GitHub-hosted runners
 
 ## Environment
 
-Every `HQ_` name the package reads. The `QK_` names in the second column are QuestKeep's, read as well for one release, until 0.2.0; the `HQ_` name wins when both are set.
+Every `HQ_` name the package reads. The `QK_` names in the second column are QuestKeep's, read as well through 0.2 and removed in 0.3.0; the `HQ_` name wins when both are set.
 
 | Name | Read by | Also read as | Means |
 | --- | --- | --- | --- |

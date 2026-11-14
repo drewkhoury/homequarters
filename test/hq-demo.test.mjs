@@ -111,6 +111,14 @@ test('the header reads HQ with a HomeQuarters wordmark, and the project\'s name 
   assert.match(demoPage('<a class="brand" href="/">HQ</a>', cfg), /<a class="brand" href="\/">HQ<small class="hq-wordmark"[^>]*>HomeQuarters<\/small><\/a>/);
 });
 
+test("a git name that starts with HQ is not taken for a person, so HQ's own class names and paths survive", () => {
+  // the package's own test runs and CI set git's name to "HQ Test"; demoFacts adds git's user.name as an author
+  const withHq = demoConfig({ ...FACTS, authors: [...FACTS.authors, ['HQ Test', 'hq@mail.invalid']] }, SETTINGS);
+  const page = '<a href="#hq-main">Skip</a><link rel="stylesheet" href="/hq/hq-comments.css"><div class="hq-moss">hq check</div>';
+  assert.equal(scrub(page, withHq), page);
+  assert.ok(!withHq.people.some(p => /^hq$/i.test(p.first)), 'HQ is nobody\'s first name');
+});
+
 test('the paths the settings hide are hidden in any letter case, and nothing else is', () => {
   for (const p of ['web/images', 'web/images/a.jpg', 'WEB/Images/b.JPG', '/web/images/c.png', 'docs/secret.md']) assert.equal(hiddenPath(cfg, p), true, p);
   for (const p of ['web', 'web/imagesque.js', 'web/app.js', 'docs/secret.md.bak', 'docs']) assert.equal(hiddenPath(cfg, p), false, p);

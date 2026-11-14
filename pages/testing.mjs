@@ -25,6 +25,12 @@ export function readFilter(params) {
   const where = WHERE.some(([k]) => k && k === params.get('where')) ? params.get('where') : '';
   return { where, branch: params.get('branch') || '' };
 }
+// A run by its id. A link to a run that ended in the last second names one the store has not looked for yet, so a miss
+// looks at the folders again before it is a 404.
+const runById = (cache, id, source) => {
+  const find = runs => runs.find(x => x.id === id && (!source || x.source === source));
+  return find(allRuns(cache)) || find(allRuns(cache, { maxAge: 0 }));
+};
 export const filterRuns = (runs, f) => runs.filter(r => (!f.where || (r.info.where || r.source) === f.where) && (!f.branch || r.info.branch === f.branch));
 
 // A link to the Testing page that keeps the filter, with some parameters changed ('' drops one).
@@ -172,7 +178,7 @@ export function testingPage(ctx, params) {
 
 // A run and its tests.
 export function runPage({ repo, cache }, id) {
-  const r = allRuns(cache).find(x => x.id === id);
+  const r = runById(cache, id);
   if (!r) return null;
   const files = catalogue(repo), i = r.info;
   const report = r.report && existsSync(join(cache, r.report)) ? `/cache/${r.report.split('/').map(encodeURIComponent).join('/')}` : null;
@@ -214,7 +220,7 @@ function logView(r, { title, crumb, real, plain }) {
 
 // A step's log, read from where devpipe keeps it inside the cache, never from the path the run.json names.
 export function logPage({ cache }, id, task) {
-  const r = allRuns(cache).find(x => x.id === id && x.source === 'laptop');
+  const r = runById(cache, id, 'laptop');
   const t = r && r.tasks.find(x => x.id === task);
   if (!t || !t.log) return null;
   const plain = `runs/runs/${id}/logs/${basename(t.log)}`, real = safePath(cache, plain);
@@ -225,7 +231,7 @@ export function logPage({ cache }, id, task) {
 // inside the cache: a run line is a file on disk, so an out naming anywhere else opens nothing. task names the rerun
 // (task=rerun) for a test red again there, whose log is its own; without it the log is the gate's.
 export function testLogPage({ cache }, id, name, task = null) {
-  const r = allRuns(cache).find(x => x.id === id && x.source === 'laptop');
+  const r = runById(cache, id, 'laptop');
   const c = r && r.tasks.filter(t => (task ? t.id === task : t.id !== 'rerun')).flatMap(t => t.cases).find(x => x.name === name && x.log);
   if (!c) return null;
   const plain = relative(cache, c.log).split(sep).join('/'), real = safePath(cache, plain);

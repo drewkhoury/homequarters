@@ -4,6 +4,11 @@ What each version of HomeQuarters changes for a project that installs it. The ma
 rule (docs/standards/manifest.md): a key, once published, is never renamed or removed, and a newer manifest is read with
 a warning.
 
+## 0.1.1
+
+- The demo setting no longer takes a git name that starts with HQ ("HQ Test") for a person. It used to swap every
+  lowercase "hq" on a page, class names and asset paths too, so a demo page lost its styling.
+
 ## 0.1.0
 
 The first package: HQ as it left QuestKeep on 14 October 2026, with a manifest, one `hq` command for serving, checking

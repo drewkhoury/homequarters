@@ -6,6 +6,7 @@ import { esc, urlPath, layout } from '../lib/page.mjs';
 import { info, dataTable } from '../lib/ui.mjs';
 import { catalogue } from '../lib/catalogue.mjs';
 import { allRuns, flakes, resultsByFile, fileForCase, kindLabel, ago } from '../lib/runs.mjs';
+import { kept } from '../lib/kept.mjs';
 import { safePath } from '../lib/paths.mjs';
 import { gitInfo } from '../lib/outside.mjs';
 import { pipelineView } from './pipeline.mjs';
@@ -31,7 +32,9 @@ const runById = (cache, id, source) => {
   const find = runs => runs.find(x => x.id === id && (!source || x.source === source));
   return find(allRuns(cache)) || find(allRuns(cache, { maxAge: 0 }));
 };
-export const filterRuns = (runs, f) => runs.filter(r => (!f.where || (r.info.where || r.source) === f.where) && (!f.branch || r.info.branch === f.branch));
+// Kept against the store's array and the two filters, so what is worked out from the filtered runs is kept as well.
+const filtered = kept((runs, where, branch) => runs.filter(r => (!where || (r.info.where || r.source) === where) && (!branch || r.info.branch === branch)));
+export const filterRuns = (runs, f) => (f.where || f.branch ? filtered(runs, f.where || '', f.branch || '') : runs);
 
 // A link to the Testing page that keeps the filter, with some parameters changed ('' drops one).
 export function testingLink(f, extra = {}) {
@@ -75,7 +78,12 @@ const result = (o, f) => o
 function testsTab({ repo, cache }, runs, f, params, L) {
   const files = catalogue(repo), by = resultsByFile(runs, files), shots = screenshots(repo, cache);
   const flakyFiles = new Map();
-  for (const x of flakes(runs)) { const file = fileForCase(x.task, x.test, files); if (file) flakyFiles.set(file.path, [...(flakyFiles.get(file.path) || []), x]); }
+  for (const x of flakes(runs)) {
+    const file = fileForCase(x.task, x.test, files);
+    if (!file) continue;
+    if (!flakyFiles.has(file.path)) flakyFiles.set(file.path, []);
+    flakyFiles.get(file.path).push(x);
+  }
   const wheres = f.where ? [f.where] : ['laptop', 'container', 'ci'];
   const columns = [
     { key: 'test', label: 'Test', filter: 'text', w: 'lg' },

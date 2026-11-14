@@ -64,3 +64,37 @@ test('a CI folder that gains a file after HQ first read it is read again', () =>
     assert.deepEqual(tasks(), ['gate', 'unit']);
   } finally { s.done(); }
 });
+
+// What is worked out from the runs is kept against the store's array, and the catalogue against its list of files:
+// these hold that a new run, or a changed test file, is worked out afresh and never answered from the last one.
+test('after a new run, the flakes and the test file results include it', async () => {
+  const { flakes, resultsByFile } = await import('../lib/runs.mjs');
+  const { catalogue } = await import('../lib/catalogue.mjs');
+  const s = buildStore();
+  try {
+    const before = read(s), files = catalogue(s.repo);
+    assert.equal(flakes(before).some(f => f.test === 'the newer copy wins'), false);
+    const merges = () => resultsByFile(read(s), files).get('tests/unit/merge.test.mjs').length;
+    const was = merges();
+    // the same commit's unit run red on a test that passed before: a new flake
+    s.laptop('2026-11-06T10-00-00Z_000014', { at: '2026-11-06T10:01:00Z', tasks: [{ id: 'unit', status: 'FAIL', cases: [{ name: 'the newer copy wins', status: 'failed', time: 0.01 }], info: { kind: 'test' } }] });
+    const after = read(s);
+    assert.notEqual(after, before, 'a new run is a new array');
+    assert.equal(flakes(after).some(f => f.test === 'the newer copy wins' && f.kind === 'test'), true);
+    assert.equal(merges(), was + 1);
+  } finally { s.done(); }
+});
+
+test('a test file whose titles change is read again into the catalogue', async () => {
+  const { catalogue } = await import('../lib/catalogue.mjs');
+  const s = buildStore();
+  try {
+    const titles = () => catalogue(s.repo, { maxAge: 0 }).find(f => f.path === 'tests/unit/merge.test.mjs').titles;
+    assert.deepEqual(titles(), ['the newer copy wins']);
+    assert.equal(catalogue(s.repo, { maxAge: 0 }), catalogue(s.repo, { maxAge: 0 }), 'unchanged, the same list');
+    writeFileSync(join(s.repo, 'tests', 'unit', 'merge.test.mjs'), "test('the newer copy wins', () => {});\ntest('a tombstone outlives the copy', () => {});\n");
+    assert.deepEqual(titles(), ['the newer copy wins', 'a tombstone outlives the copy']);
+    writeFileSync(join(s.repo, 'tests', 'unit', 'fresh.test.mjs'), "test('a new file is found', () => {});\n");
+    assert.equal(catalogue(s.repo, { maxAge: 0 }).some(f => f.path === 'tests/unit/fresh.test.mjs'), true);
+  } finally { s.done(); }
+});

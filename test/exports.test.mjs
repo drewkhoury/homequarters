@@ -1,5 +1,5 @@
 // Proves: a project that installs the package can import the plugin API from `homequarters`, the test helpers from
-// `homequarters/testing`, any file under `homequarters/internal/`, and `homequarters/package.json`, and is refused a
+// `homequarters/testing`, the unpromised helpers from `homequarters/unstable`, any file under `homequarters/internal/`, and `homequarters/package.json`, and is refused a
 // deep import such as `homequarters/lib/backlog.mjs`. Why: QuestKeep's 40 deep imports move to one `internal/` prefix
 // (decision 18), so 0.2.0 can drop that prefix in one place; a bare `lib/` path that still resolved would hide the
 // imports the switch missed.
@@ -34,6 +34,7 @@ function resolveFrom(dir, specifier) {
 const allowed = {
   homequarters: 'lib/ui-api.mjs',
   'homequarters/testing': 'testing.mjs',
+  'homequarters/unstable': 'unstable.mjs',
   'homequarters/internal/lib/backlog.mjs': 'lib/backlog.mjs',
   'homequarters/internal/server.mjs': 'server.mjs',
   'homequarters/package.json': 'package.json',

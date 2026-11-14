@@ -10,7 +10,7 @@ import { FILE, SCHEMA } from '../lib/manifest.mjs';
 
 let softwareKept = null; // asked once a minute at most: a dozen version calls take a second or two
 const KEEP_MS = 60000;
-// probes, when the server was started with them ({ host, exec }), answer in place of the real tools: host for the
+// probes, when the server was started with them ({ host, exec, loadavg?, cores? }), answer in place of the real tools: host for the
 // machine's figures (lib/machine.mjs), exec for the versions (lib/scan.mjs). Their answers are never kept, so a stubbed
 // page cannot feed a real one, nor a real one a stubbed one.
 async function software(probes) {
@@ -69,7 +69,7 @@ function manifestCard(ctx, scan) {
 
 export async function machinePage(ctx) {
   const p = ctx.probes;
-  const host = p?.host ? hostInfo({ run: p.host, ...(ctx.platform ? { platform: ctx.platform } : {}) }) : hostInfo();
+  const host = p?.host ? hostInfo({ run: p.host, ...(ctx.platform ? { platform: ctx.platform } : {}), ...(p.loadavg ? { loadavg: p.loadavg } : {}), ...(p.cores ? { cores: p.cores } : {}) }) : hostInfo();
   const [h, list] = await Promise.all([Promise.resolve(host), software(p)]);
   const scan = scanRepo(ctx.repo);
   const body = `<div class="hq-pagehead"><h1>Machine${info('This computer, the software on it, and what HQ was given to read. The baseline: it works for any git repo.', 'About this page')}</h1></div>

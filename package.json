@@ -18,6 +18,7 @@
   "exports": {
     ".": "./lib/ui-api.mjs",
     "./testing": "./testing.mjs",
+    "./unstable": "./unstable.mjs",
     "./internal/*": "./*",
     "./package.json": "./package.json"
   },
@@ -37,6 +38,7 @@
     "demo.json",
     "README.md",
     "testing.mjs",
+    "unstable.mjs",
     "CHANGELOG.md",
     "LICENSE"
   ],

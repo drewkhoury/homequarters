@@ -45,7 +45,7 @@ The one API HQ promises a plugin, frozen, from `lib/ui-api.mjs`. Within a major 
 
 | Member | Gives |
 | --- | --- |
-| `UI_VERSION` | the version of this object, 1 |
+| `UI_VERSION` | the version of this object, 2 (2 from 0.2.0, which added the members from `kindIn` down) |
 | `layout` | `layout({ title, active, body, wide, full, head, skip, scripts })`: a whole HQ page around `body`, with the header, the nav (`active` is the nav key to mark) and the theme |
 | `esc` | `esc(s)`: text made safe for HTML |
 | `urlPath` | `urlPath(p)`: a repo path as a URL path, each part encoded and the slashes kept |
@@ -63,5 +63,19 @@ The one API HQ promises a plugin, frozen, from `lib/ui-api.mjs`. Within a major 
 | `renderMarkdown` | `renderMarkdown(text, from, kind, { rawHtml })`: markdown as HQ renders the repo's docs |
 | `runGit` | `runGit(args, cwd)`: git's output, or `''` when it failed. HQ itself only reads with it |
 | `runGh` | `runGh(args, cwd)`: gh's output with the person's own login; rejects when gh fails. HQ itself only reads with it |
+| `kindIn` | `kindIn(root)(path)`: `'file'`, `'dir'` or `null` for a repo path, through the same check the server serves files by, so a path that leaves the repo or names a refused folder is `null` |
+| `gh` | `gh.checksOf(pr)`: a pull request's checks (its `statusCheckRollup` from gh) in one word: `passing`, `failing`, `running` or `none` |
+| `git` | `git.belongs(cwd, main)`: whether a folder is the main checkout, inside it, or one of its worktrees |
+| `claude` | `claude.folderName(dir)`: the name Claude Code gives a checkout's folder under `~/.claude/projects` |
+| `days` | `days.key(ms, tz)`: the day an instant falls on in a zone, as `yyyy-mm-dd`; `days.start(key, tz)`: the instant that day starts there. Delivery's daily copies are filed by these days |
+| `backlog` | `backlog.parseItem(text, { slug, stage })`, `backlog.check(items)`, `backlog.openBlockers(item, items)`: a backlog item read, the folder's problems, an item's blockers still open; `backlog.dir()` and `backlog.stages()`: the folder and stages the manifest set |
 
-A plugin may import the package's other modules too. Those are stable for one exact version only, so a plugin that does should pin `homequarters` exactly. From 0.1.0 such imports go through `homequarters/internal/...`, the one deep path the package's `exports` map allows.
+## homequarters/unstable
+
+HQ's own helpers that run programs, open a terminal, call GitHub through HQ's cache or write its stash: `ghPart`, `branchPr`, `mainCheckout`, `readTurns`, `itemsHtml`, `gitInfo`, `openInClaude`, `findClaude`, `pickTerminal`, `focusTabCommand`, `projectId`, `makeStash`, `readEntry`, `fileFor`, `branchWork`. Each is the function HQ's pages use. None is promised: any may change or go in a minor release, so a project that imports one pins `homequarters` exactly and takes each release in a pull request of its own.
+
+## homequarters/testing
+
+What a project's own tests import. `start(options)` serves HQ on a free port touching nothing on the machine unless the test says so: a new empty cache and Claude projects folder (removed by `close()`), the manifest's link file never written, the demo off whatever `HQ_DEMO` says, claude not installed, and the Machine page asking `NO_TOOLS`, which finds every tool missing and every reading unknown. A test passes its own `probes`, `claude`, `demo`, `cache` or `projectsDir` to change one; the rest of `start()`'s options pass through. It answers `{ url, server, close }`. A plugin that calls `findClaude` from `homequarters/unstable` itself still finds the real one. The readers `loadManifest`, `loadPlugins`, `setNav`, `demoConfig`, `demoFacts`, `demoSettings`, `runInfo`, `readLaptopRuns`, `loadDecisions` and `dailyAsOf` are HQ's own, so a project's contract test holds its records against HQ's reading of them. Navigation and the backlog's settings are process-wide.
+
+`homequarters/internal/...` still reaches any file in 0.2, for projects moving off it. 0.3.0 removes it.

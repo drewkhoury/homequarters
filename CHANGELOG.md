@@ -4,6 +4,25 @@ What each version of HomeQuarters changes for a project that installs it. The ma
 rule (docs/standards/manifest.md): a key, once published, is never renamed or removed, and a newer manifest is read with
 a warning.
 
+## 0.3.1
+
+Speed and memory, with nothing to change in a project: no manifest keys, commands or exports are added or removed.
+Times are from one laptop with QuestKeep's data: 3,611 recorded runs, 2.8 million test results, about 5 GB.
+
+- HQ reads each recorded run once and keeps it, reading a folder again only when it changes. A warm page answers in
+  10 to 150 ms; on 0.3.0 Home took 4 to 13 seconds and the Testing page's Tests tab 34.
+- Flakes, results by file, the test catalogue, the Testing tabs' times and the Conversations page are worked out
+  once per change.
+- Problems answers at once from the snapshot it has, and reads the register again after the response when a run
+  lands or a minute has passed. A read of the register went from 30 seconds to 0.35 warm: git is read once a read
+  rather than once for each fix and run, and red runs' logs only when they change.
+- hq serve asks itself for each page once it is listening, so the first click finds the stores read. On this data
+  the warm-up takes about 30 seconds after a start.
+- The run store holds one copy of each test name; a name used to keep its whole JUnit file alive. Heap after every
+  page has been read: about 850 MB.
+- Fixes: a run that finished after HQ first looked could stay hidden for up to 5 seconds; a CI download that failed
+  part way was never fetched again (hq ci-fetch now moves an artifact into the store only once it is whole).
+
 ## 0.3.0
 
 Removes what 0.2 kept for projects moving off it. A project that runs on 0.2 without warnings and imports nothing

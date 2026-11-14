@@ -23,16 +23,32 @@ import { testResults } from '../lib/problem-derive.mjs';
 import { privacyContext } from '../lib/problem-privacy.mjs';
 import { RANGES, windowOf, overview, trends, slot, testsView, exportJSON, entryOut, guardText, FINDER_GROUPS } from '../lib/problem-view.mjs';
 
-const DAY = 86400000, TTL = 5 * 60000;
+// A snapshot is read again once a minute at most, unless the run store has a new run
+const DAY = 86400000, TTL = 60000;
 
-// ---- The register, read once every few minutes: a read takes about four seconds over the real stores ----
+// ---- The register: a page answers from the snapshot it has, and the next is read after the response ----
 
 const jsonLines = file => { try { return readFileSync(file, 'utf8').split('\n').filter(Boolean).map(l => { try { return JSON.parse(l); } catch { return null; } }).filter(Boolean); } catch { return []; } };
-let snap = null;
-export function snapshot({ repo, cache }, { fresh = false, now = Date.now() } = {}) {
+// The first read, a read asked for (?fresh=1) and a read for another checkout happen at once. Otherwise a new runs list
+// from the run store or a snapshot past TTL queues one read with later(), which runs after the response is sent, and
+// the page answers from the snapshot it has.
+let snap = null, queued = null;
+export function snapshot({ repo, cache }, { fresh = false, now = Date.now(), later = setImmediate } = {}) {
   const key = `${repo}\n${cache}`;
-  if (!fresh && snap && snap.key === key && now - snap.readAt < TTL) return snap;
-  const runs = allRuns(cache), lock = jsonLines(join(cache, 'lock', 'log.jsonl')), files = catalogue(repo);
+  if (fresh || !snap || snap.key !== key) return (snap = readSnapshot({ repo, cache }, key, now));
+  if (queued !== key && (now - snap.readAt >= TTL || allRuns(cache, { now }) !== snap.runs)) {
+    queued = key;
+    later(() => {
+      // a read that fails keeps the snapshot the page has, and the next page queues another
+      try { const next = readSnapshot({ repo, cache }, key, Date.now()); if (snap && snap.key === key) snap = next; }
+      catch (e) { console.error(`hq: the problem register could not be read again: ${e && e.message}`); }
+      finally { queued = null; }
+    });
+  }
+  return snap;
+}
+function readSnapshot({ repo, cache }, key, now) {
+  const runs = allRuns(cache, { now }), lock = jsonLines(join(cache, 'lock', 'log.jsonl')), files = catalogue(repo);
   const reg = readRegister({ repo, cache, runs, lock, files, now });
   const diffs = new Map();
   const fileSame = (file, a, b) => {
@@ -40,8 +56,7 @@ export function snapshot({ repo, cache }, { fresh = false, now = Date.now() } = 
     if (!diffs.has(k)) diffs.set(k, spawnSync('git', ['diff', '--quiet', a, b, '--', file], { cwd: repo }).status === 0);
     return diffs.get(k);
   };
-  snap = { key, readAt: now, reg, runs, lock, files, results: testResults(runs, { keyOf: testKeyer(files) }), fileSame, ctx: privacyContext({ cache }) };
-  return snap;
+  return { key, readAt: now, reg, runs, lock, files, results: testResults(runs, { keyOf: testKeyer(files) }), fileSame, ctx: privacyContext({ cache }) };
 }
 
 // ---- Words and small pieces ----

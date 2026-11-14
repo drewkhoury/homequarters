@@ -32,7 +32,8 @@ test('the packed tarball installs and runs every command QuestKeep calls, from o
   const servers = [];
   t.after(async () => {
     await Promise.all(servers.map(s => (s.exitCode !== null || s.signalCode !== null ? null : new Promise(r => { s.once('exit', r); s.kill(); }))));
-    rmSync(dir, { recursive: true, force: true });
+    // a git or gh a warm-up page started can outlive its server by a moment and still be writing in dir
+    rmSync(dir, { recursive: true, force: true, maxRetries: 10, retryDelay: 200 });
   });
   execFileSync('npm', ['pack', '--silent', '--pack-destination', dir, PKG], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] });
   const tarball = readdirSync(dir).find(f => f.endsWith('.tgz'));

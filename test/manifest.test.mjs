@@ -93,7 +93,7 @@ test('a key of the wrong type is ignored with a warning, never a crash', () => {
 
 test('the delivery key takes the deploy and test workflows and a time zone, and refuses a zone Intl does not know', () => {
   const { m, warnings } = read({ schemaVersion: 1, name: 'app', delivery: { userPaths: ['web'], deployWorkflow: '.github/workflows/ship.yml', testWorkflow: '.github/workflows/check.yml', tz: 'Australia/Melbourne' } });
-  assert.deepEqual(m.delivery, { userPaths: ['web'], deployWorkflow: '.github/workflows/ship.yml', testWorkflow: '.github/workflows/check.yml', tz: 'Australia/Melbourne', gateJobs: null, deployJob: null, smokeJob: null, deploySteps: null, reuseSteps: null, testSteps: null, dailyAt: null });
+  assert.deepEqual(m.delivery, { userPaths: ['web'], deployWorkflow: '.github/workflows/ship.yml', testWorkflow: '.github/workflows/check.yml', tz: 'Australia/Melbourne', gateJobs: null, deployJob: null, smokeJob: null, deploySteps: null, reuseSteps: null, testSteps: null, dailyAt: null, countingChanges: null });
   assert.deepEqual(warnings, []);
   const bad = read({ schemaVersion: 1, name: 'app', delivery: { tz: 'Mars/Olympus' } });
   assert.equal(bad.m.delivery.tz, null);

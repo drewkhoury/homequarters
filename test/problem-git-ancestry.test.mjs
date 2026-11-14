@@ -61,9 +61,7 @@ test('one read asks git a few times whatever the number of pairs, and a commit n
     const { contains } = loadGit({ repo: h.repo, exec });
     const names = Object.keys(h.sha);
     for (let round = 0; round < 3; round++) for (const f of names) for (const c of names) contains(h.sha[f], h.sha[c]);
-    const pairsWithU = names.length * 2 - 1;
-    assert.ok(ran.filter(w => w === 'merge-base').length <= pairsWithU, `merge-base ran ${ran.filter(w => w === 'merge-base').length} times`);
-    assert.ok(ran.filter(w => w !== 'merge-base' && w !== 'show').length <= 4, `other git runs: ${ran.join(', ')}`);
+    assert.ok(ran.filter(w => w !== 'show').length <= 5, `git runs: ${ran.join(', ')}`);
   } finally { h.done(); }
 });
 

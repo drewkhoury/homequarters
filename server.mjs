@@ -110,7 +110,7 @@ function sendFile(res, root, rel, { revalidate = false } = {}) {
   res.end(res.req.method === 'HEAD' ? undefined : readFileSync(real));
 }
 
-export function handler({ repo = REPO, m = loadManifest(repo).m, plugins = [], pluginsFailed = [], warnings = [], cache = m.cache, gh, run, platform, fb, claude = {}, projectsDir, demo = null } = {}) {
+export function handler({ repo = REPO, m = loadManifest(repo).m, plugins = [], pluginsFailed = [], warnings = [], cache = m.cache, gh, run, platform, fb, claude = {}, projectsDir, demo = null, probes = null } = {}) {
   const links = { cache, repo, hasDashboard: false };
   // the manifest, applied once: where the conventions live, the nav, and the project's name in the header
   if (m.backlog) configureBacklog({ rel: m.backlog.rel, mapRel: m.backlog.map ? m.backlog.map.slice(repo.length + 1) : null, earlierRel: m.backlog.earlierRel, stages: m.backlog.stages });
@@ -126,7 +126,7 @@ export function handler({ repo = REPO, m = loadManifest(repo).m, plugins = [], p
   const github = !!gitInfo(repo)?.slug;
   const nav = pagesFor(m, demo ? plugins.filter(p => p.demo) : plugins, { github }), brand = m.name;
   setNav(nav); setBrand(brand); // the fallback, for anything drawn outside a request
-  const ctx = { repo, cache, m, plugins, pluginsFailed, warnings, links, gh, fb, demo, ...(projectsDir ? { projectsDir } : {}) };
+  const ctx = { repo, cache, m, plugins, pluginsFailed, warnings, links, gh, fb, demo, ...(projectsDir ? { projectsDir } : {}), ...(probes ? { probes, platform } : {}) };
   const off = f => !m.features[f];
   const cw = claudeWatcher({ find: claude.find, env: claude.env || process.env, platform, repo });
   cw.get(); // look claude up now, so the first page already knows
@@ -430,8 +430,8 @@ async function claudeFollowRoute(req, res, params, { repo, projectsDir, claude, 
 
 // Listens on the port given, or on 8780 and upwards past any port in use; `movedFrom` says when it is not the one asked
 // for, so the start line can say so. HQ_PORT is taken as it is, and port 0 takes any free one, for the tests.
-export function start({ port = +(process.env.HQ_PORT || 8780), repo = REPO, m = loadManifest(repo).m, plugins = [], pluginsFailed = [], warnings = [], cache = m.cache, gh, run, platform, fb, claude, projectsDir, demo = loadDemo({ repo, cache, name: m.name, file: m.demo }) } = {}) {
-  const server = createServer(handler({ repo, m, plugins, pluginsFailed, warnings, cache, gh, run, platform, fb, claude, projectsDir, demo }));
+export function start({ port = +(process.env.HQ_PORT || 8780), repo = REPO, m = loadManifest(repo).m, plugins = [], pluginsFailed = [], warnings = [], cache = m.cache, gh, run, platform, fb, claude, projectsDir, probes, demo = loadDemo({ repo, cache, name: m.name, file: m.demo }) } = {}) {
+  const server = createServer(handler({ repo, m, plugins, pluginsFailed, warnings, cache, gh, run, platform, fb, claude, projectsDir, demo, probes }));
   const fixed = !!process.env.HQ_PORT || port === 0;
   return new Promise((resolve, reject) => {
     const attempt = p => {

@@ -79,3 +79,19 @@ test('a second read while origin/main has not moved reads no log again, and asks
     assert.ok(ran.length <= 3, `ran: ${ran.join(', ')}`);
   } finally { h.done(); }
 });
+
+test('a commit no ref reaches, or one git does not have, costs one git run however often it is asked', () => {
+  const h = history();
+  try {
+    const { ran, exec } = counting();
+    const { contains } = loadGit({ repo: h.repo, exec });
+    const before = ran.length, gone = 'feedfacefeedfacefeedfacefeedfacefeedface';
+    for (let round = 0; round < 3; round++) for (const f of Object.keys(h.sha)) {
+      contains(h.sha[f], h.sha.u); contains(h.sha.u, h.sha[f]); contains(h.sha[f], gone); contains(gone, h.sha[f]);
+    }
+    assert.ok(ran.length - before <= 2, `asked git ${ran.length - before} more times: ${ran.slice(before).join(', ')}`);
+    assert.equal(contains(h.sha.m3, h.sha.u.slice(0, 8)), true);
+    assert.equal(contains(h.sha.m4, h.sha.u), false);
+    assert.equal(contains(gone, h.sha.m6), null);
+  } finally { h.done(); }
+});

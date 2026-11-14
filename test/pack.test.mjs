@@ -27,7 +27,13 @@ const git = (dir, ...a) => execFileSync('git', ['-C', dir, ...a], { encoding: 'u
 
 test('the packed tarball installs and runs every command QuestKeep calls, from outside the checkout', { timeout: 180000, skip: process.env.HQ_OFFLINE === '1' && 'needs the npm registry for marked and highlight.js' }, async t => {
   const dir = mkdtempSync(join(tmpdir(), 'hq-pack-')), prefix = join(dir, 'prefix'), repo = join(dir, 'repo'), cache = join(dir, 'cache');
-  t.after(() => rmSync(dir, { recursive: true, force: true }));
+  // the servers stop first and are waited for: one still writing in dir (its warm-up reads pages) fails the rm, and a
+  // hook that throws leaves the hooks after it unrun and the servers holding the runner open
+  const servers = [];
+  t.after(async () => {
+    await Promise.all(servers.map(s => (s.exitCode !== null || s.signalCode !== null ? null : new Promise(r => { s.once('exit', r); s.kill(); }))));
+    rmSync(dir, { recursive: true, force: true });
+  });
   execFileSync('npm', ['pack', '--silent', '--pack-destination', dir, PKG], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] });
   const tarball = readdirSync(dir).find(f => f.endsWith('.tgz'));
   assert.ok(tarball, 'npm pack made a tarball');
@@ -89,7 +95,7 @@ test('the packed tarball installs and runs every command QuestKeep calls, from o
 
   function serve(tt, args, extra) {
     const srv = spawn(hq, args, { cwd: repo, env: env(extra) });
-    tt.after(() => srv.kill());
+    servers.push(srv);
     return new Promise((res, rej) => {
       let out = ''; srv.stdout.on('data', d => { out += d; const m = /(http:\/\/127\.0\.0\.1:\d+)/.exec(out); if (m) res(m[1]); });
       srv.stderr.on('data', d => { out += d; }); srv.on('close', () => rej(new Error(`hq ${args.join(' ')} ended: ${out}`)));

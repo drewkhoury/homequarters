@@ -97,7 +97,8 @@
             "properties": {
               "date": { "type": "string", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$" },
               "what": { "type": "string", "minLength": 1 },
-              "decision": { "type": ["string", "null"], "description": "A file name in the decisions folder." }
+              "decision": { "type": ["string", "null"], "description": "A file name in the decisions folder." },
+              "mark": { "type": "string", "minLength": 1, "maxLength": 60, "description": "From 0.3.2: a short label Delivery's deploys chart draws on this note's day, such as \"Laptop CI from here\"." }
             }
           }
         }

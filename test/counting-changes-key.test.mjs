@@ -47,3 +47,14 @@ test('hq check reports a note whose decision file is not in the folder, and noth
   const present = repoWith(t, [FILED], [FILED.decision]);
   assert.deepEqual(checks(present, loadManifest(present, { home: present, env: {} }), { files: [] }).filter(p => p.area === 'delivery'), []);
 });
+
+// Proves: a note can carry a mark, the short label Delivery's deploys chart draws on its day; the manifest keeps it,
+// and a mark that is not a short piece of text is warned about and left off the note. Why: the chart drew two marks
+// found by searching for two of QuestKeep's decision file names, which no other project has (from 0.3.2).
+test('the manifest keeps a note\'s mark, and warns on one that is not short text', t => {
+  const marked = { ...FILED, mark: 'Reused gates from here' };
+  const repo = repoWith(t, [marked, { ...EARLY, mark: 7 }, { ...EARLY, date: '2026-01-11', mark: 'x'.repeat(61) }]);
+  const { m, warnings } = loadManifest(repo, { home: repo, env: {} });
+  assert.deepEqual(m.delivery.countingChanges, [marked, { ...EARLY, decision: null }, { ...EARLY, date: '2026-01-11', decision: null }]);
+  assert.equal(warnings.filter(w => /countingChanges\[[12]\]\.mark/.test(w)).length, 2, warnings.join('\n'));
+});

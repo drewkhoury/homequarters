@@ -364,3 +364,21 @@ test("the Flake rate says how many of its flakes the rerun found", async t => {
   for (const w of data.windows) Object.assign((w.project || w.questkeep).cost, { flakes: 3, flakesByRerun: 2, testRuns: 40, flakesPer100: 7.5 });
   assert.match(text(section(await open(t, '', data), 'dv-pipeline')), /2 by the rerun/);
 });
+
+// Proves: the deploys chart marks the days of the project's notes that carry a mark, with the mark as the label, and
+// draws nothing for a note without one. A project with no marked note keeps the two marks found by QuestKeep's
+// decision names, until 0.3.3. Why: those names are one project's, so no other project's chart had marks (from 0.3.2).
+test('the deploys chart draws the marks the project\'s notes carry, and none from decision names beside them', async t => {
+  const marked = structuredClone(dora);
+  marked.countingChanges = [{ date: '2026-10-02', what: 'The gate moved to a new runner.', decision: null, mark: 'New runner from here' },
+    { date: '2026-10-03', what: 'CI moved to the Laptop.', decision: '2026-10-03-ci-on-the-laptop.md' }];
+  const sec = section(await open(t, '', marked), 'dv-deploys');
+  assert.match(sec, /New runner from here/);
+  assert.doesNotMatch(sec, /Laptop CI from here/);
+});
+
+test('with no marked note, the deploys chart keeps the marks QuestKeep\'s decision names gave', async t => {
+  const named = structuredClone(dora);
+  named.countingChanges = [{ date: '2026-10-03', what: 'CI moved to the Laptop.', decision: '2026-10-03-ci-on-the-laptop.md' }];
+  assert.match(section(await open(t, '', named), 'dv-deploys'), /Laptop CI from here/);
+});

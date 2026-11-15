@@ -193,8 +193,11 @@ function deploysSection(f, w, range, p) {
   const P = w.portable, rows = p.now.map(k => ({ day: k, player: p.by.get(k)?.deploys.player ?? 0 }));
   const before = p.before.length ? p.before.map(k => ({ day: k, player: p.by.get(k)?.deploys.player ?? 0 })) : undefined;
   const busiest = rows.reduce((b, r) => (!b || r.player > b.player ? r : b), null);
-  const marks = [['ci-on-the-laptop', 'Laptop CI from here'], ['served-files-change', 'Redeploys skipped from here']]
-    .map(([name, label]) => ({ day: ruleDate(f, name), label })).filter(m => m.day && rows.some(r => r.day === m.day));
+  // the days the project's notes mark (hq.json's delivery.countingChanges[].mark); with none marked, the two QuestKeep's
+  // decision names gave before 0.3.2, which 0.3.3 stops reading
+  const own = f.countingChanges.filter(c => c.mark).map(c => ({ day: c.date, label: c.mark }));
+  const marks = (own.length ? own : [['ci-on-the-laptop', 'Laptop CI from here'], ['served-files-change', 'Redeploys skipped from here']]
+    .map(([name, label]) => ({ day: ruleDate(f, name), label }))).filter(m => m.day && rows.some(r => r.day === m.day));
   const label = P.deploys.n ? `Deploys per day, ${p.range}: ${P.deploys.n}${busiest?.player ? `, busiest ${dayName(busiest.day)} with ${busiest.player}` : ''}.${before ? ` ${p.prior}: ${w.prev.portable.deploys.n}.` : ''}` : `Deploys per day, ${p.range}: none.`;
   const chart = dayChart(rows, [{ key: 'player', label: 'deploys', cls: 'now', bar: true }], { label, before, beforeLabel: p.prior, marks, href: day => rawHref(range, 'deploys', day), narrow: true });
   const unknown = P.deploys.unknown ? `<p class="hint">${P.deploys.unknown === 1 ? '1 unclassified deploy' : `${P.deploys.unknown} unclassified deploys`} not shown</p>` : '';

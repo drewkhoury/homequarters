@@ -215,14 +215,31 @@ test('Waiting on you lists the open pull requests oldest first, with age, checks
   assert.match(text(section(empty, 'dv-waiting')), /Nothing waiting on you/);
 });
 
-test('the deploys chart has no same-app series; same-app redeploys are counted in Method with the rule\'s own date', async t => {
+test('the deploys chart has no same-app series; same-app redeploys are counted in Method from the note that dates the skip', async t => {
   const moved = structuredClone(dora);
-  // the project's own note on the rule, as QuestKeep's hq.json lists it (delivery.countingChanges), moved a day
-  moved.countingChanges = [{ date: '2026-10-04', what: 'Pushes that don\'t change served files stop deploying.', decision: '2026-10-05-deploy-only-when-served-files-change.md' }];
+  // the project's own note on the rule (delivery.countingChanges), moved a day, dating the skip by its since key
+  moved.countingChanges = [{ date: '2026-10-04', what: 'Pushes that don\'t change served files stop deploying.', decision: null, since: 'skipped-redeploys' }];
   const html = await open(t, '', moved);
   assert.doesNotMatch(section(html, 'dv-deploys'), /Same-app|bl-s-ghost/);
   assert.match(text(html), /Same-app redeploys: 0 · skipped since 4 Oct/);
   assert.doesNotMatch(html, /October 2026/);
+});
+
+// Proves: the two dates Delivery gives in words, the day the gate moved to the Laptop and the day redeploys of a tree
+// already live started being skipped, come from the notes whose since key names them, and from no decision file's
+// name. Why: through 0.3.2 HQ found them by QuestKeep's decision names, so no other project could date them (0.3.3).
+test('the Laptop and skipped-redeploy dates come from the notes that say since, and none from decision names', async t => {
+  const at = { ...doraAt(Date.parse('2026-10-08T12:00:00Z')), waiting };
+  const page = async notes => text(await open(t, '', { ...at, countingChanges: notes }));
+  const laptop = { date: '2026-10-03', what: 'CI moved to the Laptop.', decision: null, since: 'laptop-gate' };
+  const skip = { date: '2026-10-04', what: 'Pushes that don\'t change served files stop deploying.', decision: null, since: 'skipped-redeploys' };
+  const both = await page([laptop, skip]);
+  assert.match(both, /Gate time 5 min median · Laptop 3 runs, Laptop since 3 Oct/);
+  assert.match(both, /skipped since 4 Oct/);
+  const named = await page([{ ...laptop, since: undefined, decision: '2026-10-03-ci-on-the-laptop.md' },
+    { ...skip, since: undefined, decision: '2026-10-05-deploy-only-when-served-files-change.md' }]);
+  assert.match(named, /Gate time 5 min median · Laptop 3 runs/);
+  assert.doesNotMatch(named, /Laptop since|skipped since/);
 });
 
 test('the deploys chart draws the period before as a dashed line where the record reaches it', async t => {
@@ -366,19 +383,16 @@ test("the Flake rate says how many of its flakes the rerun found", async t => {
 });
 
 // Proves: the deploys chart marks the days of the project's notes that carry a mark, with the mark as the label, and
-// draws nothing for a note without one. A project with no marked note keeps the two marks found by QuestKeep's
-// decision names, until 0.3.3. Why: those names are one project's, so no other project's chart had marks (from 0.3.2).
-test('the deploys chart draws the marks the project\'s notes carry, and none from decision names beside them', async t => {
+// draws nothing for a note without one, whatever its decision file is called. Why: through 0.3.2 a project with no
+// marked note had the two marks HQ found by QuestKeep's decision names, which are one project's (0.3.3).
+test('the deploys chart draws the marks the project\'s notes carry, and none from decision names', async t => {
   const marked = structuredClone(dora);
   marked.countingChanges = [{ date: '2026-10-02', what: 'The gate moved to a new runner.', decision: null, mark: 'New runner from here' },
     { date: '2026-10-03', what: 'CI moved to the Laptop.', decision: '2026-10-03-ci-on-the-laptop.md' }];
   const sec = section(await open(t, '', marked), 'dv-deploys');
   assert.match(sec, /New runner from here/);
   assert.doesNotMatch(sec, /Laptop CI from here/);
-});
-
-test('with no marked note, the deploys chart keeps the marks QuestKeep\'s decision names gave', async t => {
   const named = structuredClone(dora);
   named.countingChanges = [{ date: '2026-10-03', what: 'CI moved to the Laptop.', decision: '2026-10-03-ci-on-the-laptop.md' }];
-  assert.match(section(await open(t, '', named), 'dv-deploys'), /Laptop CI from here/);
+  assert.doesNotMatch(section(await open(t, '', named), 'dv-deploys'), /Laptop CI from here/);
 });

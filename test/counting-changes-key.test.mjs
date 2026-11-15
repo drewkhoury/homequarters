@@ -58,3 +58,15 @@ test('the manifest keeps a note\'s mark, and warns on one that is not short text
   assert.deepEqual(m.delivery.countingChanges, [marked, { ...EARLY, decision: null }, { ...EARLY, date: '2026-01-11', decision: null }]);
   assert.equal(warnings.filter(w => /countingChanges\[[12]\]\.mark/.test(w)).length, 2, warnings.join('\n'));
 });
+
+// Proves: a note can say which of Delivery's two dates it gives, the day the gate moved to the Laptop (laptop-gate) or
+// the day redeploys of a tree already live started being skipped (skipped-redeploys); the manifest keeps it, and warns
+// on any other word and on a second note giving the same date, keeping both notes without it. Why: from 0.3.3 HQ
+// finds those dates by this key, where it had used QuestKeep's decision names.
+test('the manifest keeps a note\'s since, and warns on an unknown one or a second note with the same', t => {
+  const laptop = { ...FILED, since: 'laptop-gate' }, skip = { ...EARLY, decision: null, since: 'skipped-redeploys' };
+  const repo = repoWith(t, [laptop, skip, { ...EARLY, date: '2026-01-11', since: 'gate-moved' }, { ...EARLY, date: '2026-01-12', since: 'laptop-gate' }]);
+  const { m, warnings } = loadManifest(repo, { home: repo, env: {} });
+  assert.deepEqual(m.delivery.countingChanges, [laptop, skip, { ...EARLY, date: '2026-01-11', decision: null }, { ...EARLY, date: '2026-01-12', decision: null }]);
+  assert.equal(warnings.filter(w => /countingChanges\[[23]\]\.since/.test(w)).length, 2, warnings.join('\n'));
+});

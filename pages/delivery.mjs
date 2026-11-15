@@ -95,7 +95,8 @@ const CAUSE = { test: 'Test', infra: 'Machine', filing: 'Machine', experiment: '
 const CAUSE_ORDER = ['test', 'infra', 'filing', 'experiment'];
 const byCause = reds => [...reds].sort((x, y) => CAUSE_ORDER.indexOf(x.cause) - CAUSE_ORDER.indexOf(y.cause) || (x.at < y.at ? 1 : -1));
 const inWindow = (iso, w) => iso && iso >= w.from && iso < w.to;
-const ruleDate = (f, name) => f.countingChanges.find(c => (c.decision || '').includes(name))?.date || null;
+// the day of the project's note whose since key names one of Delivery's dates (hq.json, delivery.countingChanges)
+const sinceDate = (f, key) => f.countingChanges.find(c => c.since === key)?.date || null;
 
 // ---- The period and its record ----
 
@@ -193,11 +194,8 @@ function deploysSection(f, w, range, p) {
   const P = w.portable, rows = p.now.map(k => ({ day: k, player: p.by.get(k)?.deploys.player ?? 0 }));
   const before = p.before.length ? p.before.map(k => ({ day: k, player: p.by.get(k)?.deploys.player ?? 0 })) : undefined;
   const busiest = rows.reduce((b, r) => (!b || r.player > b.player ? r : b), null);
-  // the days the project's notes mark (hq.json's delivery.countingChanges[].mark); with none marked, the two QuestKeep's
-  // decision names gave before 0.3.2, which 0.3.3 stops reading
-  const own = f.countingChanges.filter(c => c.mark).map(c => ({ day: c.date, label: c.mark }));
-  const marks = (own.length ? own : [['ci-on-the-laptop', 'Laptop CI from here'], ['served-files-change', 'Redeploys skipped from here']]
-    .map(([name, label]) => ({ day: ruleDate(f, name), label }))).filter(m => m.day && rows.some(r => r.day === m.day));
+  // the days the project's notes mark (hq.json's delivery.countingChanges[].mark)
+  const marks = f.countingChanges.filter(c => c.mark).map(c => ({ day: c.date, label: c.mark })).filter(m => rows.some(r => r.day === m.day));
   const label = P.deploys.n ? `Deploys per day, ${p.range}: ${P.deploys.n}${busiest?.player ? `, busiest ${dayName(busiest.day)} with ${busiest.player}` : ''}.${before ? ` ${p.prior}: ${w.prev.portable.deploys.n}.` : ''}` : `Deploys per day, ${p.range}: none.`;
   const chart = dayChart(rows, [{ key: 'player', label: 'deploys', cls: 'now', bar: true }], { label, before, beforeLabel: p.prior, marks, href: day => rawHref(range, 'deploys', day), narrow: true });
   const unknown = P.deploys.unknown ? `<p class="hint">${P.deploys.unknown === 1 ? '1 unclassified deploy' : `${P.deploys.unknown} unclassified deploys`} not shown</p>` : '';
@@ -287,7 +285,7 @@ function pipelineSection(f, w, range, p) {
   const figure = (label, value, unit, sub, title = '') => `<div class="dv-stat"><span class="dv-stat-k"${title ? ` title="${esc(title)}"` : ''}>${esc(label)}</span><div class="dv-figure"><span class="dv-value">${esc(value)}</span>${unit ? ` <span class="dv-unit">${esc(unit)}</span>` : ''}</div>${sub ? `<div class="dv-sub">${sub}</div>` : ''}</div>`;
   // gate time is a machine figure: given for the runner the period ended on, never compared across a change of runner
   let time;
-  const move = ruleDate(f, 'ci-on-the-laptop');
+  const move = sinceDate(f, 'laptop-gate');
   if (c.mixed) {
     const name = c.gateSecByRunner.laptop ? 'Laptop' : 'GitHub', s = c.gateSecByRunner.laptop || c.gateSecByRunner.hosted;
     time = figure('Gate time', dur(s.median), `median · ${name}`, `${counted(s.n, 'run')}${move && name === 'Laptop' ? `, Laptop since ${esc(dayName(move))}` : ''}`);
@@ -336,7 +334,7 @@ function method(f, w, range) {
     ['Live check', DEFINE.live], ['Gate', DEFINE.gate], ['Red attempts', DEFINE.reds], ['Flake', DEFINE.flake]];
   const shifts = f.countingChanges.filter(x => x.date >= w.prev.from.slice(0, 10) && x.date < w.to.slice(0, 10));
   const pushes = hbars([{ label: 'Skipped', n: q.rows[5] }, { label: 'Reused gate', n: q.rows[6] }, { label: 'Ran gate', n: q.rows[7] }], `Pushes to main: ${q.rows[5]} skipped, ${q.rows[6]} reused a gate, ${q.rows[7]} ran the gate.`);
-  const skipped = ruleDate(f, 'served-files-change');
+  const skipped = sinceDate(f, 'skipped-redeploys');
   const perRunner = k => ls.byRunner ? Object.entries(ls.byRunner).map(([r, v]) => `${RUNNER[r]} ${dur(v[k]?.median)}`).join(' · ') : ls[k] ? dur(ls[k].median) : '–';
   const sw = c.slotWait, delayed = f.items.changes.filter(x => inWindow(x.liveAt, w) && x.split?.slotWaitSec > 0).length;
   const slot = !sw || !sw.gates ? '' : sw.waited ? `Test slot waits: ${sw.waited} of ${sw.gates} Laptop runs${sw.sec ? ` · median ${dur(sw.sec.median)}` : ''} · ${delayed ? `${delayed} delayed a live change` : 'none delayed a live change'}` : `Test slot waits: 0 of ${sw.gates} Laptop runs`;

@@ -4,6 +4,21 @@ What each version of HomeQuarters changes for a project that installs it. The ma
 rule (docs/standards/manifest.md): a key, once published, is never renamed or removed, and a newer manifest is read with
 a warning.
 
+## 0.3.3
+
+One manifest key, and Delivery stops reading QuestKeep's decision names. A project that dates "Laptop since" or
+"skipped since" adds `since` to those notes first; HQ 0.3.2 reads a note with it without a warning.
+
+- `delivery.countingChanges[].since`: `laptop-gate` on the note for the day the gate moved to the Laptop, which
+  Delivery gives beside gate time, or `skipped-redeploys` on the note for the day redeploys of a tree already live
+  started being skipped, which Method gives. One note each; `hq check` warns on another word or a second note.
+- Delivery finds those two dates, and the deploys chart its marks, only by `since` and `mark`. The lookups by
+  QuestKeep's decision file names are gone, as 0.3.2 said.
+- What each branch does to the backlog is read in four git runs, plus one for each branch still on the old one-file
+  backlog: the commit graph once, every branch's merge base worked out from it, and every branch's diff in one
+  `diff-tree`. Home's first read used to run two for each branch not merged into main; on QuestKeep's 599 branches
+  that takes 97 ms, against 758.
+
 ## 0.3.2
 
 Restarts and memory, and one optional manifest key. Nothing has to change in a project. Times are from the same

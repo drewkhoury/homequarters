@@ -17,7 +17,7 @@ import { dayChart, dotPlot, hbars, numbers, duration } from '../lib/charts.mjs';
 import { KIND, STAGE, DISPOSITIONS, GUARD_TYPES, EFFECTS, FACTOR, CONFIDENCE } from '../lib/problems.mjs';
 import { allRuns } from '../lib/runs.mjs';
 import { catalogue } from '../lib/catalogue.mjs';
-import { readRegister } from '../lib/problem-register.mjs';
+import { readRegister, resultKeysOf } from '../lib/problem-register.mjs';
 import { testKeyer } from '../lib/problem-observations.mjs';
 import { testResults } from '../lib/problem-derive.mjs';
 import { privacyContext } from '../lib/problem-privacy.mjs';
@@ -49,14 +49,16 @@ export function snapshot({ repo, cache }, { fresh = false, now = Date.now(), lat
 }
 function readSnapshot({ repo, cache }, key, now) {
   const runs = allRuns(cache, { now }), lock = jsonLines(join(cache, 'lock', 'log.jsonl')), files = catalogue(repo);
-  const reg = readRegister({ repo, cache, runs, lock, files, now });
+  // the Tests tab reads the browser tests' results, from the records the register makes
+  const browser = files.filter(f => f.set === 'gate' || f.set === 'after').map(f => f.name);
+  const reg = readRegister({ repo, cache, runs, lock, files, now, resultKeys: browser });
   const diffs = new Map();
   const fileSame = (file, a, b) => {
     const k = `${file} ${a} ${b}`;
     if (!diffs.has(k)) diffs.set(k, spawnSync('git', ['diff', '--quiet', a, b, '--', file], { cwd: repo }).status === 0);
     return diffs.get(k);
   };
-  return { key, readAt: now, reg, runs, lock, files, results: testResults(runs, { keyOf: testKeyer(files) }), fileSame, ctx: privacyContext({ cache }) };
+  return { key, readAt: now, reg, runs, lock, files, results: testResults(runs, { keyOf: testKeyer(files), keep: resultKeysOf(reg.entries, browser) }), fileSame, ctx: privacyContext({ cache }) };
 }
 
 // ---- Words and small pieces ----

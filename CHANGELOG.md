@@ -4,6 +4,25 @@ What each version of HomeQuarters changes for a project that installs it. The ma
 rule (docs/standards/manifest.md): a key, once published, is never renamed or removed, and a newer manifest is read with
 a warning.
 
+## 0.3.2
+
+Restarts and memory, and one optional manifest key. Nothing has to change in a project. Times are from the same
+laptop and data as 0.3.1's, measured while other tests ran on it.
+
+- HQ saves what it read from the run store to `<cache>/hq/runs-index.json` (about 54 MB here), and a restarted HQ
+  reads only the run folders that changed since: 0.8 s for the store, against 7.3 s cold.
+- A red run's causes are worked out from its logs once, and saved to `<cache>/hq/causes-index.json` for the next
+  start. New lines from passing tests elsewhere no longer make every red run's logs read again.
+- The register's git calls are batched: one `cat-file --batch` for the backlog items fixes deleted, and one lookup
+  for the commits no ref reaches, where a cold read ran git about 200 times.
+- The register keeps test results only for the tests it reads them for, the fixed flaky tests and the Tests tab's
+  browser tests: about 240,000 of 2.8 million. Flakes and red sorting read results in full only where a test failed.
+- After a restart the warm-up takes about 20 seconds, against 31 on 0.3.1; a register read takes 2.0 s, against
+  11.6. Heap after every page has been read: about 580 MB, against 850.
+- `delivery.countingChanges[].mark`: a label of up to 60 characters that Delivery's deploys chart draws on that
+  note's day. With no note marked, the chart keeps the two marks HQ found by QuestKeep's decision names; 0.3.3 stops
+  reading those names. HQ 0.3.1 reads a note with a mark without a warning, so a project can add marks first.
+
 ## 0.3.1
 
 Speed and memory, with nothing to change in a project: no manifest keys, commands or exports are added or removed.

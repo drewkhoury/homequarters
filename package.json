@@ -1,6 +1,6 @@
 {
   "name": "homequarters",
-  "version": "0.3.1",
+  "version": "0.3.2",
   "description": "HQ: a local website for keeping up with your own repo. Reads what your project writes; runs no code from it.",
   "type": "module",
   "license": "MIT",

@@ -28,11 +28,14 @@ const git = (dir, ...a) => execFileSync('git', ['-C', dir, ...a], { encoding: 'u
 test('the packed tarball installs and runs every command QuestKeep calls, from outside the checkout', { timeout: 180000, skip: process.env.HQ_OFFLINE === '1' && 'needs the npm registry for marked and highlight.js' }, async t => {
   const dir = mkdtempSync(join(tmpdir(), 'hq-pack-')), prefix = join(dir, 'prefix'), repo = join(dir, 'repo'), cache = join(dir, 'cache');
   // the servers stop first and are waited for: one still writing in dir (its warm-up reads pages) fails the rm, and a
-  // hook that throws leaves the hooks after it unrun and the servers holding the runner open
+  // hook that throws leaves the hooks after it unrun and the servers holding the runner open. Each server leads its
+  // own process group, and the whole group is stopped: a git its warm-up started outlives a server killed alone, and
+  // went on writing in dir (ENOTEMPTY on CI's node 22 Linux job, retries or not)
   const servers = [];
+  const group = (s, sig) => { try { process.kill(-s.pid, sig); } catch { /* the group has gone */ } };
   t.after(async () => {
-    await Promise.all(servers.map(s => (s.exitCode !== null || s.signalCode !== null ? null : new Promise(r => { s.once('exit', r); s.kill(); }))));
-    // a git or gh a warm-up page started can outlive its server by a moment and still be writing in dir
+    await Promise.all(servers.map(s => (s.exitCode !== null || s.signalCode !== null ? null : new Promise(r => { s.once('exit', r); group(s, 'SIGTERM'); }))));
+    for (const s of servers) group(s, 'SIGKILL');
     rmSync(dir, { recursive: true, force: true, maxRetries: 10, retryDelay: 200 });
   });
   execFileSync('npm', ['pack', '--silent', '--pack-destination', dir, PKG], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] });
@@ -95,7 +98,7 @@ test('the packed tarball installs and runs every command QuestKeep calls, from o
   assert.match(await (await fetch(demoUrl)).text(), /HomeQuarters/, 'the demo setting\'s wordmark');
 
   function serve(tt, args, extra) {
-    const srv = spawn(hq, args, { cwd: repo, env: env(extra) });
+    const srv = spawn(hq, args, { cwd: repo, env: env(extra), detached: true });
     servers.push(srv);
     return new Promise((res, rej) => {
       let out = ''; srv.stdout.on('data', d => { out += d; const m = /(http:\/\/127\.0\.0\.1:\d+)/.exec(out); if (m) res(m[1]); });

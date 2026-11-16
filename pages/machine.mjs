@@ -7,18 +7,36 @@ import { info, dataTable } from '../lib/ui.mjs';
 import { hostInfo } from '../lib/machine.mjs';
 import { scanSoftware, scanRepo, proposeManifest, MAKE_SNIPPET } from '../lib/scan.mjs';
 import { FILE, SCHEMA } from '../lib/manifest.mjs';
+import { readFileSync, writeFileSync, mkdirSync, renameSync } from 'node:fs';
+import { join, dirname } from 'node:path';
 
-let softwareKept = null; // asked once a minute at most: a dozen version calls take a second or two
+// The software list, kept in <cache>/hq/software.json: a dozen version calls take a second or more (firebase alone,
+// one), and the answers rarely change. A page answers from the list it has, the saved one after a restart, and once
+// that is over a minute old asks the tools again with later(), after the response. With no list at all it asks at once.
 const KEEP_MS = 60000;
+let softwareKept = null;
+const softwareFile = cache => join(cache, 'hq', 'software.json');
+export async function softwareList(cache, { exec, later = setImmediate, now = Date.now() } = {}) {
+  if (!softwareKept && cache) { try { const saved = JSON.parse(readFileSync(softwareFile(cache), 'utf8')); if (Array.isArray(saved.list)) softwareKept = { at: saved.at, list: saved.list, cache }; } catch { /* none saved */ } }
+  const ask = async at => {
+    const list = await scanSoftware(exec ? { exec } : {});
+    softwareKept = { at, list, cache };
+    if (cache) { try { mkdirSync(dirname(softwareFile(cache)), { recursive: true }); writeFileSync(`${softwareFile(cache)}.tmp`, JSON.stringify({ at, list })); renameSync(`${softwareFile(cache)}.tmp`, softwareFile(cache)); } catch { /* the next start asks again */ } }
+    return list;
+  };
+  if (!softwareKept) return ask(now);
+  if (now - softwareKept.at >= KEEP_MS && !softwareKept.queued) {
+    softwareKept.queued = true;
+    later(() => ask(Date.now()).catch(() => { if (softwareKept) softwareKept.queued = false; }));
+  }
+  return softwareKept.list;
+}
 // probes, when the server was started with them ({ host, exec, loadavg?, cores? }), answer in place of the real tools: host for the
 // machine's figures (lib/machine.mjs), exec for the versions (lib/scan.mjs). Their answers are never kept, so a stubbed
 // page cannot feed a real one, nor a real one a stubbed one.
-async function software(probes) {
+async function software(probes, cache) {
   if (probes?.exec) return scanSoftware({ exec: probes.exec });
-  if (softwareKept && Date.now() - softwareKept.at < KEEP_MS) return softwareKept.list;
-  const list = await scanSoftware();
-  softwareKept = { at: Date.now(), list };
-  return list;
+  return softwareList(cache);
 }
 
 const mb = n => (n == null ? '' : `${Math.round(n)} MB`);
@@ -70,12 +88,12 @@ function manifestCard(ctx, scan) {
 export async function machinePage(ctx) {
   const p = ctx.probes;
   const host = p?.host ? hostInfo({ run: p.host, ...(ctx.platform ? { platform: ctx.platform } : {}), ...(p.loadavg ? { loadavg: p.loadavg } : {}), ...(p.cores ? { cores: p.cores } : {}) }) : hostInfo();
-  const [h, list] = await Promise.all([Promise.resolve(host), software(p)]);
+  const [h, list] = await Promise.all([Promise.resolve(host), software(p, ctx.cache)]);
   const scan = scanRepo(ctx.repo);
   const body = `<div class="hq-pagehead"><h1>Machine${info('This computer, the software on it, and what HQ was given to read. The baseline: it works for any git repo.', 'About this page')}</h1></div>
     <div class="hq-machine">
       ${hardwareCard(h)}
-      <section class="card hq-card"><div class="hq-card-head"><span class="kicker">Software</span>${info('Each tool asked for its version once a minute at most. A login is shown where the tool can say.', 'About this table')}</div>${softwareTable(list)}</section>
+      <section class="card hq-card"><div class="hq-card-head"><span class="kicker">Software</span>${info('Each tool asked for its version once a minute at most, after the page is shown; the list is kept across restarts. A login is shown where the tool can say.', 'About this table')}</div>${softwareTable(list)}</section>
       ${manifestCard(ctx, scan)}
     </div>`;
   return layout({ title: 'Machine', active: 'machine', body, wide: true });

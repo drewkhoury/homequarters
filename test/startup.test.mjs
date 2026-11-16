@@ -23,29 +23,28 @@ function repo(t) {
   return dir;
 }
 const env = { PATH: process.env.PATH, HOME: process.env.HOME };
-// starts hq serve and answers its URL once it prints it; stopped after the test
-function serve(t, args, cwd) {
+// starts hq serve and answers { url, text() } once it prints its URL. A server that prints none within 20 s fails the
+// test with what it printed, and each one is stopped after the test and waited for, killed if SIGTERM has not ended it
+// within 3 s: on 15 November the suite hung 10 minutes here with three servers idle (problem f1ec87), and nothing said
+// which wait it was in. It has not happened again in 22 runs.
+function start(t, args, cwd) {
   const p = spawn(process.execPath, [HQ, 'serve', ...args], { cwd, env });
-  t.after(() => p.kill('SIGTERM'));
-  return new Promise((res, rej) => {
-    let out = '';
-    p.stdout.on('data', d => { out += d; const m = /(http:\/\/127\.0\.0\.1:\d+)/.exec(out); if (m) res(m[1]); });
-    p.stderr.on('data', d => { out += d; });
-    p.on('close', () => rej(new Error(`hq serve ended: ${out}`)));
-  });
-}
-
-// the same, with the whole start-up text readable after the URL came
-function serveOut(t, args, cwd) {
-  const p = spawn(process.execPath, [HQ, 'serve', ...args], { cwd, env });
-  t.after(() => p.kill('SIGTERM'));
+  t.after(() => (p.exitCode !== null || p.signalCode !== null ? null : new Promise(done => {
+    const kill = setTimeout(() => p.kill('SIGKILL'), 3000);
+    p.once('exit', () => { clearTimeout(kill); done(); });
+    p.kill('SIGTERM');
+  })));
   let out = '';
   return new Promise((res, rej) => {
-    p.stdout.on('data', d => { out += d; const m = /(http:\/\/127\.0\.0\.1:\d+)/.exec(out); if (m) setTimeout(() => res({ url: m[1], text: () => out }), 50); });
+    const late = setTimeout(() => rej(new Error(`hq serve ${args.join(' ')} printed no URL in 20 s: ${out}`)), 20000);
+    p.stdout.on('data', d => { out += d; const m = /(http:\/\/127\.0\.0\.1:\d+)/.exec(out); if (m) { clearTimeout(late); setTimeout(() => res({ url: m[1], text: () => out }), 50); } });
     p.stderr.on('data', d => { out += d; });
-    p.on('close', () => rej(new Error(`hq serve ended: ${out}`)));
+    p.on('close', () => { clearTimeout(late); rej(new Error(`hq serve ended: ${out}`)); });
   });
 }
+const serve = async (t, args, cwd) => (await start(t, args, cwd)).url;
+const serveOut = start;
+const LIMIT = { timeout: 60000 };
 
 test('hq finds the checkout from a folder inside it, and --repo points it elsewhere', t => {
   const dir = repo(t);
@@ -55,7 +54,7 @@ test('hq finds the checkout from a folder inside it, and --repo points it elsewh
   assert.equal(elsewhere.status, 0, elsewhere.stderr); assert.match(elsewhere.stdout, /fix-it/);
 });
 
-test('with no port given hq serves on 8780 or the next free one; a given port is taken as it is', async t => {
+test('with no port given hq serves on 8780 or the next free one; a given port is taken as it is', LIMIT, async t => {
   const dir = repo(t);
   const url = await serve(t, [], dir);
   assert.ok(+new URL(url).port >= 8780, url);
@@ -75,7 +74,7 @@ test('with no port given hq serves on 8780 or the next free one; a given port is
 
 // The stranger's install (finding 4): --port 8790 served on 8791 because 8790 was on a list of ports QuestKeep's laptop
 // uses. A port list is one machine's; a given port is taken when free, and a move is said out loud.
-test('a given port on no list is taken when free, and when it is in use the start line says so', async t => {
+test('a given port on no list is taken when free, and when it is in use the start line says so', LIMIT, async t => {
   const dir = repo(t);
   const probe = async p => { const s = createServer(); try { await new Promise((r, j) => { s.once('error', j); s.listen(p, '127.0.0.1', r); }); await new Promise(r => s.close(r)); return true; } catch { return false; } };
   let want = null;

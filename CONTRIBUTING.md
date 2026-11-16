@@ -39,6 +39,16 @@ The suite takes about ten seconds. A test that fails now and then is a bug; plea
 4. Keep `lib/ui-api.mjs` and the manifest keys backwards compatible: add, never rename or remove.
 5. Open a pull request. CI runs the suite on Node 22 and 24, on Linux and macOS.
 
+## Before a release
+
+A release is a `v*` tag. Before it, try the new HQ on a real project's data beside the HQ that project has pinned:
+
+```sh
+node scripts/try-release.mjs ../your-project
+```
+
+It starts the pinned HQ (`node_modules/homequarters`, or `--pinned <folder>`) and this checkout's, one after the other, reads each page from both, and prints each page's status and first-read time and the sentences the pinned HQ showed that the new one does not. It ends 1 when a page's status moved. A sentence that went may be the point of the release; read each one. Neither HQ writes the project's link file or rewrites its `dora.json`.
+
 ## Licence
 
 By contributing you agree that your contribution is licensed under the MIT licence in `LICENSE`.

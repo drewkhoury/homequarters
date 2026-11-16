@@ -4,6 +4,33 @@ What each version of HomeQuarters changes for a project that installs it. The ma
 rule (docs/standards/manifest.md): a key, once published, is never renamed or removed, and a newer manifest is read with
 a warning.
 
+## 0.3.4
+
+Delivery draws what hq.json says now, a restart after an upgrade starts warm, and the slowest first reads are cut.
+One manifest key: a project that wants Delivery's Not counted list adds `delivery.blindSpots` when it moves to 0.3.4;
+HQ 0.3.3 warns on the key. The first start on 0.3.4 reads the run store cold once, since 0.3.3's indexes carry no
+code key. Times are from QuestKeep's data on the same laptop.
+
+- Delivery takes the counting notes from the manifest HQ started with, where it drew the copies `dora.json` saved
+  at the last `hq dora`. On 15 November QuestKeep's "skipped since" went missing until `make dora` ran.
+- `delivery.blindSpots`: the sentences Delivery lists under Not counted. The list was QuestKeep's, written into the
+  package; with no key there is no such section.
+- The period line names the zone the figures were cut in, where it said New York time for every project.
+- `dora.json` records the settings its figures were counted by. Figures counted by other settings, written before HQ
+  started, get the background refresh old figures already get, once.
+- The run index and the causes index are kept by a fingerprint of the code that reads, not by HQ's version: an
+  upgrade that leaves that code alone starts from them.
+- The Repo page reads every branch worktree's distance from main and last commit in one git run, and keeps the
+  picture for 10 s, then reads again after the response: 2 ms warm, against 1.9 s. Fetch drops it. Export shares it.
+- Export's check for minified files reads each line once: 23 ms over QuestKeep's 2,060 files, against 1,961.
+- Conversations finds every backlog item a session mentions in one pass over its text, 213 ms against 1,764, and
+  matches a session's commits by subject, 175 ms against 984.
+- The Machine page keeps its software list in `<cache>/hq/software.json` and asks the tools again after the response
+  once it is a minute old. Its first read after a start takes about 0.1 s, against 3.5.
+- After a restart the warm-up takes about 13 s, against 20 on 0.3.3.
+- For contributors: `scripts/try-release.mjs <project>` tries a release on a project's data beside its pinned HQ;
+  CONTRIBUTING.md has it as the step before a tag. The workflows use checkout v7.0.1 and setup-node v6.5.0.
+
 ## 0.3.3
 
 One manifest key, and Delivery stops reading QuestKeep's decision names. A project that dates "Laptop since" or

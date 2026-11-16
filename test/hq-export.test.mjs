@@ -57,6 +57,11 @@ test('binary, minified, generated, lock and huge files stay out of Source; the p
   assert.equal(skipReason('package-lock.json', 2, null), 'generated or someone else\'s');
   assert.equal(skipReason('web/app.min.js', 10, null), 'generated or someone else\'s');
   assert.equal(skipReason('web/bundle.js', 6001, Buffer.from(`var a=${'1,'.repeat(3000)}`)), 'minified');
+  // a line of 2000 characters is minified and one of 1999 is not, wherever it sits in the first 8000 bytes
+  assert.equal(skipReason('web/a.js', 4000, Buffer.from(`${'x'.repeat(1999)}\n${'y'.repeat(1999)}\n`)), '');
+  assert.equal(skipReason('web/a.js', 4000, Buffer.from(`short\n${'y'.repeat(2000)}`)), 'minified');
+  assert.equal(skipReason('web/a.js', 4000, Buffer.from(`${'x'.repeat(1000)}\r\n${'y'.repeat(999)}`)), '');
+  assert.equal(skipReason('web/a.js', 12000, Buffer.from(`${'x\n'.repeat(4000)}${'y'.repeat(2500)}`)), '', 'a long line past the first 8000 bytes');
   assert.equal(skipReason('big.json', MAX_FILE + 1, null), 'over 512 KB');
   assert.equal(skipReason('web/app.js', 245 * 1024, null), '', 'the app\'s own main file, about 240 KB, goes in');
   assert.equal(skipReason('web/vendor/three@0.184.0/build/three.module.js', 1200 * 1024, null), 'generated or someone else\'s', 'a vendored library stays out whatever its size');

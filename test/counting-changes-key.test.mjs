@@ -70,3 +70,16 @@ test('the manifest keeps a note\'s since, and warns on an unknown one or a secon
   assert.deepEqual(m.delivery.countingChanges, [laptop, skip, { ...EARLY, date: '2026-01-11', decision: null }, { ...EARLY, date: '2026-01-12', decision: null }]);
   assert.equal(warnings.filter(w => /countingChanges\[[23]\]\.since/.test(w)).length, 2, warnings.join('\n'));
 });
+
+// Proves: delivery.blindSpots, the project's list of what its figures cannot see, is kept as written, and an entry
+// that is not text is warned about and left out. Why: Delivery's "Not counted" list was QuestKeep's, written into the
+// package (0.3.4).
+test('the manifest keeps the blind spots that are text, and warns on the rest', t => {
+  const repo = mkdtempSync(join(tmpdir(), 'hq-blind-'));
+  t.after(() => rmSync(repo, { recursive: true, force: true }));
+  writeFileSync(join(repo, 'hq.json'), JSON.stringify({ schemaVersion: 1, name: 'app', delivery: { blindSpots: ['Deploys made by hand.', 7, ''] } }));
+  const { m, warnings } = loadManifest(repo, { home: repo, env: {} });
+  assert.deepEqual(m.delivery.blindSpots, ['Deploys made by hand.']);
+  assert.equal(warnings.filter(w => /blindSpots\[[12]\]/.test(w)).length, 2, warnings.join('\n'));
+  assert.ok(!warnings.some(w => /not a key this HQ knows/.test(w)), warnings.join('\n'));
+});

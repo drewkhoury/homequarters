@@ -396,3 +396,47 @@ test('the deploys chart draws the marks the project\'s notes carry, and none fro
   named.countingChanges = [{ date: '2026-10-03', what: 'CI moved to the Laptop.', decision: '2026-10-03-ci-on-the-laptop.md' }];
   assert.doesNotMatch(section(await open(t, '', named), 'dv-deploys'), /Laptop CI from here/);
 });
+
+// Proves: Delivery takes the project's counting notes and its "Not counted" list from the manifest HQ started with,
+// not from the copies dora.json saved, and names the zone its days are cut in from that zone, not New York.
+// Why: on 15 November QuestKeep moved to 0.3.3 with notes that said since, and Delivery lost "skipped since" until make
+// dora ran again, because it drew the notes dora.json had saved that morning. The list and the zone's name were
+// QuestKeep's, written into the package.
+test('the counting notes come from the manifest, not the copy dora.json saved', async t => {
+  const what = 'Pushes that don\'t change served files stop deploying.';
+  const saved = { ...structuredClone(dora), countingChanges: [{ date: '2026-10-04', what, decision: null }] };
+  configureDelivery({ countingChanges: [{ date: '2026-10-04', what, decision: null, since: 'skipped-redeploys' }] });
+  t.after(() => configureDelivery({ countingChanges: null }));
+  assert.match(text(await open(t, '', saved)), /skipped since 4 Oct/);
+});
+
+test('Not counted lists the manifest\'s blind spots, and nothing of QuestKeep\'s without them', async t => {
+  t.after(() => configureDelivery({ blindSpots: null }));
+  configureDelivery({ blindSpots: ['Deploys made by hand.'] });
+  const own = text(await open(t));
+  assert.match(own, /Not counted Deploys made by hand\./);
+  assert.doesNotMatch(own, /make deploy/);
+  configureDelivery({ blindSpots: null });
+  const none = text(await open(t));
+  assert.doesNotMatch(none, /make deploy|Not counted/);
+});
+
+test('the period line names the zone the figures were cut in', async t => {
+  const words = text(await open(t, '', { ...structuredClone(dora), tz: 'Europe/London' }));
+  assert.match(words, /London time/);
+  assert.doesNotMatch(words, /New York/);
+  assert.match(text(await open(t, '', { ...structuredClone(dora), tz: 'UTC' })), /· UTC ·/);
+});
+
+// Proves: figures worked out with counting settings other than the manifest's (the user paths, workflows, jobs, steps,
+// zone or daily time) start the background refresh that figures from an older hq dora start, and figures worked out
+// with the same settings start none. Why: an edit to those keys changed nothing on Delivery until the next refresh
+// that age alone set off.
+test('figures worked out with other counting settings start a refresh, and the same settings start none', async t => {
+  const other = { ...structuredClone(dora), settings: { ...dora.settings, userPaths: ['app'] } };
+  const moved = spy(), same = spy();
+  await deliveryPage({ repo, cache: cacheWith(t, 5, other) }, new URLSearchParams(), { now: NOW, run: moved.run });
+  await deliveryPage({ repo, cache: cacheWith(t, 5, dora) }, new URLSearchParams(), { now: NOW, run: same.run });
+  assert.equal(moved.calls.length, 1, 'a refresh for figures counted another way');
+  assert.equal(same.calls.length, 0, 'none for figures counted this way');
+});

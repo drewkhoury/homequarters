@@ -428,8 +428,8 @@ test('the period line names the zone the figures were cut in', async t => {
   assert.match(text(await open(t, '', { ...structuredClone(dora), tz: 'UTC' })), /· UTC ·/);
 });
 
-// Proves: figures worked out with counting settings other than the manifest's (the user paths, workflows, jobs, steps,
-// zone or daily time) start the background refresh that figures from an older hq dora start, and figures worked out
+// Proves: figures worked out with counting settings other than the manifest's (the user paths, workflows, jobs, steps
+// or zone) start the background refresh that figures from an older hq dora start, and figures worked out
 // with the same settings start none. Why: an edit to those keys changed nothing on Delivery until the next refresh
 // that age alone set off.
 test('figures worked out with other counting settings start a refresh, and the same settings start none', async t => {

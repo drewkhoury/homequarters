@@ -16,12 +16,16 @@ import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { esc, layout } from '../lib/page.mjs';
 import { info, dataTable } from '../lib/ui.mjs';
-import { dayKey, dayStart, addDays, VERSION } from '../lib/dora.mjs';
+import { dayKey, dayStart, addDays, VERSION, projectNotes, countingSettings, BLIND_SPOTS } from '../lib/dora.mjs';
 import { dayChart, hbars, spark, dotPlot, partsBar, stackBars, strip, duration as dur } from '../lib/charts.mjs';
 
 // the project's figures block: project since version 4, questkeep in files written before
 const proj = w => w.project || w.questkeep;
 export const STALE_MIN = 30;
+// when this HQ applied its manifest: figures counted by other settings and written before then are refreshed once
+const STARTED = Date.now();
+// the zone's name as the period line gives it: New York time, UTC
+const zoneName = tz => (!tz || /^(Etc\/)?(UTC|GMT)$/.test(tz) ? 'UTC' : `${tz.split('/').pop().replace(/_/g, ' ')} time`);
 // With about 4 deploys a day, one day is noise, so the shortest period is a week
 const RANGES = [['7d', '7 days'], ['30d', '30 days']];
 const LISTS = { deploys: 'Deploys', changes: 'Changes', failures: 'Failed deploys', reds: 'Red attempts' };
@@ -346,7 +350,7 @@ function method(f, w, range) {
   return `<details class="dv-method" data-reference><summary><h2>Method</h2></summary><div class="dv-method-body">
     <h3>Definitions</h3><dl class="dv-terms">${terms.map(([k, v]) => `<dt>${esc(k)}</dt><dd>${esc(v)}</dd>`).join('')}</dl>
     <h3>Counting changes</h3><ul class="dv-notes">${shifts.map(x => `<li><b>${esc(dayName(x.date))}</b> ${esc(x.what)}</li>`).join('') || '<li class="hint">None in this period</li>'}</ul>
-    <h3>Not counted</h3><ul class="dv-notes">${f.blindSpots.map(b => `<li>${esc(b)}</li>`).join('')}</ul>
+    ${f.blindSpots.length ? `<h3>Not counted</h3><ul class="dv-notes">${f.blindSpots.map(b => `<li>${esc(b)}</li>`).join('')}</ul>` : ''}
     <h3>Sources</h3>${sourcesTable(f.sources, tz)}
     <h3>Pushes to main</h3>${info('Each Deploy run skips when live already serves its tree, reuses a gate that passed on that tree, or runs the gate.', 'About pushes to main')}
     ${pushes}<p class="hint">Same-app redeploys: ${q.identicalRedeploys}${skipped ? ` · skipped since ${esc(dayName(skipped))}` : ''}</p>
@@ -577,7 +581,10 @@ export async function deliveryPage(ctx, params = new URLSearchParams(), { now = 
   const got = readDora(ctx.cache);
   // a file from an older hq dora lacks what this page draws, so it is out of date however new it is
   const older = got.data && (got.data.version || 1) < VERSION;
-  const stale = got.data && (older || now - got.at > STALE_MIN * 60000);
+  // figures counted by settings other than the manifest's, written before this HQ started; a file written since was
+  // counted from hq.json as it is on disk, and refreshing it again would change nothing
+  const recounted = got.data && got.data.settings && got.at < STARTED && JSON.stringify(got.data.settings) !== JSON.stringify(countingSettings(got.data.settings.tz));
+  const stale = got.data && (older || recounted || now - got.at > STALE_MIN * 60000);
   // Refresh and old figures start one refresh in the background; nothing waits for it
   if ((params.has('fresh') || stale) && !ctx.demo) refresh(ctx, run);
   const updating = !!running;
@@ -599,7 +606,8 @@ export async function deliveryPage(ctx, params = new URLSearchParams(), { now = 
   if (older) return page(`${head}${note}<section class="dv-sec dv-state"><p><b>Updating figures…</b> The saved figures are from an older hq dora.</p>
     <p class="hint">Reload in a minute, or run hq dora.</p></section>`);
 
-  const f = got.data, w = f.windows.find(x => x.id === range) || f.windows.find(x => x.id === '7d') || f.windows[0], p = period(f, w);
+  // the notes and the blind spots are the manifest's, drawn as they are now; dora.json's copies are the fallback for notes
+  const f = { ...got.data, countingChanges: projectNotes() ?? got.data.countingChanges ?? [], blindSpots: BLIND_SPOTS || [] }, w = f.windows.find(x => x.id === range) || f.windows.find(x => x.id === '7d') || f.windows[0], p = period(f, w);
   if (list) { const d = drillDown(f, w, range, list, day, p); return page(`${note}${d.body}`, d.title); }
 
   const seg = `<div class="seg" role="group" aria-label="Period">${RANGES.map(([k, label]) => `<a class="seg-opt" href="?range=${k}"${k === range ? ' aria-current="true"' : ''}>${esc(label)}</a>`).join('')}</div>`;
@@ -609,7 +617,7 @@ export async function deliveryPage(ctx, params = new URLSearchParams(), { now = 
     const n = (f.today.deploys || []).filter(d => d.playerFacing === true).length, r = (f.today.failures || []).filter(x => x.released).length;
     today = !n && !r ? 'Today: no deploys' : `Today: ${plural(n, 'deploy')} · ${r ? `${MARK} ${r} failed` : '0 failed'}`;
   }
-  const bar = `<div class="dv-bar">${seg}<span class="dv-range">${esc([p.range, 'New York time', p.recordFrom ? `record from ${dayName(p.recordFrom)}` : '', why].filter(Boolean).join(' · '))}</span>${today ? `<span>${today}</span>` : ''}</div>`;
+  const bar = `<div class="dv-bar">${seg}<span class="dv-range">${esc([p.range, zoneName(f.tz), p.recordFrom ? `record from ${dayName(p.recordFrom)}` : '', why].filter(Boolean).join(' · '))}</span>${today ? `<span>${today}</span>` : ''}</div>`;
   const body = `${head}${note}${bar}${hero(figures(f, w, p))}${waitingSection(f, now)}${deploysSection(f, w, range, p)}${leadSection(f, w, range, p)}${liveSection(f, w, range, p)}${pipelineSection(f, w, range, p)}${method(f, w, range)}`;
   return page(body);
 }

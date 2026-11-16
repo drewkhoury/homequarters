@@ -181,7 +181,7 @@ const file = summarise(all, { asOf: Date.parse('2026-10-06T12:00:00Z'), repo: 'o
 
 test('dora.json has the documented shape, with portable figures apart from the project\'s own', () => {
   assert.equal(file.version, 4);
-  assert.deepEqual(Object.keys(file).sort(), ['blindSpots', 'countingChanges', 'generatedAt', 'items', 'level', 'repo', 'series', 'sources', 'start', 'today', 'tz', 'version', 'waiting', 'windows']);
+  assert.deepEqual(Object.keys(file).sort(), ['blindSpots', 'countingChanges', 'generatedAt', 'items', 'level', 'repo', 'series', 'settings', 'sources', 'start', 'today', 'tz', 'version', 'waiting', 'windows']);
   assert.deepEqual(file.windows.map(w => w.id), ['1d', '7d', '30d']);
   for (const w of file.windows) {
     assert.deepEqual(Object.keys(w.portable).sort(), ['deploys', 'failedDeploys', 'leadTime', 'recovery', 'rework']);

@@ -88,6 +88,7 @@
         "reuseSteps": { "$ref": "#/$defs/names" },
         "testSteps": { "$ref": "#/$defs/names" },
         "dailyAt": { "type": "string", "pattern": "^([01][0-9]|2[0-3]):[0-5][0-9]$", "description": "When the project's daily run takes its copy of the figures, as hh:mm in tz, such as 07:07. hq dora writes a missed day's copy as of this time on that day; without it, as of the day's end." },
+        "blindSpots": { "type": "array", "items": { "type": "string", "minLength": 1 }, "description": "From 0.3.4: what the project's figures cannot see, listed on Delivery under Not counted." },
         "countingChanges": {
           "type": "array",
           "description": "The project's notes on the days its figures started being counted another way, shown on Delivery. A note naming a decision file shows while that file is in the decisions folder; hq check reports one whose file is missing.",

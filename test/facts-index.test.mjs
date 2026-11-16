@@ -5,7 +5,7 @@
 // them all again whenever a new run brought a new passing line.
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import fs, { mkdtempSync, mkdirSync, writeFileSync, rmSync, realpathSync } from 'node:fs';
+import fs, { mkdtempSync, mkdirSync, writeFileSync, readFileSync, rmSync, realpathSync } from 'node:fs';
 import { syncBuiltinESMExports } from 'node:module';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
@@ -58,5 +58,25 @@ test('a log that changed while HQ was stopped is read again', async () => {
     writeFileSync(join(f.logs, 'a.log'), 'Error: the bridge gave way under the third quest\n');
     const { causesOfFolder } = await restarted();
     assert.equal(lineOf(causesOfFolder(f.dir, new Set(), { index: f.index, saveIndex: now })), 'Error: the bridge gave way under the third quest');
+  } finally { f.done(); }
+});
+
+// Proves: an index another HQ version saved is used while the code that works out causes is the same, and one written by
+// other code is passed over. Why: the index was keyed by HQ's version, so every upgrade read every red run's logs again.
+test('an index from another HQ version with the same cause-reading code is used; other code\'s is passed over', async () => {
+  const f = folder();
+  try {
+    const first = (await restarted()).causesOfFolder(f.dir, new Set(), { index: f.index, saveIndex: now });
+    const saved = JSON.parse(readFileSync(f.index, 'utf8'));
+    writeFileSync(f.index, JSON.stringify({ ...saved, hq: '0.0.1' }));
+    const kept = (await restarted()).causesOfFolder;
+    const same = readsUnder(f.dir, () => kept(f.dir, new Set(), { index: f.index, saveIndex: now }));
+    assert.deepEqual(same.seen, [], 'another version, the same code: no log read');
+    assert.deepEqual([...same.value], [...first]);
+    writeFileSync(f.index, JSON.stringify({ ...saved, readers: 'other' }));
+    const fresh = (await restarted()).causesOfFolder;
+    const other = readsUnder(f.dir, () => fresh(f.dir, new Set(), { index: f.index, saveIndex: now }));
+    assert.ok(other.seen.length > 0, 'other code: the logs are read again');
+    assert.deepEqual([...other.value], [...first]);
   } finally { f.done(); }
 });

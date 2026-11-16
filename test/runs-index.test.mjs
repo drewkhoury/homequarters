@@ -1,6 +1,7 @@
 // Proves: after HQ restarts, the runs it reads are the ones a cold read gives, taken from the index it saved in
-// <cache>/hq without opening a run's files again; a run that changed while HQ was stopped is read again, and an index
-// another HQ version wrote, or one cut off, is passed over.
+// <cache>/hq without opening a run's files again; a run that changed while HQ was stopped is read again; an index
+// another HQ version wrote is used while the code that reads a run is the same, and one written by other reading code,
+// or cut off, is passed over.
 // Why: reading QuestKeep's 3,600 runs and 2.8 million results cold takes about 7 s, and every restart paid it before
 // Home or Problems could answer.
 import { test } from 'node:test';
@@ -48,16 +49,30 @@ test('a run that ends or changes while HQ is stopped is read, and only it', asyn
   } finally { s.done(); }
 });
 
-test('an index another HQ version saved, or one cut off, is passed over and the runs read cold', async () => {
+test('an index written by other code that reads runs, or one cut off, is passed over and the runs read cold', async () => {
   const s = buildStore();
   try {
     const cold = plain((await restarted()).allRuns(s.cache, { saveIndex: now }));
     const saved = JSON.parse(readFileSync(indexOf(s), 'utf8'));
-    for (const bad of [JSON.stringify({ ...saved, hq: '0.0.1' }), JSON.stringify(saved).slice(0, 200)]) {
+    for (const bad of [JSON.stringify({ ...saved, readers: 'other' }), JSON.stringify(saved).slice(0, 200)]) {
       writeFileSync(indexOf(s), bad);
       const c = counting(s.cache);
       assert.deepEqual(plain((await restarted()).allRuns(s.cache, { io: c.io, saveIndex: now })), cold);
       assert.ok(c.opened.some(p => p.endsWith('run.json')), 'read cold');
     }
+  } finally { s.done(); }
+});
+
+// Why: the index was keyed by HQ's version, so every upgrade started cold, about 7 s on QuestKeep, though most releases
+// change nothing in how a run is read.
+test('an index another HQ version saved with the same code that reads runs is used, opening no run', async () => {
+  const s = buildStore();
+  try {
+    const cold = plain((await restarted()).allRuns(s.cache, { saveIndex: now }));
+    const saved = JSON.parse(readFileSync(indexOf(s), 'utf8'));
+    writeFileSync(indexOf(s), JSON.stringify({ ...saved, hq: '0.0.1' }));
+    const c = counting(s.cache);
+    assert.deepEqual(plain((await restarted()).allRuns(s.cache, { io: c.io, saveIndex: now })), cold);
+    assert.ok(!c.opened.some(p => p.endsWith('run.json')), `opened ${c.opened.join(', ')}`);
   } finally { s.done(); }
 });

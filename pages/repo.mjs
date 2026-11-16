@@ -8,6 +8,8 @@ const ago = iso => {
   const s = (Date.now() - new Date(iso)) / 1000;
   return s < 90 ? 'just now' : s < 3600 ? `${Math.round(s / 60)} min ago` : s < 86400 ? `${Math.round(s / 3600)} h ago` : `${Math.round(s / 86400)} d ago`;
 };
+// how long ago the page's git picture was read: just now, 25 s ago, 3 min ago
+const readAgo = ms => (ms < 2000 ? 'just now' : ms < 90000 ? `${Math.round(ms / 1000)} s ago` : `${Math.round(ms / 60000)} min ago`);
 const n = (x, one, many) => `${x} ${x === 1 ? one : many}`;
 const state = h => (h.clean ? '<span class="pass">clean</span>'
   : `<span class="hq-dirty">${[h.changed && n(h.changed, 'changed', 'changed'), h.untracked && n(h.untracked, 'untracked', 'untracked'), h.conflicted && n(h.conflicted, 'conflict', 'conflicts')].filter(Boolean).join(', ')}</span>`);
@@ -31,7 +33,7 @@ export function repoCard(c) {
       <button type="button" class="btn btn-secondary hq-fetch" ${c.hasRemote ? '' : 'disabled'}>${FETCH_ICON} Fetch</button></div></section>`;
 }
 
-export function repoPage({ repo }, h) {
+export function repoPage({ repo }, h, { readAt = null, now = Date.now() } = {}) {
   const c = h.checkout;
   const wt = dataTable({ id: 'worktrees', columns: [
     { key: 'path', label: 'Folder', filter: 'text' }, { key: 'branch', label: 'Branch', filter: 'text', w: 'lg' }, { key: 'state', label: 'State', filter: 'chips', w: 'md' },
@@ -49,6 +51,7 @@ export function repoPage({ repo }, h) {
     rows: h.merged.map(b => ({ cells: { b: `<code>${esc(b)}</code>` } })), empty: `No local branches merged into ${h.base} besides main.` });
   const body = `<p class="hq-crumbs"><a href="/">Home</a> <span class="sep">/</span> Repo</p>
     <div class="hq-pagehead"><h1>Repo${info('What git says about this checkout and its worktrees. HQ only shows these; it never changes a branch, a stash or a worktree. Fetch is the one thing it does, and only when you press it.', 'About this page')}</h1></div>
+    ${readAt == null ? '' : `<p class="hint hq-read">Read ${esc(readAgo(now - readAt))} · <a href="/repo?fresh=1">Read again</a></p>`}
     <div class="hq-repo-top">${repoCard(c)}</div>
     <h2>Worktrees${info(`Every checkout of this repo on this machine. Ahead and behind are against ${h.base}, as of the last fetch.`, 'About worktrees')}</h2>${wt}
     <h2>Stashes</h2>${stashes}

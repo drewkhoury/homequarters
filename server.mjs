@@ -45,7 +45,7 @@ import { githubPage, githubPart } from './pages/github.mjs';
 import { setStash } from './lib/github.mjs';
 import { makeStash } from './lib/stash.mjs';
 import { reveal, forgetGit, gitInfo } from './lib/outside.mjs';
-import { checkoutHealth, repoHealth } from './lib/git.mjs';
+import { checkoutHealth, repoHealthKept, forgetRepoHealth } from './lib/git.mjs';
 import { repoCard, repoPage } from './pages/repo.mjs';
 import { backlogPage, backlogItemPage, backlogCard } from './pages/backlog.mjs';
 import { conversationsPage, conversationPage, closedInDemo } from './pages/conversations.mjs';
@@ -172,7 +172,11 @@ export function handler({ repo = REPO, m = loadManifest(repo).m, plugins = [], p
             : existsSync(join(repo, homeFile)) ? homePage(page, homeFile, url.searchParams, { home: true }) : homePage(page, '', url.searchParams, { home: true });
           return html ? send(res, 200, html) : notFound(res, 'No such file.');
         }
-        case 'repo': return rest ? notFound(res) : send(res, 200, repoPage(ctx, await repoHealth(repo)));
+        case 'repo': {
+          if (rest) return notFound(res);
+          const kept = await repoHealthKept(repo, { fresh: url.searchParams.has('fresh') });
+          return send(res, 200, repoPage(ctx, kept.health, { readAt: kept.readAt }));
+        }
         case 'backlog': {
           if (!rest) return send(res, 200, await backlogPage(ctx, url.searchParams));
           const html = restParts.length === 1 ? await backlogItemPage(ctx, restParts[0], url.searchParams) : null;
@@ -281,7 +285,7 @@ const runChecked = (cmd, args, opts) => new Promise(done => {
 async function fetchRoute(req, res, { repo, run = runChecked }) {
   if (!(await guardedJson(req, res, 'Fetch'))) return;
   const err = await run('git', ['fetch', '--prune'], { cwd: repo });
-  forgetGit();
+  forgetGit(); forgetRepoHealth();
   if (err) return json(res, 502, { message: `git fetch failed: ${(err.stderr || err.message || '').trim().split('\n').pop()}` });
   return json(res, 200, { message: 'Fetched.', at: new Date().toISOString() });
 }

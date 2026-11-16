@@ -5,7 +5,7 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { esc, layout } from '../lib/page.mjs';
 import { info } from '../lib/ui.mjs';
-import { runGit, repoHealth } from '../lib/git.mjs';
+import { runGit, repoHealth, repoHealthKept } from '../lib/git.mjs';
 import { catalogue } from '../lib/catalogue.mjs';
 import { allRuns, flakes } from '../lib/runs.mjs';
 import { conversationsIndex, indexDir } from '../lib/conversations.mjs';
@@ -65,7 +65,8 @@ export async function getSections(ctx, { git = runGit, now = Date.now() } = {}) 
   const files = { docs: [], plans: [], backlogItems: [], source: { files: [], skipped: {} } };
   let backlogSummary = '';
   await Promise.all([
-    build('repo', async () => repoSection(await repoHealth(ctx.repo, git), await git(['log', '-30', '--format=%h %ad %s', '--date=short'], ctx.repo))),
+    // the Repo page's kept picture when git is the real one; a test's own git reads its own
+    build('repo', async () => repoSection(git === runGit ? (await repoHealthKept(ctx.repo)).health : await repoHealth(ctx.repo, git), await git(['log', '-30', '--format=%h %ad %s', '--date=short'], ctx.repo))),
     build('docs', async () => docsSection(files.docs = await trackedDocs(ctx.repo, git, 'docs'))),
     build('plans', async () => docsSection(files.plans = await trackedDocs(ctx.repo, git, 'plans'), 'plans')),
     build('backlog', async () => { const b = await backlogSection(ctx); files.backlogItems = b.items; backlogSummary = b.summary; return b.full; }),

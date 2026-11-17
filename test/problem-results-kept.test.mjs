@@ -1,10 +1,11 @@
-// Proves: after a new run, the Problems page's test results are worked out for that run alone, and the CI runs whose
+// Proves: after a new run, the Problems page's test results and reds are worked out for that run alone, and the CI runs whose
 // folders did not change are the same runs as before, so what was worked out from them is kept too.
 // Why: each new run made the Problems page walk all of QuestKeep's 2.8 million test results again, about 1.5 s on the
 // server's one thread, and every page asked of HQ meanwhile waited.
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { testResults } from '../lib/problem-derive.mjs';
+import { observeReds } from '../lib/problem-observations.mjs';
 import { allRuns } from '../lib/runs.mjs';
 import { buildStore } from './run-fixtures.mjs';
 
@@ -32,6 +33,20 @@ test('the results keep their order by time across old and new runs', () => {
   testResults(old, { keyOf });
   const got = testResults([run(3, ['a quest is kept']), ...old], { keyOf });
   assert.deepEqual(got['a quest is kept'].map(r => r.run), ['run-1', 'run-3', 'run-5']);
+});
+
+// a run whose cases say when they are read, on a commit of its own
+const watched = (i, read, cases) => { const r = run(i, []); r.info.commit = `c${i}`; Object.defineProperty(r.tasks[0], 'cases', { get: () => (read.push(r.id), cases) }); return r; };
+
+test('after a new run, the reds walk only the new run and the runs on its commit', () => {
+  const read = [], pass = [{ name: 'a quest is kept', status: 'pass', seconds: 0.01 }];
+  const old = [watched(1, read, pass), watched(2, read, pass)];
+  observeReds(old);
+  read.length = 0;
+  const red = watched(3, read, [{ name: 'a quest is kept', status: 'fail', seconds: 0.01 }]);
+  const obs = observeReds([red, ...old]);
+  assert.deepEqual([...new Set(read)], ['run-3'], 'the old runs, on other commits, are not walked');
+  assert.deepEqual(obs.map(o => [o.run, o.sig, o.class]), [['run-3', 'a quest is kept', 'never-rerun']]);
 });
 
 test('a new laptop run leaves the CI runs as they were', () => {

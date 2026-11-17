@@ -4,6 +4,20 @@ What each version of HomeQuarters changes for a project that installs it. The ma
 rule (docs/standards/manifest.md): a key, once published, is never renamed or removed, and a newer manifest is read with
 a warning.
 
+## 0.3.5
+
+The Problems page's read after a response no longer holds HQ for seconds, so pages asked while it reads are answered.
+No manifest change. The first start on 0.3.5 reads the run store and the causes index cold once, since the code that
+reads them changed. Times are from QuestKeep's data on the same laptop.
+
+- After a new run, the register works out test results and reds for that run alone, where it walked all 2.8 million
+  results again. A CI run whose folders did not change is kept as the same run, so what was worked out from it stands.
+- The red runs' folders are stamped with non-blocking file calls before the register reads them, in place of 44,000
+  stat calls in a row.
+- The lock log, the problem events and each CI folder's run.json are parsed once while they stay unchanged.
+- The longest stretch a re-read holds the server fell from 330-400 ms to 95-195 ms. On 0.3.4 a re-read after a new
+  run took about 1.5 s of it, in one piece.
+
 ## 0.3.4
 
 Delivery draws what hq.json says now, a restart after an upgrade starts warm, and the slowest first reads are cut.

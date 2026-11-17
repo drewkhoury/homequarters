@@ -17,7 +17,9 @@ import { dayChart, dotPlot, hbars, numbers, duration } from '../lib/charts.mjs';
 import { KIND, STAGE, DISPOSITIONS, GUARD_TYPES, EFFECTS, FACTOR, CONFIDENCE } from '../lib/problems.mjs';
 import { allRuns } from '../lib/runs.mjs';
 import { catalogue } from '../lib/catalogue.mjs';
-import { readRegister, resultKeysOf } from '../lib/problem-register.mjs';
+import { readRegister, resultKeysOf, causeFolders } from '../lib/problem-register.mjs';
+import { folderStamps } from '../lib/facts.mjs';
+import { jsonLines } from '../lib/json-lines.mjs';
 import { testKeyer } from '../lib/problem-observations.mjs';
 import { testResults } from '../lib/problem-derive.mjs';
 import { privacyContext } from '../lib/problem-privacy.mjs';
@@ -28,30 +30,35 @@ const DAY = 86400000, TTL = 60000;
 
 // ---- The register: a page answers from the snapshot it has, and the next is read after the response ----
 
-const jsonLines = file => { try { return readFileSync(file, 'utf8').split('\n').filter(Boolean).map(l => { try { return JSON.parse(l); } catch { return null; } }).filter(Boolean); } catch { return []; } };
 // The first read, a read asked for (?fresh=1) and a read for another checkout happen at once. Otherwise a new runs list
 // from the run store or a snapshot past TTL queues one read with later(), which runs after the response is sent, and
-// the page answers from the snapshot it has.
+// the page answers from the snapshot it has. That read waits on the disk without holding the thread, so pages asked
+// while it reads are answered too.
 let snap = null, queued = null;
 export function snapshot({ repo, cache }, { fresh = false, now = Date.now(), later = setImmediate } = {}) {
   const key = `${repo}\n${cache}`;
   if (fresh || !snap || snap.key !== key) return (snap = readSnapshot({ repo, cache }, key, now));
   if (queued !== key && (now - snap.readAt >= TTL || allRuns(cache, { now }) !== snap.runs)) {
     queued = key;
-    later(() => {
-      // a read that fails keeps the snapshot the page has, and the next page queues another
-      try { const next = readSnapshot({ repo, cache }, key, Date.now()); if (snap && snap.key === key) snap = next; }
-      catch (e) { console.error(`hq: the problem register could not be read again: ${e && e.message}`); }
+    later(async () => {
+      // a read that fails keeps the snapshot the page has, and the next page queues another. The red runs' folders are
+      // stamped first without holding the thread (thousands of logs), so pages asked meanwhile are answered.
+      try {
+        const at = Date.now(), files = catalogue(repo), runs = allRuns(cache, { now: at });
+        const stamps = await folderStamps(causeFolders(runs, { cache, files }));
+        const next = readSnapshot({ repo, cache }, key, at, stamps);
+        if (snap && snap.key === key) snap = next;
+      } catch (e) { console.error(`hq: the problem register could not be read again: ${e && e.message}`); }
       finally { queued = null; }
     });
   }
   return snap;
 }
-function readSnapshot({ repo, cache }, key, now) {
+function readSnapshot({ repo, cache }, key, now, stamps = null) {
   const runs = allRuns(cache, { now }), lock = jsonLines(join(cache, 'lock', 'log.jsonl')), files = catalogue(repo);
   // the Tests tab reads the browser tests' results, from the records the register makes
   const browser = files.filter(f => f.set === 'gate' || f.set === 'after').map(f => f.name);
-  const reg = readRegister({ repo, cache, runs, lock, files, now, resultKeys: browser });
+  const reg = readRegister({ repo, cache, runs, lock, files, now, resultKeys: browser, stamps });
   const diffs = new Map();
   const fileSame = (file, a, b) => {
     const k = `${file} ${a} ${b}`;
